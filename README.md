@@ -9,6 +9,7 @@ The overall idea is to kill all the Combine without being seen by them.
 
 Main features:
 
+
 Currently Manhacks, Rollermines, Metropolices, Ceiling Cameras/Turrets, Floor Turrets, Soldiers, Snipers, Elite Soldiers, Shotgunners, Combine Helicopters and Combine Gunships are implemented and working, but more NPCs will be added in the future.
 
 Each map features multiple enemy squads that will spread on the map and patrol almost every corner, including aerial enemis if the map allows it. Each map features at least five squads, every one of them with a special setup. Also, lots of items and static NPCs are present, and always spawn on randomized places.
@@ -25,4 +26,6 @@ Ability to kill an enemy without alerting others.
 
 Singleplayer and Multiplayer modes are both supported, which means you aren't dependant of other people when you want to play it. The gamemode will work well with one or a bunch of people, but beware, it isn't developed with lot's of players in mind. Try to keep the treshold at 5 players, not much more, or the game would start being too easy.
 
-More features I don't remember now
+Features like special room guarded by cameras, which you will need to disable finding their Control Panels. You can try to access the room gun-in-hand, too (see: grenades).
+
+More features I don't remember now.
