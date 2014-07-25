@@ -1,0 +1,9 @@
+"TheHunt"
+{
+	"base"		"base"
+	"title"		"The Hunt"
+	"maps"		""
+	"menusystem"	"1"
+
+
+}
