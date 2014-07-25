@@ -26,6 +26,6 @@ Ability to kill an enemy without alerting others.
 
 Singleplayer and Multiplayer modes are both supported, which means you aren't dependant of other people when you want to play it. The gamemode will work well with one or a bunch of people, but beware, it isn't developed with lot's of players in mind. Try to keep the treshold at 5 players, not much more, or the game would start being too easy.
 
-Features like special room guarded by cameras, which you will need to disable finding their Control Panels. You can try to access the room gun-in-hand, too (see: grenades).
+Optinal challenges, like special rooms full of weapons and other items, but guarded by ceiling turret/cameras, which you will need to disable finding their Control Panels. You can try to access the room gun-in-hand, too (see: grenades).
 
 More features I don't remember now.
