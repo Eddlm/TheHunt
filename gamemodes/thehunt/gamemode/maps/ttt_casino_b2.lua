@@ -109,17 +109,10 @@ SpawnCeilingTurretStrong(Vector(2540.163818, 1012.583130, -377.673248),Angle(0,9
 SpawnCeilingTurretStrong(Vector(2482.168945, 1408.941895, -359.673248),Angle(0.000, 307.383, 0.000))
 SpawnCeilingTurretStrong(Vector(2606.615479, 1418.773315, -359.673248),Angle(0.000, 229.082, 0.000))
 
-
-SpawnStaticProp(Vector(2199.015625, 573.703186, -537.154663),Angle(0,-90,0),"models/props_c17/furnituredrawer001a.mdl")
-SpawnStaticProp(Vector(235.944275, 1073.582275, -353.404755),Angle(0,-180,0),"models/props_c17/furnitureshelf002a.mdl")
-SpawnStaticProp(Vector(958.268982, 1587.688721, -440.704742),Angle(0,-90,0),"models/props_c17/furnitureshelf002a.mdl")
-SpawnStaticProp(Vector(1879.860229, -89.707169, -249.764725),Angle(0,-180,0),"models/props_interiors/furniture_desk01a.mdl")
-SpawnStaticProp(Vector(1157.729492, 1575.480713, -249.207413),Angle(0,-180,0),"models/props_c17/furnituredrawer001a.mdl")
-SpawnStaticProp(Vector(1247.508301, 1300.867798, -249.224884),Angle(0,-90,0),"models/props_c17/furnituredrawer001a.mdl")
-SpawnStaticProp(Vector(1949.937622, 735.193970, -249.079269),Angle(0,-180,0),"models/props_c17/furnituredrawer001a.mdl")
-
-SpawnDynamicAmmoCrate(Vector(2491.832031, 1390.150757, -495.610779), Angle(0.000, 0.000, 0.000))
-SpawnDynamicAmmoCrate(Vector(2588.388184, 1392.813477 -499.610779), Angle(0.000, 0.000, 0.000))
+SpawnDynamicAmmoCrate(Vector(2510.223633, 1399.513916, -557.142212), Angle(0.000, -90.000, 0.000))
+SpawnDynamicAmmoCrate(Vector(2470.184570, 1400.305908, -557.170593), Angle(0.000, -90.000, 0.000))
+SpawnSuitCharger(Vector(2632.964355, 1306.589600, -507.415039), Angle(0.000, 90.000, 0.000) )
+SpawnAmmoCrate(Vector(2589.500977, 1399.023926, -541.156372),Angle(0,-90,0),8)
 
 if math.random(1,2) == 1 then
 SpawnItem("button_turrets", Vector(-238.699768, 874.053345, -359.754150), Angle(0,180,0))
@@ -137,6 +130,17 @@ elseif math.random(1,2) == 1 then
 SpawnItem("button_turrets", Vector(502.875458, 809.920593, -202.281784), Angle(0,90,0))
 SpawnTurret(Vector(467.057709, 854.514771, -244.892578),Angle(0.321, 45.270, 0.732))
 end
+
+
+SpawnStaticProp(Vector(2199.015625, 573.703186, -537.154663),Angle(0,-90,0),"models/props_c17/furnituredrawer001a.mdl")
+SpawnStaticProp(Vector(235.944275, 1073.582275, -353.404755),Angle(0,-180,0),"models/props_c17/furnitureshelf002a.mdl")
+SpawnStaticProp(Vector(958.268982, 1587.688721, -440.704742),Angle(0,-90,0),"models/props_c17/furnitureshelf002a.mdl")
+SpawnStaticProp(Vector(1879.860229, -89.707169, -249.764725),Angle(0,-180,0),"models/props_interiors/furniture_desk01a.mdl")
+SpawnStaticProp(Vector(1157.729492, 1575.480713, -249.207413),Angle(0,-180,0),"models/props_c17/furnituredrawer001a.mdl")
+SpawnStaticProp(Vector(1247.508301, 1300.867798, -249.224884),Angle(0,-90,0),"models/props_c17/furnituredrawer001a.mdl")
+SpawnStaticProp(Vector(1949.937622, 735.193970, -249.079269),Angle(0,-180,0),"models/props_c17/furnituredrawer001a.mdl")
+
+
 
 
 

@@ -125,9 +125,9 @@ SpawnItem("npc_sniper", Vector(1.436721, 2327.846191, 814.919250), Angle(0.000, 
 SpawnStaticProp(Vector(-36.970547, 2432.588867, 762.860474),Angle(0.000, 0.000, 0.000),"models/props_combine/combinetower001.mdl")
 end
 
-SpawnRPGCrate(Vector(-306.447327, -2283.708496, 1176.364502),Angle(0,90,0))
-SpawnRPGCrate(Vector(-95.464302, 1928.546753, 496.437103),Angle(0,0,0))
-SpawnFragCrate(Vector(-240.591293, -1640.027466, -15.631243),Angle(0,0,0))
+SpawnAmmoCrate(Vector(-306.447327, -2283.708496, 1176.364502),Angle(0,90,0),3)
+SpawnAmmoCrate(Vector(-95.464302, 1928.546753, 496.437103),Angle(0,0,0),3)
+SpawnAmmoCrate(Vector(-240.591293, -1640.027466, -15.631243),Angle(0,0,0),5)
 
 
 SpawnItem("item_healthcharger", Vector(199.316650, -2221.875488, 1046.708740), Angle(0.000, 0.000, 0.000) )
@@ -138,8 +138,6 @@ SpawnItem("item_healthcharger", Vector(-455.397827, -2112.535156, 439.275482), A
 SpawnItem("item_rpg_round", Vector(-20.392382, -2025.527222, 386.241119), Angle(-1.000, -63.503, 52.809) )
 SpawnItem("item_rpg_round", Vector(-28.810713, -1968.042603, 386.233917), Angle(0.592, 170.257, -71.574) )
 
-
-SpawnDynamicAmmoCrate(Vector(125.528694, 1138.000977, 448.031250), Angle(0.000, 0.000, 0.000))
 
 
 if math.random(1,2) == 1 then

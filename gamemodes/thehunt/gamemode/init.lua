@@ -838,12 +838,12 @@ NPC:SetKeyValue("AmmoType", 5)
 NPC:Spawn()
 end
 
-function SpawnRPGCrate( pos, ang )
+function SpawnAmmoCrate( pos, ang, ammotype )
 NPC = ents.Create( "item_ammo_crate" )
 NPC:SetPos( pos )
 NPC:SetName("RPGAMMO")
 NPC:SetAngles( ang ) 
-NPC:SetKeyValue("AmmoType", 3)
+NPC:SetKeyValue("AmmoType", ammotype)
 NPC:Spawn()
 end
 

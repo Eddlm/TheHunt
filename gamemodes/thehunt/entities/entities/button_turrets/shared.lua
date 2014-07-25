@@ -7,7 +7,6 @@ ENT.Contact	= "Don't"
 ENT.Purpose	= ""
 ENT.Instructions	= ""
 
-
 function ENT:Initialize()
 if SERVER then
 self:SetModel( "models/props_combine/combine_intmonitor003.mdl" )
@@ -15,7 +14,7 @@ self:SetSolid( SOLID_VPHYSICS )
 self:SetMoveType(MOVETYPE_NONE)
 self:SetUseType(SIMPLE_USE)
 else
-self.PosePosition = 0
+--self.PosePosition = 0
 end
 end
 
@@ -36,17 +35,17 @@ end
 end
 end
 
+/*
 function ENT:Think()
 if SERVER then
---print(self.On)
+print(self.On)
 else
-//self:UpdateLever()
+self:UpdateLever()
 end
 end
-
 if CLIENT then
 end
-
+*/
 function ENT:Draw()
 self:DrawModel()
 end
