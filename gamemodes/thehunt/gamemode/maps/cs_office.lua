@@ -37,6 +37,8 @@ Vector(2131.773926, -37.425266, -108.965073),
 Vector(-1438.419922, -1458.935913, -279.867950),
 Vector(-693.724304, -1146.022461, -191.640594),
 Vector(-56.639225, -724.146973, -176.947861),
+Vector(-384.318817, -32.022541, -101.968750),
+Vector(-667.256470, 148.832520, -101.968750),
 }
 
 combinespawnzones = {
@@ -82,10 +84,49 @@ print(v:GetClass())
 v:Remove()
 end
 
-SpawnItem("info_player_start", Vector(-840.900513, 341.436676, -303.968750)+Vector(0,0,-45), Angle(0,-30,0) )
-SpawnItem("info_player_start", Vector(-1679.968750, -582.632629, -175.093262)+Vector(0,0,-60), Angle(0,40,0) )
-SpawnItem("info_player_start", Vector(-873.838318, -1199.497314, -175.968750)+Vector(0,0,-45), Angle(0,50,0) )
+SpawnStaticProp(Vector(-1313.221558, -1243.587769, -310.317780),Angle(0,0,0),"models/props_junk/trashdumpster01a.mdl")
+SpawnStaticProp(Vector(-1313.120972, -1328.330322, -310.333618),Angle(0,0,0),"models/props_junk/trashdumpster01a.mdl")
 
 
+
+SpawnItem("info_player_start", Vector(-840.900513, 341.436676, -303.968750)+Vector(0,0,-45), Angle(0,-30,0))
+SpawnItem("info_player_start", Vector(-1679.968750, -582.632629, -175.093262)+Vector(0,0,-60), Angle(0,40,0))
+SpawnItem("info_player_start", Vector(-873.838318, -1199.497314, -175.968750)+Vector(0,0,-45), Angle(0,50,0))
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(-491.003052, -1442.955566, -239.262634),Angle(0.397, 167.418, 0.522))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(-86.159615, -1113.844360, -223.263809),Angle(0.257, 92.666, 0.642))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(160.571671, 258.939148, -159.335083),Angle(0.246, -135.069, 0.669))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(46.546043, 245.570648, -159.359268),Angle(0.245, -44.737, 0.494))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(533.487549, 399.575165, -159.320435),Angle(0.267, 68.587, 0.236))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(1520.726563, 712.739624, -159.232742),Angle(0.251, -117.771, 0.229))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(1438.213135, -100.056686, -159.260376),Angle(0.388, -139.589, 0.437))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(1596.922363, -66.794807, -159.254135),Angle(0.365, -55.106, 0.123))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(-476.431427, 743.850830, -159.272491),Angle(0.395, -89.819, 0.520))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(-1749.798584, -1412.027466, -327.260681),Angle(0.127, -0.001, 0.366))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(376.728180, -867.903198, -223.239578),Angle(0.320, -52.959, -0.013))
+end
+if math.random(1,2) == 1 then
+SpawnTurret(Vector(2311.805420, 87.288605, -159.254349),Angle(0.238, -161.699, 0.572))
+end
 end
 

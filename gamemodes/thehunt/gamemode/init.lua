@@ -356,7 +356,6 @@ end )
 function OverwatchAmbientOne()
 		table.Random(player.GetAll()):EmitSound(table.Random(OverwatchAmbientSoundsOne), 100, 100)
 end
---timer.Create( "OverwatchAmbientOne", math.random(50,200), 0, OverwatchAmbientOne ) 
 
 
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
@@ -421,22 +420,23 @@ function waveend()
 			PrintMessage(HUD_PRINTCENTER, "Squad Nº"..Wave.." defeated!")
 			WAVESPAWN = 1
 		end
+		timer.Simple(TIME_BETWEEN_WAVES, function()
 		timer.Create( "TimerRunSpawn", 30, 1, waveswalk)		
 		if Wave == 1 then timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) end
 		if Wave == 2 then timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) end
 		if Wave == 3 then timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 	end
-		if Wave == 4 then timer.Create( "fifthwave", 2, CombineFifthWave, fifthwave ) 
-		end
+		if Wave == 4 then timer.Create( "fifthwave", 2, CombineFifthWave, fifthwave )  end
+		end)
 		if Wave == 5 then 
-			if DEFAULTGAME != 0 then
+			if DEFAULTGAME == 1 then
 				if AUTOREPEAT == 1 then
-				timer.Simple(20, autofirstwave)
+				timer.Simple(5, autofirstwave)
 				PrintMessage(HUD_PRINTCENTER, "Combine Defeated! Restarting Squads!")
 				else
 				PrintMessage(HUD_PRINTCENTER, "Combine Defeated!")
 				end
 				else
-				print("DEFAULTGAME isnt 0")
+				print("DEFAULTGAME isnt 1")
 			end
 		end
 		CanCheck = 0
@@ -916,7 +916,7 @@ for k, v in pairs(ents.FindByClass("npc_combine_s")) do
 			else
 			v:SetSchedule(SCHED_FORCED_GO)
 			end
-		--print(""..v:GetName().." changed patrol area")
+		print(""..v:GetName().." changed patrol area")
 		end
 	end
 end
@@ -1043,7 +1043,6 @@ MapSetup()
 for k, v in pairs(ents.FindByClass("prop_physics")) do
 if v:GetModel() == "models/props_c17/furnituredrawer001a.mdl" or v:GetModel() == "models/props_c17/furnitureshelf002a.mdl" or v:GetModel() == "models/props_wasteland/kitchen_shelf001a.mdl" or v:GetModel() == "models/props_interiors/furniture_desk01a.mdl" or v:GetModel() == "models/warby/wan_prop_caffe_table_01.mdl" or v:GetModel() == "models/props_junk/trashdumpster01a.mdl" or v:GetModel() == "models/props_c17/bench01a.mdl" then 
 
-
 table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,30))
 print("found one")
 end
@@ -1074,12 +1073,12 @@ end
 */
 if npc:GetEnemy() then
 if npc:GetEnemy():IsPlayer() then
---	npc:SetKeyValue("squadname", "CombineSquad")
+--npc:SetKeyValue("squadname", "CombineSquad")
 
 if npc:GetEnemy().spotted != 1 then
 npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
-net.Start( "Spotted" )
-net.Send(player.GetByID(1))
+net.Start("Spotted")
+net.Send(npc:GetEnemy())
 npc:GetEnemy().spotted = 1
 end
 	if npc:IsCurrentSchedule(SCHED_FORCED_GO) || npc:IsCurrentSchedule(SCHED_FORCED_GO_RUN)	then npc:ClearSchedule() end
@@ -1230,6 +1229,21 @@ end
 
 -- GM HOOKS v
 function GM:OnNPCKilled(victim, killer, weapon)
+/*
+ent = ents.Create( "env_explosion" )
+ent:SetPos(victim:GetPos())
+--ent:SetKeyValue( "spawnflags", 32 )
+ent:Spawn()
+--ent:EmitSound( "siege/big_explosion.wav", 500, 500 )
+ent:SetKeyValue( "iMagnitude", "100" )
+print("assploded")
+ent:Fire("Explode",0,0)
+*/
+
+if victim:GetClass() == "npc_sniper" then
+PrintMessage(HUD_PRINTTALK, ""..killer:GetName().." got that Sniper out of the way ")
+end
+
 
 if victim:GetClass() == "npc_turret_floor" then
 nearbycombinecome(victim)
@@ -1352,13 +1366,7 @@ end
 
 function GM:EntityTakeDamage(damaged,damage)
 
-if damaged:GetClass() == "npc_turret_ceiling" then
-if damage:IsDamageType(64) then
-damage:ScaleDamage(1)
-else
-damage:ScaleDamage(0)
-end
-end
+
 if damaged:IsNPC() then
 	if damaged:GetClass() != "npc_helicopter" && damaged:GetClass() != "npc_combinegunship" then
 		if damaged:GetEnemy() == nil then
@@ -1437,15 +1445,50 @@ end
 
 end
 end
+
+
+
+if damaged:GetClass() == "npc_sniper" then
+print(damage:GetInflictor():GetClass())
+if damage:GetInflictor():GetClass() == "crossbow_bolt" then
+damaged:SetHealth(0)
+end
 end
 
-function GM:KeyPress(player,key)
-if key == IN_ATTACK then
-if player:Alive() then
-if player:GetActiveWeapon():GetClass() != "weapon_crowbar" && player:GetActiveWeapon():GetClass() != "weapon_crossbow" && player:GetActiveWeapon():GetClass() != "weapon_slam" && player:GetActiveWeapon():GetClass() != "weapon_physcannon" && player:GetActiveWeapon():GetClass() != "weapon_frag" then 
-if player:Alive() then
-allthecombinecome(player,MAXGUNSHOTINVESTIGATE)
+if damaged:GetClass() == "npc_turret_ceiling" then
+if damage:IsDamageType(64) then
+damage:ScaleDamage(1)
+else
+damage:ScaleDamage(0)
 end
+end
+
+
+end
+function GetAmmoForCurrentWeapon( ply )
+	if (  !IsValid( ply ) ) then return -1 end
+
+	local wep = ply:GetActiveWeapon()
+	if (  !IsValid( wep ) ) then return -1 end
+ 
+	print(ply:GetAmmoCount(wep:GetPrimaryAmmoType()))
+end
+function GM:KeyPress(player,key)
+if player:Alive() then
+
+if key == IN_ATTACK then
+if player:GetActiveWeapon():GetClass() == "weapon_frag" then
+if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) < 2 then
+timer.Simple(1, function()
+
+player:StripWeapon("weapon_frag")
+end)
+end
+end
+if player:GetActiveWeapon():GetClass() != "weapon_crowbar" && player:GetActiveWeapon():GetClass() != "weapon_crossbow" && player:GetActiveWeapon():GetClass() != "weapon_slam" && player:GetActiveWeapon():GetClass() != "weapon_physcannon" && player:GetActiveWeapon():GetClass() != "weapon_frag" then 
+
+allthecombinecome(player,MAXGUNSHOTINVESTIGATE)
+
 end
 end
 end

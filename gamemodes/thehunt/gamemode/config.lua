@@ -1,11 +1,13 @@
-/*----------------The Hunt Configuration File-------------------
-Edit these values to customize the gameplay experience. Note that the default configuration it's intended for a well balanced gameplay.
+/*-----------------------The Hunt Configuration File--------------------------
+Edit these values to customize the gameplay experience.
+Note that the default configuration it's intended for a well balanced gameplay.
 
 Remember that certain settings (like the AUTOSTART feature) only allow two values, 1 for enabled, 0 for disabled.
---------------------------------------------------------------*/
+----------------------------------------------------------------------------*/
 
 -- Editable in real time: you can change the variable values running lua_run VARIABLE = VALUE on the Console (for example, lua_run MAXHELP = 2). The change will be only applied to the current map. If you wish to change the variable for the next maps, change it on this config file.
 
+TIME_BETWEEN_WAVES = 20 -- When a wave is defeated, the game will wait this time before it starts spawning more combine. Default: 20
 MINENEMIES = 3 -- If the combine number is below this, the wave is defeated.
 MAXHELP = 4 -- How many combine are able to help the one who spotted you? Default: 4
 PLAYERSCALEDAMAGE = 3 -- Anytime a player takes damage, it will be multiplied by this value. You can use decimal values, like 0.2. Default: 3

@@ -7,15 +7,7 @@ CombineFourthWave = 15
 CombineFifthWave = 20
 
 ITEMPLACES ={
-
-/*
-Vector(-998.563843, -502.401276, -303.968750),
 Vector(318.459747, -686.967041, -7.707550),
-Vector(1074.791870, 2085.643311, -159.968750),
-Vector(3532.413086, -800.450073, 576.031250),
-Vector(2904.375977, -1405.136597, 64.031250),
-Vector(2276.960449, 99.244652, -108.066513)
-*/
 }
 
 
@@ -76,7 +68,6 @@ SpawnMine( Vector(647.945862, -196.434509, 384.364349) )
 SpawnMine( Vector(543.016296, -285.596008, 384.361145) )
 SpawnMine( Vector(435.173401, -941.878540, 128.376968) )
 end
-SpawnCeilingTurretStrong(Vector(987.270935, 2120.543213, -96.715111), Angle(-0.269, -61.089, 0.129))
 
 
 SpawnStaticProp(Vector(3619.986328, -778.575745, 537.645752),Angle(0,-90,0),"models/props_junk/trashdumpster01a.mdl")
@@ -88,11 +79,8 @@ SpawnStaticProp(Vector(2130.858398, -1317.641846, -491.198303),Angle(0,90,0),"mo
 SpawnStaticProp(Vector(2274.209961, -1317.731934, -491.217682),Angle(0,90,0),"models/props_c17/bench01a.mdl")
 
 
-
 SpawnTurret(Vector(2399.942627, -1451.707397, -511.248260),Angle(0,110,0))
-
 SpawnTurret(Vector(1066.489502, -1106.694824, 624.773071),Angle(0,150,0))
-
 SpawnTurret(Vector(1402.557861, 73.241920, -191.248886),Angle(0,220,0))
 
 SpawnItem ("weapon_357", Vector(-884.515442, -28.447969, -91.765511), Angle(7.757, 27.987 ,-77.472))
@@ -160,8 +148,11 @@ SpawnStaticProp(Vector(-290.605225, -1111.907349, 191.438995),Angle(0.000, 0.000
 if math.random(1,2) == 1 then
 SpawnItem("npc_sniper", Vector(264.701355, -742.659790, 353.738403), Angle(0.000, 90.000, 0.000) )
 SpawnStaticProp(Vector(295.017578, -861.739380, 299.215607),Angle(0.000, 180.000, 0.000),"models/props_combine/combinetower001.mdl")
+else
+SpawnItem("npc_sniper", Vector(1191.594727, 836.494019, -56.115135), Angle(0.000, 0.000, 0.000) )
+SpawnStaticProp(Vector(1028.177734, 838.166443, -37.060078),Angle(0,0,0),"models/props_combine/combine_booth_short01a.mdl")
+SpawnStaticProp(Vector(1071.785278, 804.460815, -110.469765),Angle(0,90,0),"models/props_combine/combinetower001.mdl")
 end
-
 
 for k, v in pairs(ents.FindByClass("info_player_start")) do
 print(v:GetClass())
