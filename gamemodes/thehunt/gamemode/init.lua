@@ -27,7 +27,9 @@ end
 if file.Exists( "gamemodes/thehunt/gamemode/maps/"..game.GetMap()..".lua", "GAME" ) then
 include("/maps/"..game.GetMap()..".lua")
 win = 1
+print("map found")
 else
+print("map not found")
 win = 0
 include("/maps/nomap.lua")
 end
@@ -46,9 +48,6 @@ CombineAssisting = 0
 ManuallySpawnedEntity = 0
 HeliAangered = 0
 
-CURRENTTURRETS=0
-
-MAXTURRETS=20
 -- VARIABLES ^
 
 -- UTILITY COMMANDS v
@@ -139,14 +138,15 @@ print("MEDIUMWEAPONS: ")
 PrintTable(MEDIUMWEAPONS)
 end)
 concommand.Add( "helpme", function()
-print("No")
+print("Commands")
+print("seesettings: See the current settings. You can change them (for this map only) by typing lua_run VARIABLE=VALUE, like lua_run RPGMAX=25")
+print("This section is in development right now.")
+
 end )
 concommand.Add( "hidezones", function()
 hidezones()
 print("All sprites removed.")
 end)
-
-
 
 concommand.Add( "assplode", function(ply)
 if ply:IsAdmin() then
@@ -880,20 +880,6 @@ if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO
 		end
 end
 end
-/*
-if WAVESPAWN == 0 then
-local turrets=0
-for k, v in pairs(ents.FindByClass("npc_combine_s")) do 
-if v then
-if turrets<1 && CURRENTTURRETS < MAXTURRETS then
-SpawnTurret(v:GetPos()+Vector(0,0,3)-v:GetForward()*70, v:GetAngles())
-turrets=turrets+1
-CURRENTTURRETS=CURRENTTURRETS+1
-end
-end
-end
-end
-*/
 end
 
 function wander()

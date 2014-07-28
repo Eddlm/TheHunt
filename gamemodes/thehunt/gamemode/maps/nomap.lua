@@ -1,37 +1,28 @@
 -- PRE-PLAY THINGS v
-playermodels = {
-"models/player/group01/female_01.mdl",
-"models/player/group01/female_02.mdl",
-"models/player/group01/female_03.mdl",
-"models/player/group01/female_04.mdl",
-"models/player/group01/female_05.mdl",
-"models/player/group01/female_06.mdl",
-"models/player/group01/male_01.mdl",
-"models/player/group01/male_02.mdl",
-"models/player/group01/male_03.mdl",
-"models/player/group01/male_04.mdl",
-"models/player/group01/male_05.mdl",
-"models/player/group01/male_06.mdl",
-"models/player/group01/male_07.mdl",
-"models/player/group01/male_08.mdl",
-"models/player/group01/male_09.mdl",
-"models/player/odessa.mdl"}
 
 
+ITEMPLACES ={
+Vector(0,0,0)
+}
+
+zonescovered ={
+Vector(0,0,0)
+}
+combinespawnzones = {
+Vector(0,0,0)
+}
 -- PRE-PLAY THINGS ^
 
 -- MAP INITIAL SETUP v
 
 
 function FirstSpawn()
+PrintMessage(HUD_PRINTTALK, "Sorry! "..game.GetMap().." it's not compatible with The Hunt yet.")
+PrintMessage(HUD_PRINTTALK, " Go to Facepunch>Garrysmod>Gamemode&Addon releases>TheHunt for more information.")
+
 end
 
-function GM:InitPostEntity()
-
-timer.Create( "makenpcwander", math.random(6,15), 0, wander )
-timer.Create( "CombineIdleSpeech", math.random(2,5), 0, CombineIdleSpeech ) 
-timer.Create( "CicloUnSegundo", 1, 0, CicloUnSegundo ) 
-timer.Create( "OverwatchAmbientOne", math.random(30,200), 0, OverwatchAmbientOne ) 
+function MapSetup()
 
 end
 -- MAP INITIAL SETUP ^
