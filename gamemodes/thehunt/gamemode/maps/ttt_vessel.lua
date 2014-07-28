@@ -72,9 +72,6 @@ HeliA:Fire("gunoff","",0)
 
 if HeliA:Health() != 1500 then print("WARNING: This Helicopter hasn't the adequeate health.") end
 
---SpawnTurret(Vector(-202.601089, -1152.92810, -31.238178),Angle(0,-25,0))
---SpawnTurret(Vector(-137.459900, -1649.471436, -31.230539),Angle(0,11,0))
-
 if math.random(1,2) == 1 then
 SpawnTurret(Vector(222.714203, -2269.970947, 992.753479),Angle(0.261, 58.264, 0.100))
 end
@@ -130,13 +127,14 @@ SpawnAmmoCrate(Vector(-95.464302, 1928.546753, 496.437103),Angle(0,0,0),3)
 SpawnAmmoCrate(Vector(-240.591293, -1640.027466, -15.631243),Angle(0,0,0),5)
 
 
-SpawnItem("item_healthcharger", Vector(199.316650, -2221.875488, 1046.708740), Angle(0.000, 0.000, 0.000) )
+SpawnItem("item_healthcharger", Vector(199.031250, -2172.320068, 1046.275391), Angle(0.000, 0.000, 0.000) )
 SpawnItem("item_healthcharger", Vector(136.031250, -2285.958252, 662.275452), Angle(0.000, 0.000, 0.000) )
 SpawnItem("item_healthcharger", Vector(541.742615, -2351.913574, 438.275482), Angle(0.000, 0.000, 0.000) )
 SpawnItem("item_healthcharger", Vector(-455.397827, -2112.535156, 439.275482), Angle(0.000, 90.000, 0.000) )
 
 SpawnItem("item_rpg_round", Vector(-20.392382, -2025.527222, 386.241119), Angle(-1.000, -63.503, 52.809) )
 SpawnItem("item_rpg_round", Vector(-28.810713, -1968.042603, 386.233917), Angle(0.592, 170.257, -71.574) )
+
 
 
 
@@ -223,10 +221,6 @@ playerspawnpoint:SetAngles(Angle(0,-0,0))
 playerspawnpoint = ents.Create("info_player_start");
 playerspawnpoint:SetPos(Vector(-450.057098, -1984.592163, 358.031250))
 playerspawnpoint:SetAngles(Angle(0,-90,0))
-
-playerspawnpoint = ents.Create("info_player_start");
-playerspawnpoint:SetPos(Vector(-152.732101, -1518.024902, 42.221054))
-playerspawnpoint:SetAngles(Angle(0,0,0))
 
 playerspawnpoint = ents.Create("info_player_start");
 playerspawnpoint:SetPos(Vector(-488.252899, -719.962524, 668.142029))

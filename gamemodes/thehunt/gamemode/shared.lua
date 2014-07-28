@@ -161,11 +161,11 @@ timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 print("")
 end
 
-
+/*
 MEDIUMWEAPONS = {
 "weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1"
 }
-
+*/
 CRATEITEMS = {
 "weapon_shotgun", "weapon_357", "weapon_frag", "weapon_slam", "item_healthkit", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black","npc_rollermine","item_dynamic_resupply"
 }

@@ -3,20 +3,11 @@ AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "config.lua" )
 include( "shared.lua" )
 include( "config.lua" )
-	
-
-
 util.AddNetworkString( "Spotted" )
 util.AddNetworkString( "Hidden" )
 
-/*   CHULETA
-lua_run for k, model in pairs(ents.GetAll()) do if model:GetModel() == "models/mechanics/wheels/wheel_extruded_48.mdl" then print(model:GetPos()) end end
 
-] r_drawviewmodel 1
-] cl_drawhud 1
-
-
-
+/*               notes
 NPC:SetKeyValue( "model", "models/elite_synth/elite_synth.mdl" )
 NPC:SetSkin(1)
 Get info from an entity typing this on the console while facing at it
@@ -24,16 +15,14 @@ lua_run print(player.GetByID(1):GetEyeTrace().Entity:GetAngles()) print(player.G
 */
 
 function GM:Initialize()
-
 if AUTOSTART == 1 then
 timer.Simple(10, autofirstwave)
 end
---RunConsoleCommand( "sv_cheats", "1") 
 RunConsoleCommand( "sk_helicopter_health", "1500") 
 RunConsoleCommand( "air_density", "0")
---RunConsoleCommand( "sv_cheats", "0") 
 NODES = 0
 end
+
 -- WHAT-MAP-ARE-THEY-PLAYING CHECK v
 if file.Exists( "gamemodes/thehunt/gamemode/maps/"..game.GetMap()..".lua", "GAME" ) then
 include("/maps/"..game.GetMap()..".lua")
@@ -62,71 +51,7 @@ CURRENTTURRETS=0
 MAXTURRETS=20
 -- VARIABLES ^
 
--- PRESET WAVES v
-
--- PRESET WAVES ^
-
 -- UTILITY COMMANDS v
-
-
-concommand.Add( "assplode", function()
-ent = ents.Create( "env_explosion" )
-ent:SetPos(player.GetByID(1):GetEyeTraceNoCursor().HitPos)
---ent:SetKeyValue( "spawnflags", 32 )
-ent:Spawn()
---ent:EmitSound( "siege/big_explosion.wav", 500, 500 )
-ent:SetKeyValue( "iMagnitude", "100" )
-print("assploded")
-ent:Fire("Explode",0,0)
-end )
-
-concommand.Add( "assplodeinv", function()
-ent = ents.Create( "env_physexplosion" )
-ent:SetPos(player.GetByID(1):GetEyeTraceNoCursor().HitPos)
-ent:SetKeyValue( "spawnflags", 1 )
-ent:SetKeyValue("radius", 300)
-ent:SetKeyValue( "magnitude", 20 )
-ent:Spawn()
---ent:EmitSound( "siege/big_explosion.wav", 500, 500 )
-print("assploded")
-ent:Fire("Explode",0,0)
-end )
-
-concommand.Add( "autoturrets", function()
-local turrets=0
-for k, v in pairs(ents.FindByClass("npc_combine_s")) do 
-if v then if v:IsMoving() then if turrets<2 then
-SpawnTurret(v:GetPos()+Vector(0,0,3)-v:GetForward()*70, v:GetAngles())
-turrets=turrets+1
-end
-end
-end
-end
-end)
-
-concommand.Add( "beam", function()
-
-
-local laser = ents.Create( "env_beam" )
-	laser:SetPos( player.GetByID(1):GetEyeTraceNoCursor().HitPos)
-	laser:SetKeyValue( "StrikeTime", "0.2" )
-	laser:SetKeyValue( "spawnflags", "5" )
-	laser:SetKeyValue( "rendercolor", "200 200 255" )
-	laser:SetKeyValue( "texture", "sprites/laserbeam.spr" )
-	laser:SetKeyValue( "TextureScroll", "1" )
-	laser:SetKeyValue( "Damage", "11" )
-	--laser:SetKeyValue( "renderfx", "6" )
-	laser:SetKeyValue( "NoiseAmplitude", ""..math.random(5,2) )
-	laser:SetKeyValue( "BoltWidth", "1" )
-	laser:SetKeyValue( "TouchType", "0" )
---	laser:SetKeyValue( "LightningStart",  )
---	laser:SetKeyValue( "LightningEnd",  )
-	laser:SetKeyValue("Radius", "100")
-	laser:SetKeyValue("life", "0.5")
-	laser:Spawn()
-	laser:Activate()
-end )
-
 concommand.Add( "Spotted", function()
 net.Start( "Spotted" )
 net.Send(player.GetByID(1))
@@ -138,21 +63,6 @@ end )
 
 concommand.Add( "NearbyEntities", function()
 NearbyEntities()
-end )
-concommand.Add( "Hunt_Difficulty_HARD", function()
-PLAYERSCALEDAMAGE = 3
-NPCSCALEDAMAGE = 3
-print("Difficulty changed to HARD.")
-end )
-concommand.Add( "Hunt_Difficulty_NORMAL", function()
-PLAYERSCALEDAMAGE = 1
-NPCSCALEDAMAGE = 1
-print("Difficulty changed to NORMAL.")
-end )
-concommand.Add( "Hunt_Difficulty_EASY", function()
-PLAYERSCALEDAMAGE = 0.2
-NPCSCALEDAMAGE = 2
-print("Difficulty changed to EASY.")
 end )
 
 concommand.Add( "revealzones", function()
@@ -167,8 +77,9 @@ sprite:SetKeyValue( "renderfx", 7 )
 sprite:Spawn()
 sprite:Activate()
 sprite:SetName("ZoneReveal")
-print("Zones Hithlighted.")
 end)
+print("Combine Covered Zones Hithlighted.")
+
 end)
 
 
@@ -184,8 +95,9 @@ sprite:SetKeyValue( "renderfx", 7 )
 sprite:Spawn()
 sprite:Activate()
 sprite:SetName("ZoneReveal")
-print("Zones Hithlighted.")
 end)
+print("Weapon Spawn Zones Hithlighted.")
+
 end)
 
 
@@ -203,121 +115,164 @@ sprite:Activate()
 sprite:SetName("ZoneReveal")
 print("Heli Path Hithlighted.")
 end
-end )
-
-
-function revealcoverzones()
-local sprite = ents.Create( "env_sprite" )
-sprite:SetPos(table.Random(zonescovered))
-sprite:SetColor( Color( 255, 0, 0 ) )
-sprite:SetName("ZoneReveal")
-sprite:SetKeyValue( "model", "sprites/light_glow01.vmt" )
-sprite:SetKeyValue( "scale", 0.50 )
-sprite:SetKeyValue( "rendermode", 5 )
-sprite:SetKeyValue( "renderfx", 7 )
-sprite:Spawn()
-sprite:Activate()
-sprite:SetName("ZoneReveal")
-end
+end)
 
 concommand.Add( "seesettings", function()
 print("PLAYERSCALEDAMAGE: "..PLAYERSCALEDAMAGE.."")
 print("NPCSCALEDAMAGE: "..NPCSCALEDAMAGE.."")
 print("FRIENDLYFIRE: "..FRIENDLYFIRE.."")
-print("LostPlayerTimeout: "..LostPlayerTimeout.."")
-print("WEAPONOFFSET: "..WEAPONOFFSET.."")
-print("AUTOREPEAT: "..AUTOREPEAT.."")
-print("RPGMAX: "..RPGMAX.."")
-print("FANCYSTATUSCHECKER: "..FANCYSTATUSCHECKER.."")
-print("HALOS: "..HALOS.."")
 print("HEALTHELP: "..HEALTHELP.."")
+print("HALOS: "..HALOS.."")
+print("")
 print("AUTOSTART: "..AUTOSTART.."")
+print("AUTOREPEAT: "..AUTOREPEAT.."")
+print("MINENEMIES: "..MINENEMIES.."")
+print("MAXHELP: "..MAXHELP.."")
+print("MAXGUNSHOTINVESTIGATE: "..MAXGUNSHOTINVESTIGATE.."")
+print("LostPlayerTimeout: "..LostPlayerTimeout.."")
+print("TIME_BETWEEN_WAVES: "..TIME_BETWEEN_WAVES.."")
+print("")
+print("WEAPONOFFSET: "..WEAPONOFFSET.."")
+print("RPGMAX: "..RPGMAX.."")
+print("KILL_UNUSED_WEAPONS: "..KILL_UNUSED_WEAPONS.."")
+print("MEDIUMWEAPONS: ")
+PrintTable(MEDIUMWEAPONS)
 end)
-
 concommand.Add( "helpme", function()
-print("")
-print("Spawn Commands")
-print("")
-print("spawnmetro - Spawn Metropolice.")
-print("spawnrollermine - Spawn Rollermine.")
-print("SpawnCombineS1 - Spawn Combine Soldier.")
-print("SpawnCombineSFlashlight - Spawn Combine Soldier with a FlashLight.")
-print("SpawnCombineElite1 - Spawn Combine Soldier Elite.")
-print("SpawnRebel - Spawn a Rebel. They have 1000 health.")
-print("")
-print("Utility Commands:")
-print("")
-print("revealzones - Show the zones the Combine cycle through. Run this command at least four times to reveal them all.")
-print("hidezones - Hide them.")
-print("revealhelipath - Show the points where the Helicopter can go. You cant hide them for now.")
-print("")
-print("Waves")
-print("")
-print("CAUTION: The second wave will be automatically called when you kill the first wave. Same with the third wave when you kill the second.")
-print("")
-print("firstwave -  Calls the first wave of combines, if the map is configured. It's mostly Metropolices.")
-print("secondwave - Calls the second Combine wave. Better armed Metropolices, Soldiers and Shotgunners.")
-print("thirdwave -  Calls the third Combine wave. Soldiers and Elite Soldiers.")
-print("fourthwave -  Calls the third Combine wave. Grenade armed Soldiers and Elite Soldiers.")
+print("No")
 end )
-
-
 concommand.Add( "hidezones", function()
 hidezones()
-print("Done.")
+print("All sprites removed.")
+end)
+
+
+
+concommand.Add( "assplode", function(ply)
+if ply:IsAdmin() then
+ent = ents.Create( "env_explosion" )
+ent:SetPos(ply:GetEyeTraceNoCursor().HitPos)
+ent:Spawn()
+ent:SetKeyValue( "iMagnitude", "100" )
+print("assploded")
+ent:Fire("Explode",0,0)
+end
 end )
-concommand.Add( "SpawnMetropolice", function()
-SpawnMetropolice( player.GetByID(1):GetEyeTraceNoCursor().HitPos )
+concommand.Add( "assplodeinv", function(ply)
+if ply:IsAdmin() then
+ent = ents.Create( "env_physexplosion" )
+ent:SetPos(ply:GetEyeTraceNoCursor().HitPos)
+ent:SetKeyValue( "spawnflags", 1 )
+ent:SetKeyValue("radius", 300)
+ent:SetKeyValue( "magnitude", 20 )
+ent:Spawn()
+--ent:EmitSound( "siege/big_explosion.wav", 500, 500 )
+print("assploded inv")
+ent:Fire("Explode",0,0)
+end
+end )
+concommand.Add( "beam", function(ply)
+if ply:IsAdmin() then
+local laser = ents.Create( "env_beam" )
+	laser:SetPos( ply:GetEyeTraceNoCursor().HitPos)
+	laser:SetKeyValue( "StrikeTime", "0.2" )
+	laser:SetKeyValue( "spawnflags", "5" )
+	laser:SetKeyValue( "rendercolor", "200 200 255" )
+	laser:SetKeyValue( "texture", "sprites/laserbeam.spr" )
+	laser:SetKeyValue( "TextureScroll", "1" )
+	laser:SetKeyValue( "Damage", "11" )
+	--laser:SetKeyValue( "renderfx", "6" )
+	laser:SetKeyValue( "NoiseAmplitude", ""..math.random(5,2) )
+	laser:SetKeyValue( "BoltWidth", "1" )
+	laser:SetKeyValue( "TouchType", "0" )
+--	laser:SetKeyValue( "LightningStart",  )
+--	laser:SetKeyValue( "LightningEnd",  )
+	laser:SetKeyValue("Radius", "100")
+	laser:SetKeyValue("life", "0.5")
+	laser:Spawn()
+	laser:Activate()
+	end
+end )
+concommand.Add( "SpawnMetropolice", function(ply)
+if ply:IsAdmin() then
+SpawnMetropolice( ply:GetEyeTraceNoCursor().HitPos )
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnFastZombie", function()
-SpawnFastZombie( player.GetByID(1):GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
+concommand.Add( "SpawnFastZombie", function(ply)
+if ply:IsAdmin() then
+SpawnFastZombie( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnRebel", function()
-SpawnRebel( player.GetByID(1):GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
+concommand.Add( "SpawnRebel", function(ply)
+if ply:IsAdmin() then
+SpawnRebel( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnRollermine", function()
-SpawnRollermine( player.GetByID(1):GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
+concommand.Add( "SpawnRollermine", function(ply)
+if ply:IsAdmin() then
+SpawnRollermine( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
 print("Spawned.")
+end
 end )
-concommand.Add( "spawnSNPC", function()
-spawnSNPC( player.GetByID(1):GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
+concommand.Add( "spawnSNPC", function(ply)
+if ply:IsAdmin() then
+spawnSNPC( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
 print("Spawned. LOL")
+end
 end )
-concommand.Add( "SpawnCombineElite1", function()
-SpawnCombineElite1( player.GetByID(1):GetEyeTraceNoCursor().HitPos)
+concommand.Add( "SpawnCombineElite1", function(ply)
+if ply:IsAdmin() then
+SpawnCombineElite1( ply:GetEyeTraceNoCursor().HitPos)
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnCombineElite2", function()
-SpawnCombineElite2( player.GetByID(1):GetEyeTraceNoCursor().HitPos)
+concommand.Add( "SpawnCombineElite2", function(ply)
+if ply:IsAdmin() then
+SpawnCombineElite2( ply:GetEyeTraceNoCursor().HitPos)
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnTurret", function()
-SpawnTurret( player.GetByID(1):GetEyeTraceNoCursor().HitPos + Vector(0,0,5), player.GetByID(1):EyeAngles())
+concommand.Add( "SpawnTurret", function(ply)
+if ply:IsAdmin() then
+SpawnTurret( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,5), ply:EyeAngles())
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnCombineS1", function()
-SpawnCombineS1( player.GetByID(1):GetEyeTraceNoCursor().HitPos)
+concommand.Add( "SpawnCombineS1", function(ply)
+if ply:IsAdmin() then
+SpawnCombineS1( ply:GetEyeTraceNoCursor().HitPos)
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnCombineS2", function()
-SpawnCombineS2( player.GetByID(1):GetEyeTraceNoCursor().HitPos)
+concommand.Add( "SpawnCombineS2", function(ply)
+if ply:IsAdmin() then
+SpawnCombineS2( ply:GetEyeTraceNoCursor().HitPos)
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnScanner", function()
-SpawnScanner( player.GetByID(1):GetEyeTraceNoCursor().HitPos)
+concommand.Add( "SpawnScanner", function(ply)
+if ply:IsAdmin() then
+SpawnScanner( ply:GetEyeTraceNoCursor().HitPos)
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnFriendlyRollermine", function()
-SpawnFriendlyRollermine( player.GetByID(1):GetEyeTraceNoCursor().HitPos)
+concommand.Add( "SpawnFriendlyRollermine", function(ply)
+if ply:IsAdmin() then
+SpawnFriendlyRollermine( ply:GetEyeTraceNoCursor().HitPos)
 print("Spawned.")
+end
 end )
-concommand.Add( "SpawnCombineSFlashlight", function()
-SpawnCombineSFlashlight( player.GetByID(1):GetEyeTraceNoCursor().HitPos)
+concommand.Add( "SpawnCombineSFlashlight", function(ply)
+if ply:IsAdmin() then
+SpawnCombineSFlashlight( ply:GetEyeTraceNoCursor().HitPos)
 print("Spawned.")
+end
 end )
+
+
 
 concommand.Add( "firstwave", function()
 Wave = 1
@@ -352,14 +307,13 @@ end )
 -- UTILITY COMMANDS ^
 
 -- UTILITY FUNCTIONS v (called by the commands or by game hooks)
-
 function OverwatchAmbientOne()
 		table.Random(player.GetAll()):EmitSound(table.Random(OverwatchAmbientSoundsOne), 100, 100)
 end
 
-
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
 
+-- One npc_sniper can only kill one player, then, it won't shoot players anymore. So I remove it and respawn another when he kills a player.
 if attacker:GetClass() == "npc_sniper" then
 local pos = attacker:GetPos()
 local ang = attacker:GetAngles()
@@ -369,7 +323,6 @@ end
 
 ply:CreateRagdoll()
 ply:AddDeaths(1)
--- PrintTable(ply:GetWeapons())
 table.foreach( ply:GetWeapons(), function(key,value)
 if key > 1 then
 print(value:GetClass())
@@ -397,9 +350,9 @@ timer.Create( "TimerRunSpawn", 30, 1, waveswalk)
 end
 
 function wavefinishedchecker()
-timer.Create( "wavefinishedchecker", 5, 1, wavefinishedchecker)
-
+timer.Create( "wavefinishedchecker", 10, 1, wavefinishedchecker)
 EnemiesRemainining=0
+
 table.foreach(MainEnemies, function(key,enemy)
 for k, npc in pairs(ents.FindByClass(enemy)) do
 EnemiesRemainining=EnemiesRemainining+1
@@ -443,11 +396,6 @@ function waveend()
 		OverwatchAmbientOne()
 	
 end
-/*
-function HeliSpawnRollermine()
-SpawnRollermine(HeliA:GetPos() + Vector(0, 0, -100))
-end
-*/
 function CreateHeliPath(pos)
 creating = ents.Create( "path_track" )
 creating:SetPos( pos )
@@ -459,10 +407,6 @@ function restorecombineassistance ()
 		--	print("Combines helping automatically decreased to "..CombineAssisting.." of "..MAXHELP.."")
 		end
 end
-/*
-function restorecontactstatus()
-end
-*/
 function hidezones()
 	for k, v in pairs(ents.FindByName("ZoneReveal") ) do
 	v:Remove()
@@ -1019,7 +963,7 @@ end)
 table.foreach(MainEnemies, function(key,enemy)
 for k, v in pairs(ents.FindByClass(enemy)) do
 if v:GetEnemy() then if v:GetEnemy():IsPlayer() then
-v:GetEnemy():PrintMessage(HUD_PRINTTALK, ""..v:GetName().." lost "..v:GetEnemy():GetName().."")
+--v:GetEnemy():PrintMessage(HUD_PRINTTALK, ""..v:GetName().." lost "..v:GetEnemy():GetName().."")
 v:ClearEnemyMemory() 
 v:SetEnemy(mil)
 v:SetSchedule(SCHED_FORCED_GO_RUN)
@@ -1229,28 +1173,15 @@ end
 
 -- GM HOOKS v
 function GM:OnNPCKilled(victim, killer, weapon)
+-- Uncomment to for-the-lulz explosion kills
 /*
 ent = ents.Create( "env_explosion" )
 ent:SetPos(victim:GetPos())
---ent:SetKeyValue( "spawnflags", 32 )
 ent:Spawn()
---ent:EmitSound( "siege/big_explosion.wav", 500, 500 )
 ent:SetKeyValue( "iMagnitude", "100" )
 print("assploded")
 ent:Fire("Explode",0,0)
 */
-
-if victim:GetClass() == "npc_sniper" then
-PrintMessage(HUD_PRINTTALK, ""..killer:GetName().." got that Sniper out of the way ")
-end
-
-
-if victim:GetClass() == "npc_turret_floor" then
-nearbycombinecome(victim)
-end
-if victim:GetClass() == "npc_turret_ceiling" then
-nearbycombinecome(killer)
-end
 
 if victim:GetClass() == "npc_combinegunship" then
 HeliIsDead = 1
@@ -1276,6 +1207,17 @@ end
 
 if killer:IsPlayer() then
 if killer:Alive() then
+
+if victim:GetClass() == "npc_turret_floor" then
+nearbycombinecome(victim)
+end
+if victim:GetClass() == "npc_turret_ceiling" then
+nearbycombinecome(killer)
+end
+
+
+
+
 	if victim:GetClass() == "npc_metropolice" || victim:GetClass() == "npc_combine_s" then
 		local MAX=0
 		local TALK=0
@@ -1337,7 +1279,6 @@ if killer:Alive() then
 		end
 	end
 table.foreach(player.GetAll(), function(key,value)
--- value:SetNWInt("status", "safe" )
 net.Start( "Hidden" )
 net.Send(value)
 value.spotted = 0
@@ -1365,8 +1306,6 @@ end
 end
 
 function GM:EntityTakeDamage(damaged,damage)
-
-
 if damaged:IsNPC() then
 	if damaged:GetClass() != "npc_helicopter" && damaged:GetClass() != "npc_combinegunship" then
 		if damaged:GetEnemy() == nil then
@@ -1419,7 +1358,6 @@ HeliA:SetKeyValue( "patrolspeed", "5000" )
 if HeliCanSpotlight == 1 then
 helispotlight:SetKeyValue("lightcolor", "255 0 0") 
 HeliAFocus:Remove()
-
 HeliAFocus = ents.Create( "point_spotlight" )
 HeliAFocus:SetPos(HeliA:GetPos()+(HeliA:GetForward()*150+Vector(0,0,-50)))
 HeliAFocus:SetAngles(helispotlight:GetAngles())
@@ -1447,22 +1385,31 @@ end
 end
 
 
-
 if damaged:GetClass() == "npc_sniper" then
 print(damage:GetInflictor():GetClass())
-if damage:GetInflictor():GetClass() == "crossbow_bolt" then
+if damage:GetInflictor():GetClass() == "crossbow_bolt" or damage:IsDamageType(64) then
 damaged:SetHealth(0)
+PrintMessage(HUD_PRINTTALK, ""..damage:GetAttacker():GetName().." got that Sniper out of the way ")
 end
 end
 
+
 if damaged:GetClass() == "npc_turret_ceiling" then
+if damage:IsDamageType(64) then
+--damage:ScaleDamage(1)
+damaged:SetHealth(0)
+PrintMessage(HUD_PRINTTALK, ""..damage:GetAttacker():GetName().." got that Ceiling Turret out of the way ")
+else
+damage:ScaleDamage(0)
+end
+end
+if damaged:GetClass() == "npc_helicopter" then
 if damage:IsDamageType(64) then
 damage:ScaleDamage(1)
 else
 damage:ScaleDamage(0)
 end
 end
-
 
 end
 function GetAmmoForCurrentWeapon( ply )
