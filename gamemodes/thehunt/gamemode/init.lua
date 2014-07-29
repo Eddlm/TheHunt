@@ -15,9 +15,7 @@ lua_run print(player.GetByID(1):GetEyeTrace().Entity:GetAngles()) print(player.G
 */
 
 function GM:Initialize()
-if AUTOSTART == 1 then
-timer.Simple(10, autofirstwave)
-end
+
 RunConsoleCommand( "sk_helicopter_health", "1500") 
 RunConsoleCommand( "air_density", "0")
 NODES = 0
@@ -961,6 +959,9 @@ end
 
 
 function GM:InitPostEntity()
+if AUTOSTART == 1 then
+timer.Simple(10, autofirstwave)
+end
 timer.Create( "CountNPC", 3, 1, wander )
 timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 timer.Create( "CombineIdleSpeech", math.random(5,15), 0, CombineIdleSpeech ) 
