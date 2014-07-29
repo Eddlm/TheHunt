@@ -53,6 +53,12 @@ concommand.Add( "Spotted", function()
 net.Start( "Spotted" )
 net.Send(player.GetByID(1))
 end )
+
+concommand.Add( "HuntVersion", function()
+print("TheHunt Version: v0.3-beta")
+
+end )
+
 concommand.Add( "Hidden", function()
 net.Start( "Hidden" )
 net.Send(player.GetByID(1))
