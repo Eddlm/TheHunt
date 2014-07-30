@@ -25,7 +25,7 @@ KILL_UNUSED_WEAPONS = 0 -- If 1, it will remove any weapon left alone more than 
 AUTOSTART = 1 -- does the game start automatically when you load the map? if not, you'll need to run firstwave on the console to start the combine raid.  1=yes, 0=no.
 HALOS = 1 -- Should outlines be drawn around important entities? If 1, players will see Players outlined in green, enemies outlined in red, and dangerous items outlined in yellow.  1=yes, 0=no.
 HEALTHELP = 40 -- While a player's health is below this, nearby Healthchargers will be outlined in blue. Requires the HALOS setting set to 1.
-
+LIGHT_BASED_STEALTH_SYSTEM = 1 -- If enabled, you can hide in the shadows from enemies.
 MEDIUMWEAPONS = {
 "weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1"
 }

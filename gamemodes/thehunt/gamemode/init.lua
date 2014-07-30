@@ -5,6 +5,38 @@ include( "shared.lua" )
 include( "config.lua" )
 util.AddNetworkString( "Spotted" )
 util.AddNetworkString( "Hidden" )
+util.AddNetworkString( "light_below_limit" )
+util.AddNetworkString( "light_above_limit" )
+
+net.Receive( "light_above_limit", function( length, client )
+print("not hidden boy")
+client:SetNoTarget(false)
+end )
+
+net.Receive( "light_below_limit", function( length, client )
+local hidden=1
+for k, v in pairs(ents.FindByClass("npc_*")) do
+if v:IsValid() then
+if v:IsNPC() then
+if v:GetEnemy() == client then
+--if !timer.Exists("npcforgettimer") then
+if v:Visible(client) then
+print("visible!"..v:GetName().."")
+hidden=0
+--else
+--enemy:ClearEnemyMemory()
+--enemy:SetEnemy(nil)
+--end
+end
+end
+end
+end
+end
+if hidden==1 then client:SetNoTarget(true) print("hidden boy")
+end
+end)
+
+
 
 
 /*               notes
@@ -54,9 +86,17 @@ net.Start( "Spotted" )
 net.Send(player.GetByID(1))
 end )
 
+
+concommand.Add( "clnotarget", function(ply)
+ply:SetNoTarget(1)
+end )
+
+concommand.Add( "cltarget", function(ply)
+ply:SetNoTarget(0)
+end )
+
 concommand.Add( "HuntVersion", function()
 print("TheHunt Version: v0.3-beta")
-
 end )
 
 concommand.Add( "Hidden", function()
@@ -617,6 +657,7 @@ NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )	
 NPC:Fire("StartPatrolling","",0)
 end
+
 function SpawnMetropolice( pos )
 NPC = ents.Create( "npc_metropolice" )
 NPC:SetKeyValue("Manhacks", math.random(0,1)) 
@@ -827,6 +868,7 @@ function GM:PlayerSpawn(ply)
 
 -- MapLoadout() Placeholder
 --	ply.safe=yes
+    ply:SetCustomCollisionCheck(true)
 	ply:StripAmmo()
 	ply:StripWeapons()
 	ply:Give("weapon_crowbar")
@@ -835,6 +877,7 @@ function GM:PlayerSpawn(ply)
 	ply:SetupHands()
 	ply:SetWalkSpeed(150)
 	ply:SetRunSpeed(250)
+	ply:SetCrouchedWalkSpeed(0.3)
 	ply:AllowFlashlight(true)
 	ply:SetNoCollideWithTeammates(1)
 --	ply:SetCollisionGroup(11)
@@ -955,7 +998,7 @@ for k, v in pairs(ents.FindByClass(enemy)) do
 if v:GetEnemy() then if v:GetEnemy():IsPlayer() then
 --v:GetEnemy():PrintMessage(HUD_PRINTTALK, ""..v:GetName().." lost "..v:GetEnemy():GetName().."")
 v:ClearEnemyMemory() 
-v:SetEnemy(mil)
+v:SetEnemy(nil)
 v:SetSchedule(SCHED_FORCED_GO_RUN)
 end
 end
@@ -997,8 +1040,9 @@ function GM:OnEntityCreated(entity)
 	end
 end
 
-
 function CicloUnSegundo()
+
+
 table.foreach(MainEnemies, function(key,enemy)
 for k, npc in pairs(ents.FindByClass(enemy)) do
 if npc:Health() > 0 then
@@ -1300,6 +1344,9 @@ end
 
 function GM:EntityTakeDamage(damaged,damage)
 if damaged:IsNPC() then
+if damage:GetAttacker():IsPlayer() then
+damage:GetAttacker():SetNoTarget(false)
+end
 	if damaged:GetClass() != "npc_helicopter" && damaged:GetClass() != "npc_combinegunship" then
 		if damaged:GetEnemy() == nil then
 		damage:ScaleDamage(NPCSCALEDAMAGE*2)

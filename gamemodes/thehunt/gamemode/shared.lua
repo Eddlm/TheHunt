@@ -6,6 +6,23 @@ GM.Website = "http://facepunch.com/showthread.php?t=1391522"
 
 
 
+
+function GM:ShouldCollide(ent1,ent2)
+if SERVER then
+if ent1:IsPlayer() or ent2:IsPlayer() then
+if ent1:IsNPC() or ent2:IsNPC() then
+if ent1:GetPos():Distance(ent2:GetPos()) < 50 then
+if ent1:IsPlayer() then ent1:SetNoTarget(false) end
+if ent2:IsPlayer() then ent2:SetNoTarget(false) end
+print("did it")
+end
+end
+end
+end
+return true
+
+end
+
 function ISaid( ply, text, public )
     if text == "!remain" then
         return ""..EnemiesRemainining.." enemies left"
@@ -45,7 +62,7 @@ local coming=0
 							end
 						end
 					end
-		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),3000)) do
+		for k, v in pairs(ents.GetAll()) do
 				if v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s" then 
 						if !v:GetEnemy() then
 							if coming < MAXCOMBINERUSH then
