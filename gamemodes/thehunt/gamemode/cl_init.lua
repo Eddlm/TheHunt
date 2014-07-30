@@ -181,7 +181,7 @@ end
 if lightcol > 2 then
 	if  lightcol >= 2 and lightcol < 10 then
 	darken = "mid-light  place"
-	darkencolor = Color(122,107,44,255)
+	darkencolor = Color(117,117,117,255)
 	end
 	if lightcol > 10 then
 	darken = "light place"
