@@ -12,9 +12,10 @@ if SERVER then
 if ent1:IsPlayer() or ent2:IsPlayer() then
 if ent1:IsNPC() or ent2:IsNPC() then
 if ent1:GetPos():Distance(ent2:GetPos()) < 50 then
-if ent1:IsPlayer() then ent1:SetNoTarget(false) end
-if ent2:IsPlayer() then ent2:SetNoTarget(false) end
-print("did it")
+if ent1:IsPlayer() and ent2:GetClass() != "npc_turret_floor" then print("Bumped into something, lost hiding")
+ ent1:SetNoTarget(false) end
+if ent2:IsPlayer() and ent1:GetClass() != "npc_turret_floor" then print("Bumped into something, lost hiding")
+ ent2:SetNoTarget(false) end
 end
 end
 end

@@ -9,7 +9,7 @@ util.AddNetworkString( "light_below_limit" )
 util.AddNetworkString( "light_above_limit" )
 
 net.Receive( "light_above_limit", function( length, client )
-print("not hidden boy")
+client:PrintMessage(HUD_PRINTTALK, "You are visible.")
 client:SetNoTarget(false)
 end )
 
@@ -20,23 +20,22 @@ if v:IsValid() then
 if v:IsNPC() then
 if v:GetEnemy() == client then
 --if !timer.Exists("npcforgettimer") then
-if v:Visible(client) then
-print("visible!"..v:GetName().."")
+--if v:Visible(client) then
+client:PrintMessage(HUD_PRINTTALK, "You can't hide now. "..v:GetName().." is actively looking for you.")
 hidden=0
 --else
 --enemy:ClearEnemyMemory()
 --enemy:SetEnemy(nil)
 --end
+--end
+
 end
 end
 end
 end
-end
-if hidden==1 then client:SetNoTarget(true) print("hidden boy")
+if hidden==1 then client:SetNoTarget(true) client:PrintMessage(HUD_PRINTTALK, "You are hidden.")
 end
 end)
-
-
 
 
 /*               notes
@@ -47,7 +46,7 @@ lua_run print(player.GetByID(1):GetEyeTrace().Entity:GetAngles()) print(player.G
 */
 
 function GM:Initialize()
-
+thereareplayers = 0
 RunConsoleCommand( "sk_helicopter_health", "1500") 
 RunConsoleCommand( "air_density", "0")
 NODES = 0
@@ -81,6 +80,17 @@ HeliAangered = 0
 -- VARIABLES ^
 
 -- UTILITY COMMANDS v
+
+concommand.Add( "hunt_defaultcvars", function()
+CreateConVar( "AUTOSTART", 1, { FCVAR_REPLICATED, FCVAR_ARCHIVE,FCVAR_NOTIFY  } )
+print(GetConVarNumber("AUTOSTART"))
+end )
+
+concommand.Add( "CheckConvars", function()
+if GetConVar("AUTOSTART") then print("Autostart exists") else  print("Autostart DOESN'T exist") end
+end )
+
+
 concommand.Add( "Spotted", function()
 net.Start( "Spotted" )
 net.Send(player.GetByID(1))
@@ -356,13 +366,14 @@ function OverwatchAmbientOne()
 end
 
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
+attacker:EmitSound(table.Random(CombineKillSounds), 100, 100)
 
 -- One npc_sniper can only kill one player, then, it won't shoot players anymore. So I remove it and respawn another when he kills a player.
 if attacker:GetClass() == "npc_sniper" then
 local pos = attacker:GetPos()
 local ang = attacker:GetAngles()
 attacker:Remove()
-SpawnItem("npc_sniper", pos, ang )
+SpawnItem("npc_sniper", pos, ang)
 end
 
 ply:CreateRagdoll()
@@ -994,7 +1005,7 @@ net.Send(value)
 value.spotted = 0
 end)
 table.foreach(MainEnemies, function(key,enemy)
-for k, v in pairs(ents.FindByClass(enemy)) do
+for k, v in pairs(ents.FindByClass(enemy)) do 
 if v:GetEnemy() then if v:GetEnemy():IsPlayer() then
 --v:GetEnemy():PrintMessage(HUD_PRINTTALK, ""..v:GetName().." lost "..v:GetEnemy():GetName().."")
 v:ClearEnemyMemory() 
@@ -1007,10 +1018,21 @@ end)
 end
 
 
-function GM:InitPostEntity()
-if AUTOSTART == 1 then
+
+function GM:PlayerConnect( name, address )
+if thereareplayers == 0 then
 timer.Simple(10, autofirstwave)
+thereareplayers = 1
 end
+end
+
+function GM:InitPostEntity()
+if GetConVar("AUTOSTART") then
+if GetConVarNumber("AUTOSTART") == 1 then
+--if AUTOSTART == 1 then
+end
+end
+
 timer.Create( "CountNPC", 3, 1, wander )
 timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 timer.Create( "CombineIdleSpeech", math.random(5,15), 0, CombineIdleSpeech ) 
@@ -1345,7 +1367,9 @@ end
 function GM:EntityTakeDamage(damaged,damage)
 if damaged:IsNPC() then
 if damage:GetAttacker():IsPlayer() then
+if damaged:Health() > damage:GetDamage() then
 damage:GetAttacker():SetNoTarget(false)
+end
 end
 	if damaged:GetClass() != "npc_helicopter" && damaged:GetClass() != "npc_combinegunship" then
 		if damaged:GetEnemy() == nil then

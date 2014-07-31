@@ -31,8 +31,8 @@ tabletrace ={
 tabletrace.start = LocalPlayer():GetPos()
 tabletrace.endpos = LocalPlayer():GetAimVector()*2
 tabletrace.filter = LocalPlayer()
-*/
 
+*/
 net.Receive( "Spotted", function( length, client )
 	HUDTEXT = 'Spotted'
 	HUDCOLOR=Color(255,8,8)
@@ -138,17 +138,22 @@ CombineBootSound = {
 timer.Simple ( 5, CombineBoots)
 
 
+function PerceivedLuminance(colorvec)
+return (0.299*colorvec.x + 0.587*colorvec.y + 0.114*colorvec.z)
+end
 
 
 
 function light()
 timer.Create( "Light", 0.1, 1, light )
-lightcol = (render.GetLightColor(LocalPlayer():GetShootPos())*100):Length()
---if LocalPlayer():Alive() then
---if LocalPlayer():GetActiveWeapon():GetClass() != "weapon_crowbar" then lightcol=lightcol+2 end
---end
+lightcol = (render.GetLightColor(LocalPlayer():GetPos())*Vector(100,100,100)):Length()
+if LocalPlayer():Alive() then
+if LocalPlayer():GetActiveWeapon():GetClass() != "weapon_crowbar" or LocalPlayer():GetActiveWeapon():GetClass() != "weapon_frag" then lightcol=lightcol+1 end
+if LocalPlayer():GetActiveWeapon():GetClass() == "weapon_crossbow" then lightcol=lightcol+1 end
+
+end
 if lightcol < 4 && LocalPlayer():Crouching() then lightcol=lightcol-4 end
-if lightcol < 0 then lightcol = 0 end
+--if lightcol < 0 then lightcol = 0 end
 
 --print(lightcol)
 if LocalPlayer():FlashlightIsOn() then
