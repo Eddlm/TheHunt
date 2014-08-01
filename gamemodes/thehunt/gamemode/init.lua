@@ -1510,24 +1510,45 @@ function GetAmmoForCurrentWeapon( ply )
 	print(ply:GetAmmoCount(wep:GetPrimaryAmmoType()))
 end
 function GM:KeyPress(player,key)
-if player:Alive() then
 
-if key == IN_ATTACK then
-if player:GetActiveWeapon():GetClass() == "weapon_frag" then
-if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) < 2 then
-timer.Simple(1, function()
-
-player:StripWeapon("weapon_frag")
-end)
-end
-end
-if player:GetActiveWeapon():GetClass() != "weapon_crowbar" && player:GetActiveWeapon():GetClass() != "weapon_crossbow" && player:GetActiveWeapon():GetClass() != "weapon_slam" && player:GetActiveWeapon():GetClass() != "weapon_physcannon" && player:GetActiveWeapon():GetClass() != "weapon_frag" then 
-
-allthecombinecome(player,MAXGUNSHOTINVESTIGATE)
-
-end
-end
-end
+	if player:Alive() then
+		if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) > 0 then
+			if key == IN_ATTACK2 then
+				if player:GetActiveWeapon():GetClass() == "weapon_shotgun" then allthecombinecome(player,MAXGUNSHOTINVESTIGATE)	print("combine come (shotgun)") end
+			end
+			if key == IN_ATTACK then
+				if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) < 2 then
+				timer.Simple(1, function()
+				player:StripWeapon("weapon_frag")
+				end)
+				end
+				if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) > 0 then			
+				local silent=0
+				table.foreach(SILENT_WEAPONS, function(key,value)
+				if player:GetActiveWeapon():GetClass() == value then
+				silent=1
+				print("combine not come")
+				end
+				end)
+				if silent==0 then
+				print("combine come (not silent)")
+				allthecombinecome(player,MAXGUNSHOTINVESTIGATE)
+				end
+				end		
+			end
+		end
+		
+		if player:GetAmmoCount(player:GetActiveWeapon():GetSecondaryAmmoType()) > 0 then
+			if key == IN_ATTACK2 then
+				table.foreach(SECONDARY_FIRE_WEAPONS, function(key,value)
+					if player:GetActiveWeapon():GetClass() == value then
+					allthecombinecome(player,MAXGUNSHOTINVESTIGATE)
+					print("combine come (not silent secondary fire)")
+					end
+				end)
+			end
+		end
+	end
 end
 
 function GM:PlayerSetHandsModel( ply, ent )

@@ -202,11 +202,6 @@ timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 print("")
 end
 
-CRATEITEMS = {
-"weapon_shotgun", "weapon_357", "weapon_frag", "weapon_slam", "item_healthkit", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black","npc_rollermine","item_dynamic_resupply"
-}
-
-GOODCRATEITEMS ={"item_dynamic_resupply","weapon_frag", "weapon_slam","item_healthkit", "item_ammo_smg1_grenade","item_box_buckshot","item_ammo_smg1_large","item_ammo_crossbow","item_ammo_ar2_large","item_ammo_ar2_altfire"}
 
 MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
 MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_turret_ceiling"}

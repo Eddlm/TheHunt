@@ -27,22 +27,49 @@ HALOS = 1 -- Should outlines be drawn around important entities? If 1, players w
 HEALTHELP = 40 -- While a player's health is below this, nearby Healthchargers will be outlined in blue. Requires the HALOS setting set to 1.
 LIGHT_BASED_STEALTH_SYSTEM = 1 -- If enabled, you can hide in the shadows from enemies.
 
-MEDIUMWEAPONS = {
-"weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1"
-}
 
-TOO_BRIGHT_WEAPONS = {
-"weapon_crossbow", "weapon_physcannon", "weapon_rpg"
-}
 
-DARK_WEAPONS = {
-"weapon_frag", "weapon_crowbar"
-}
 
--- ^ Change this list to any weapons of your choice and the game will spawn them on the maps.
+
+/*--------------------WEAPON SETUP---------------------
+Here you must configure your custom weapons so the game reacts apropiately.
+-------------------------------------------------------*/
+
+CRATEITEMS = { "weapon_shotgun", "weapon_357", "weapon_frag", "weapon_slam", "item_healthkit", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black","npc_rollermine","item_dynamic_resupply" }
+--Normal crates can spawn these items.
+
+GOODCRATEITEMS = { "item_dynamic_resupply","weapon_frag", "weapon_slam","item_healthkit", "item_ammo_smg1_grenade","item_box_buckshot","item_ammo_smg1_large","item_ammo_crossbow","item_ammo_ar2_large","item_ammo_ar2_altfire"}
+--Ammo crates can spawn these items.
+
+
+MEDIUMWEAPONS = { "weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1" }
+-- Weapons the gamemode will spawn around. 
+
+/*--------------Stealth----------------------------
+This section covers the stealth value of the weapons. If a weapon has bright parts (The crossbow, for example), add it to TOO_BRIGHT_WEAPONS. If a weapon lacks any bright item (Crowbar,Grenade), add it to DARK_WEAPONS.
+
+If a weapon is not dark nor too bright (has some lights but not too many lights), do not add it to any table.
+Too bright weapons add +1 luminosity.
+Dark weapons do not add luminosity.
+Not dark weapons add +1 luminosity.
+--------------------------------------------------*/
+TOO_BRIGHT_WEAPONS = { "weapon_crossbow", "weapon_physcannon", "weapon_rpg", "weapon_medkit" }
+-- Weapons that make you more visible. It's harder to hide while carrying this weapon.
+
+DARK_WEAPONS = { "weapon_frag", "weapon_crowbar" }
+-- Weapons that don't have any bright items on them. It's easier to hide while carrying this weapon.
+
+
+SILENT_WEAPONS = { "weapon_frag", "weapon_crossbow", "weapon_crowbar", "suppressed_pistol", "suppressed_smg1" }
+-- Any weapon that's not included on this table will be considered a loud weapon and it's gunshots will attrack combine.
+
+SECONDARY_FIRE_WEAPONS = { "weapon_ar2", }
+-- Weapons that have a loud secondary fire.
+
+
+
 
 /*
-
 CreateConVar("PLAYERSCALEDAMAGE", "3", {FCVAR_NOTIFY}, "Multiplier to the damage dealt to the player. Default: 3")
 
 if GetConVar("AUTOSTART") then AUTOSTART = GetConVarNumber("AUTOSTART")
