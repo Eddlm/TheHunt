@@ -39,7 +39,7 @@ CRATEITEMS = { "weapon_shotgun", "weapon_357", "weapon_frag", "weapon_slam", "it
 --Normal crates can spawn these items.
 
 GOODCRATEITEMS = { "item_dynamic_resupply","weapon_frag", "weapon_slam","item_healthkit", "item_ammo_smg1_grenade","item_box_buckshot","item_ammo_smg1_large","item_ammo_crossbow","item_ammo_ar2_large","item_ammo_ar2_altfire"}
---Ammo crates can spawn these items.
+--Ammo crates can spawn these items.ccccccccccccccccccc
 
 
 MEDIUMWEAPONS = { "weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1" }
