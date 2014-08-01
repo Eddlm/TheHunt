@@ -15,7 +15,7 @@ NPCSCALEDAMAGE = 3 -- Anytime a NPC takes damage, it will be multiplied by this 
 FRIENDLYFIRE = 0 -- If 0, players can't damage other players. And combine can't damage other combine! If 1, players and combine will take damage from their friends. Default: 0
 LostPlayerTimeout = 10 -- How many seconds have to pass before a combine gives up on chasing you? Default: 10
 WEAPONOFFSET = 0 -- Number of Players + this value = number of weapons that will ve available at any time on the map. Default: 0 (one weapon per player)
-AUTOREPEAT = 0 -- Does the game start again automatically when you survive the five waves? 1=yes, 0=no.
+AUTOREPEAT = 1 -- Does the game start again automatically when you survive the five waves? 1=yes, 0=no.
 RPGMAX = 1 -- How many RPGs should spawn on helicopter-boss maps?
 MAXGUNSHOTINVESTIGATE = 4 -- Maximun number of combine who will come to investigate a gunshot. Default: 4
 KILL_UNUSED_WEAPONS = 0 -- If 1, it will remove any weapon left alone more than one minute, so it can respawn on a new place. Useful if you can't find weapons easily.  1=yes, 0=no.

@@ -337,25 +337,25 @@ concommand.Add( "secondwave", function()
 Wave = 2
 timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) 
 --timer.Create( "wavefinishedchecker", 20, 1, wavefinishedchecker)
-timer.Create( "TimerRunSpawn", 30, 1, waveswalk)
+
 end )
 concommand.Add( "thirdwave", function()
 Wave = 3
 timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) 
 --timer.Create( "wavefinishedchecker", 20, 1, wavefinishedchecker)
-timer.Create( "TimerRunSpawn", 30, 1, waveswalk)
+
 end )
 concommand.Add( "fourthwave", function()
 Wave = 4
 timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 
 --timer.Create( "wavefinishedchecker", 20, 1, wavefinishedchecker)
-timer.Create( "TimerRunSpawn", 30, 1, waveswalk)
+
 end )
 concommand.Add( "fifthwave", function()
 Wave = 5
 timer.Create( "fifthwave", 2, CombineFifthWave, fifthwave ) 
 --timer.Create( "wavefinishedchecker", 20, 1, wavefinishedchecker)
-timer.Create( "TimerRunSpawn", 30, 1, waveswalk)
+
 end )
 -- UTILITY COMMANDS ^
 
