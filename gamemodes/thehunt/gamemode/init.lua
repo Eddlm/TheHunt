@@ -798,6 +798,10 @@ if math.random(1,1) == 1 then
 		end
 	end
 end
+
+if breaker:IsPlayer() then
+nearbycombinecomecasual(breaker)
+end
 end
 hook.Add("PropBreak","OnPropBreak",PropBreak)
 
@@ -1365,6 +1369,11 @@ end
 end
 
 function GM:EntityTakeDamage(damaged,damage)
+
+if !damaged:IsNPC() then
+nearbycombinecomecasual(damage:GetAttacker())
+end
+
 if damaged:IsNPC() then
 if damage:GetAttacker():IsPlayer() then
 if damaged:Health() > damage:GetDamage() then

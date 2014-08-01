@@ -156,20 +156,11 @@ table.foreach(TOO_BRIGHT_WEAPONS, function(key,value)
 if LocalPlayer():GetActiveWeapon():GetClass() == value then lightcol=lightcol+1 end
 end)
 end
-if /*lightcol < 4 && */ LocalPlayer():Crouching() then lightcol=lightcol-1 end
---if lightcol < 0 then lightcol = 0 end
+if LocalPlayer():Crouching() then lightcol=lightcol-1 end
+if LocalPlayer():FlashlightIsOn() then if lightcol < 20 then lightcol = lightcol+30 end end
 
+--if lightcol < 0 then lightcol = 0 end
 --print(lightcol)
-if LocalPlayer():FlashlightIsOn() then
-darken = "light place"
-darkencolor = Color(255,255,255,255)
-if lightcol < 20 then lightcol = lightcol+30 end
-if light_above_limit != 1 then
-light_above_limit=1
-net.Start("light_above_limit")
-net.SendToServer()
-end
-return end
 --print(util.TraceLine(tabletrace).Entity)
 
 if lightcol <= 2 then

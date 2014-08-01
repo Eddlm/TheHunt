@@ -49,6 +49,29 @@ function nearbycombinecome(suspect)
 end
 end
 
+
+
+function nearbycombinecomecasual(suspect)
+local come=0
+		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
+				if (v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s") then 
+				if come < 1 then
+					if !v:GetEnemy() then
+						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
+						come=1
+							print(""..v:GetName().." investigates.")
+							v:SetLastPosition(suspect:GetPos())
+							v:SetSchedule(SCHED_FORCED_GO)
+							end
+						end
+					end
+				end
+end
+end
+
+
+
+
 function allthecombinecome(suspect,MAXCOMBINERUSH)
 local coming=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
