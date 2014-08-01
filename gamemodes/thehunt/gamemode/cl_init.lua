@@ -147,12 +147,16 @@ end
 function light()
 timer.Create( "Light", 0.1, 1, light )
 lightcol = (render.GetLightColor(LocalPlayer():GetPos())*Vector(100,100,100)):Length()
-if LocalPlayer():Alive() then
-if LocalPlayer():GetActiveWeapon():GetClass() != "weapon_crowbar" or LocalPlayer():GetActiveWeapon():GetClass() != "weapon_frag" then lightcol=lightcol+1 end
-if LocalPlayer():GetActiveWeapon():GetClass() == "weapon_crossbow" then lightcol=lightcol+1 end
 
+if LocalPlayer():Alive() then
+table.foreach(DARK_WEAPONS, function(key,value)
+if LocalPlayer():GetActiveWeapon():GetClass() != value then lightcol=lightcol+1 end
+end)
+table.foreach(TOO_BRIGHT_WEAPONS, function(key,value)
+if LocalPlayer():GetActiveWeapon():GetClass() == value then lightcol=lightcol+1 end
+end)
 end
-if lightcol < 4 && LocalPlayer():Crouching() then lightcol=lightcol-4 end
+if /*lightcol < 4 && */ LocalPlayer():Crouching() then lightcol=lightcol-1 end
 --if lightcol < 0 then lightcol = 0 end
 
 --print(lightcol)

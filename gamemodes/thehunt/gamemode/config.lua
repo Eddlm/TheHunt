@@ -30,6 +30,15 @@ LIGHT_BASED_STEALTH_SYSTEM = 1 -- If enabled, you can hide in the shadows from e
 MEDIUMWEAPONS = {
 "weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1"
 }
+
+TOO_BRIGHT_WEAPONS = {
+"weapon_crossbow", "weapon_physcannon", "weapon_rpg"
+}
+
+DARK_WEAPONS = {
+"weapon_frag", "weapon_crowbar"
+}
+
 -- ^ Change this list to any weapons of your choice and the game will spawn them on the maps.
 
 /*
