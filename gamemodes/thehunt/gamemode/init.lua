@@ -89,16 +89,6 @@ HeliAangered = 0
 -- VARIABLES ^
 
 -- UTILITY COMMANDS v
-/*
-concommand.Add( "hunt_defaultcvars", function()
-CreateConVar( "AUTOSTART", 1, { FCVAR_REPLICATED, FCVAR_ARCHIVE,FCVAR_NOTIFY  } )
-print(GetConVarNumber("AUTOSTART"))
-end )
-
-concommand.Add( "CheckConvars", function()
-if GetConVar("AUTOSTART") then print("Autostart exists") else  print("Autostart DOESN'T exist") end
-end )
-*/
 
 concommand.Add( "Spotted", function()
 net.Start( "Spotted" )
@@ -1036,12 +1026,7 @@ function GM:PlayerConnect( name, address )
 end
 
 function GM:InitPostEntity()
-/*
---if GetConVar("AUTOSTART") then
---if GetConVarNumber("AUTOSTART") == 1 then
 
---end
-*/
 
 if AUTOSTART == 1 && win == 1 then
 autofirstwave()

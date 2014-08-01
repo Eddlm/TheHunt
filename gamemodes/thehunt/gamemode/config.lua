@@ -65,16 +65,3 @@ SILENT_WEAPONS = { "weapon_frag", "weapon_crossbow", "weapon_crowbar", "suppress
 
 SECONDARY_FIRE_WEAPONS = { "weapon_ar2", }
 -- Weapons that have a loud secondary fire.
-
-
-
-
-/*
-CreateConVar("PLAYERSCALEDAMAGE", "3", {FCVAR_NOTIFY}, "Multiplier to the damage dealt to the player. Default: 3")
-
-if GetConVar("AUTOSTART") then AUTOSTART = GetConVarNumber("AUTOSTART")
-else
-AUTOSTART = 1
-CreateConVar( "AUTOSTART", ""..AUTOSTART.."", { FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY } )
-end
-*/
