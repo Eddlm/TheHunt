@@ -115,7 +115,6 @@ CANPICKUP = nil
 return true end
 
 function ItemRespawnSystem()
-
 if KILL_UNUSED_WEAPONS == 1 then
 for k,v in pairs(ents.GetAll()) do 
 local canadd=1

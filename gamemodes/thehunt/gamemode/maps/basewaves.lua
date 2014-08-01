@@ -1,7 +1,6 @@
 
 function firstwave()
 Wave = 1
-WAVESPAWN = 1
 SpawnMetropolice(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 -- CanCheck = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
@@ -9,7 +8,6 @@ end
 
 function secondwave()
 Wave = 2
-WAVESPAWN = 1
 
 	if math.random (1,6) == 2 then 
 		SpawnCombineShotgunner(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
@@ -25,7 +23,6 @@ end
 
 function thirdwave()
 Wave = 3
-WAVESPAWN = 1
 
 	if math.random (1,6) == 2 then 
 		SpawnCombineShotgunner(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
@@ -39,7 +36,6 @@ timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
 
 function fourthwave()
-WAVESPAWN = 1
 Wave = 4
 	if math.random (1,6) == 2 then 
 		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
@@ -55,7 +51,6 @@ end
 
 function fifthwave()
 Wave = 5
-WAVESPAWN = 1
 PrintMessage(HUD_PRINTCENTER, "Final Squad!")
 	if math.random (1,6) == 2 then 
 		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))

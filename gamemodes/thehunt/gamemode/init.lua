@@ -331,7 +331,6 @@ concommand.Add( "firstwave", function()
 Wave = 1
 timer.Create( "firstwave", 2, CombineFirstWave, firstwave ) 
 --timer.Create( "wavefinishedchecker", 30, 1, wavefinishedchecker)
-timer.Create( "TimerRunSpawn", 30, 0, waveswalk)
 end )
 concommand.Add( "secondwave", function()
 Wave = 2
@@ -396,7 +395,7 @@ end
 function autofirstwave()
 timer.Create( "firstwave", 2, CombineFirstWave, firstwave )
 WAVESPAWN = 1
-timer.Create( "TimerRunSpawn", 20, 1, function() WAVESPAWN=0 end)
+timer.Simple( 10, function() WAVESPAWN = 0 end)		
 end
 
 function wavefinishedchecker()
@@ -424,7 +423,7 @@ function waveend()
 		end
 		timer.Simple(TIME_BETWEEN_WAVES, function()
 		WAVESPAWN = 1
-		timer.Simple( 4, function() WAVESPAWN = 0 end)		
+		timer.Simple( 10, function() WAVESPAWN = 0 print("wavespawn is now 0")end)		
 		if Wave == 1 then timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) end
 		if Wave == 2 then timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) end
 		if Wave == 3 then timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 	end
@@ -1029,7 +1028,7 @@ function GM:InitPostEntity()
 
 
 if AUTOSTART == 1 && win == 1 then
-autofirstwave()
+timer.Simple(10, autofirstwave)
 end
 
 timer.Create( "CountNPC", 3, 1, wander )
@@ -1040,14 +1039,15 @@ timer.Create( "coverzones", 10, 1, coverzones )
 timer.Create( "wavefinishedchecker", 5, 1, wavefinishedchecker)
 CanCheck = 0
 MapSetup()
-
+/*
 for k, v in pairs(ents.FindByClass("prop_physics")) do
-if v:GetModel() == "models/props_c17/furnituredrawer001a.mdl" or v:GetModel() == "models/props_c17/furnitureshelf002a.mdl" or v:GetModel() == "models/props_wasteland/kitchen_shelf001a.mdl" or v:GetModel() == "models/props_interiors/furniture_desk01a.mdl" or v:GetModel() == "models/warby/wan_prop_caffe_table_01.mdl" or v:GetModel() == "models/props_junk/trashdumpster01a.mdl" or v:GetModel() == "models/props_c17/bench01a.mdl" then 
+if v:GetModel() == "models/props_c17/furnituredrawer001a.mdl" or v:GetModel() == "models/props_c17/furnitureshelf002a.mdl" or v:GetModel() == "models/props_interiors/furniture_desk01a.mdl" or v:GetModel() == "models/warby/wan_prop_caffe_table_01.mdl" or v:GetModel() == "models/props_junk/trashdumpster01a.mdl" or v:GetModel() == "models/props_c17/bench01a.mdl" or v:GetModel() == "models/props_wasteland/cafeteria_table001a.mdl" then 
 
 table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,30))
-print("found one")
+print("found one, "..v:GetModel().."")
 end
 end
+*/
 end
 
 function GM:GetFallDamage( ply, speed )
@@ -1497,16 +1497,20 @@ end
 function GM:KeyPress(player,key)
 
 	if player:Alive() then
+	
+		if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) < 2 && player:GetActiveWeapon():GetClass() == "weapon_frag" then
+		if key == IN_ATTACK2 or key == IN_ATTACK then
+		timer.Simple(1, function()
+		player:StripWeapon("weapon_frag")
+		end)
+		end
+		end
+		
 		if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) > 0 then
 			if key == IN_ATTACK2 then
 				if player:GetActiveWeapon():GetClass() == "weapon_shotgun" then allthecombinecome(player,MAXGUNSHOTINVESTIGATE)	print("combine come (shotgun)") end
 			end
 			if key == IN_ATTACK then
-				if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) < 2 then
-				timer.Simple(1, function()
-				player:StripWeapon("weapon_frag")
-				end)
-				end
 				if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) > 0 then			
 				local silent=0
 				table.foreach(SILENT_WEAPONS, function(key,value)
