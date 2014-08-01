@@ -20,7 +20,6 @@ RPGMAX = 1 -- How many RPGs should spawn on helicopter-boss maps?
 MAXGUNSHOTINVESTIGATE = 4 -- Maximun number of combine who will come to investigate a gunshot. Default: 4
 KILL_UNUSED_WEAPONS = 0 -- If 1, it will remove any weapon left alone more than one minute, so it can respawn on a new place. Useful if you can't find weapons easily.  1=yes, 0=no.
 
-
 -- NOT editable in real time: These variables can only be changed via this config file.
 AUTOSTART = 1 -- does the game start automatically when you load the map? if not, you'll need to run firstwave on the console to start the combine raid.  1=yes, 0=no.
 
@@ -31,11 +30,12 @@ LIGHT_BASED_STEALTH_SYSTEM = 1 -- If enabled, you can hide in the shadows from e
 MEDIUMWEAPONS = {
 "weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1"
 }
+-- ^ Change this list to any weapons of your choice and the game will spawn them on the maps.
+
+/*
 
 CreateConVar("PLAYERSCALEDAMAGE", "3", {FCVAR_NOTIFY}, "Multiplier to the damage dealt to the player. Default: 3")
 
-
-/*
 if GetConVar("AUTOSTART") then AUTOSTART = GetConVarNumber("AUTOSTART")
 else
 AUTOSTART = 1

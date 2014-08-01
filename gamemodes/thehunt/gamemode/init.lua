@@ -80,7 +80,7 @@ HeliAangered = 0
 -- VARIABLES ^
 
 -- UTILITY COMMANDS v
-
+/*
 concommand.Add( "hunt_defaultcvars", function()
 CreateConVar( "AUTOSTART", 1, { FCVAR_REPLICATED, FCVAR_ARCHIVE,FCVAR_NOTIFY  } )
 print(GetConVarNumber("AUTOSTART"))
@@ -89,7 +89,7 @@ end )
 concommand.Add( "CheckConvars", function()
 if GetConVar("AUTOSTART") then print("Autostart exists") else  print("Autostart DOESN'T exist") end
 end )
-
+*/
 
 concommand.Add( "Spotted", function()
 net.Start( "Spotted" )
@@ -106,7 +106,7 @@ ply:SetNoTarget(0)
 end )
 
 concommand.Add( "HuntVersion", function()
-print("TheHunt Version: v0.3-beta")
+print("TheHunt Version: v0.4-beta-stealth_edition")
 end )
 
 concommand.Add( "Hidden", function()
@@ -188,7 +188,7 @@ print("")
 print("WEAPONOFFSET: "..WEAPONOFFSET.."")
 print("RPGMAX: "..RPGMAX.."")
 print("KILL_UNUSED_WEAPONS: "..KILL_UNUSED_WEAPONS.."")
-print("MEDIUMWEAPONS: ")
+print("Weapons that TheHunt spawns: ")
 PrintTable(MEDIUMWEAPONS)
 end)
 concommand.Add( "helpme", function()
