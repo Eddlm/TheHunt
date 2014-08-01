@@ -1043,7 +1043,7 @@ function GM:InitPostEntity()
 --end
 */
 
-if AUTOSTART == 1 then
+if AUTOSTART == 1 && win == 1 then
 autofirstwave()
 end
 
