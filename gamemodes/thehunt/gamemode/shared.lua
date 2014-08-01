@@ -55,10 +55,10 @@ function nearbycombinecomecasual(suspect)
 local come=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
 				if (v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s") then 
-				if come < 1 then
+				if come < math.random(1,3) then
 					if !v:GetEnemy() then
 						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
-						come=1
+						come=come+1
 							print(""..v:GetName().." investigates.")
 							v:SetLastPosition(suspect:GetPos())
 							v:SetSchedule(SCHED_FORCED_GO)
@@ -202,11 +202,6 @@ timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 print("")
 end
 
-/*
-MEDIUMWEAPONS = {
-"weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1"
-}
-*/
 CRATEITEMS = {
 "weapon_shotgun", "weapon_357", "weapon_frag", "weapon_slam", "item_healthkit", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black","npc_rollermine","item_dynamic_resupply"
 }
@@ -214,6 +209,7 @@ CRATEITEMS = {
 GOODCRATEITEMS ={"item_dynamic_resupply","weapon_frag", "weapon_slam","item_healthkit", "item_ammo_smg1_grenade","item_box_buckshot","item_ammo_smg1_large","item_ammo_crossbow","item_ammo_ar2_large","item_ammo_ar2_altfire"}
 
 MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
+MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_turret_ceiling"}
 
 
 OverwatchAmbientSoundsOne = {

@@ -8,6 +8,11 @@ util.AddNetworkString( "Hidden" )
 util.AddNetworkString( "light_below_limit" )
 util.AddNetworkString( "light_above_limit" )
 
+util.PrecacheModel("models/Combine_Soldier.mdl")
+util.PrecacheModel("models/Combine_Super_Soldier.mdl")
+util.PrecacheModel("models/Police.mdl")
+
+
 net.Receive( "light_above_limit", function( length, client )
 client:PrintMessage(HUD_PRINTTALK, "You are visible.")
 client:SetNoTarget(false)
@@ -17,8 +22,11 @@ net.Receive( "light_below_limit", function( length, client )
 local hidden=1
 for k, v in pairs(ents.FindByClass("npc_*")) do
 if v:IsValid() then
-if v:IsNPC() then
+--if v:IsNPC() then
+if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
+if v:Health() > 0 then
 if v:GetEnemy() == client then
+
 --if !timer.Exists("npcforgettimer") then
 --if v:Visible(client) then
 client:PrintMessage(HUD_PRINTTALK, "You can't hide now. "..v:GetName().." is actively looking for you.")
@@ -29,6 +37,7 @@ hidden=0
 --end
 --end
 
+end
 end
 end
 end
@@ -386,10 +395,6 @@ end
 end) 
 end
 
-function waveswalk()
-WAVESPAWN = 0
-end
-
 function NearbyEntities()
 print("Entities found:")
 for k, v in pairs(ents.FindInSphere(player.GetByID(1):GetPos(),256)) do
@@ -401,7 +406,7 @@ end
 function autofirstwave()
 timer.Create( "firstwave", 2, CombineFirstWave, firstwave )
 WAVESPAWN = 1
-timer.Create( "TimerRunSpawn", 30, 1, waveswalk)
+timer.Create( "TimerRunSpawn", 20, 1, function() WAVESPAWN=0 end)
 end
 
 function wavefinishedchecker()
@@ -426,10 +431,10 @@ end
 function waveend()
 		if Wave < 5 then
 			PrintMessage(HUD_PRINTCENTER, "Squad Nº"..Wave.." defeated!")
-			WAVESPAWN = 1
 		end
 		timer.Simple(TIME_BETWEEN_WAVES, function()
-		timer.Create( "TimerRunSpawn", 30, 1, waveswalk)		
+		WAVESPAWN = 1
+		timer.Simple( 4, function() WAVESPAWN = 0 end)		
 		if Wave == 1 then timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) end
 		if Wave == 2 then timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) end
 		if Wave == 3 then timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 	end
@@ -1024,17 +1029,22 @@ end
 
 
 function GM:PlayerConnect( name, address )
-if thereareplayers == 0 then
-timer.Simple(10, autofirstwave)
-thereareplayers = 1
-end
+--if thereareplayers == 0 then
+--timer.Simple(10, autofirstwave)
+--thereareplayers = 1
+--end
 end
 
 function GM:InitPostEntity()
-if GetConVar("AUTOSTART") then
-if GetConVarNumber("AUTOSTART") == 1 then
---if AUTOSTART == 1 then
-end
+/*
+--if GetConVar("AUTOSTART") then
+--if GetConVarNumber("AUTOSTART") == 1 then
+
+--end
+*/
+
+if AUTOSTART == 1 then
+autofirstwave()
 end
 
 timer.Create( "CountNPC", 3, 1, wander )
@@ -1069,21 +1079,17 @@ end
 function CicloUnSegundo()
 
 
-table.foreach(MainEnemies, function(key,enemy)
+table.foreach(MainEnemiesCoop, function(key,enemy)
 for k, npc in pairs(ents.FindByClass(enemy)) do
 if npc:Health() > 0 then
 
-/*
-if !npc:GetEnemy() then
-npc:SetKeyValue("squadname", "")
-end
-*/
 if npc:GetEnemy() then
 if npc:GetEnemy():IsPlayer() then
 --npc:SetKeyValue("squadname", "CombineSquad")
-
 if npc:GetEnemy().spotted != 1 then
-npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
+if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
+npc:EmitSound(table.Random(ContactConfirmed), 100, 100) end
+
 net.Start("Spotted")
 net.Send(npc:GetEnemy())
 npc:GetEnemy().spotted = 1
@@ -1094,12 +1100,12 @@ end
 		timer.Destroy( "npcforgettimer")
 		print("npcforget STOPPED")
 		end
-		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),1000)) do 
+		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),2000)) do 
 		if ThisEnt:GetClass() == "npc_combine_s" || ThisEnt:GetClass() == "npc_metropolice" then
 				if ThisEnt:GetEnemy() == nil  then 
 					if CombineAssisting < MAXHELP then
 					print("combine palla")
-					--print(ThisEnt:GetName().." is helping "..v:GetName().."")
+					print(ThisEnt:GetName().." is helping "..npc:GetName().."")
 					ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
 					ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
 					CombineAssisting = CombineAssisting+1
@@ -1246,6 +1252,27 @@ print("assploded")
 ent:Fire("Explode",0,0)
 */
 
+
+
+if victim:GetClass() == "npc_turret_floor" then
+print("turret killed")
+nearbycombinecome(victim)
+for k, v in pairs(ents.FindInSphere(victim:GetPos(),1024)) do
+if v:IsPlayer() then
+net.Start( "Hidden" )
+net.Send(killer)
+killer.spotted = 0
+print("Player killet it")
+
+end
+end
+end
+
+
+if victim:GetClass() == "npc_turret_ceiling" then
+nearbycombinecome(killer)
+end
+
 if victim:GetClass() == "npc_combinegunship" then
 HeliIsDead = 1
 timer.Stop( "helipath")
@@ -1269,22 +1296,15 @@ end
 end
 
 if killer:IsPlayer() then
+net.Start( "Hidden" )
+net.Send(killer)
+killer.spotted = 0
+
 if killer:Alive() then
-
-if victim:GetClass() == "npc_turret_floor" then
-nearbycombinecome(victim)
-end
-if victim:GetClass() == "npc_turret_ceiling" then
-nearbycombinecome(killer)
-end
-
-
-
-
 	if victim:GetClass() == "npc_metropolice" || victim:GetClass() == "npc_combine_s" then
 		local MAX=0
 		local TALK=0
-		for k, see in pairs(ents.FindInSphere(victim:GetPos(),224)) do
+		for k, see in pairs(ents.FindInSphere(victim:GetPos(),256)) do
 			if see:GetClass() == "npc_combine_s" && see:EntIndex() != victim:EntIndex() then
 				if TALK<1 then
 				see:EmitSound(table.Random(CombineKilledSounds), 360, 100)
@@ -1341,11 +1361,7 @@ end
 			end
 		end
 	end
-table.foreach(player.GetAll(), function(key,value)
-net.Start( "Hidden" )
-net.Send(value)
-value.spotted = 0
-end)
+
 end
 killer:AddFrags(1)
 end
