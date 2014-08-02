@@ -105,7 +105,7 @@ ply:SetNoTarget(0)
 end )
 
 concommand.Add( "HuntVersion", function()
-print("TheHunt Version: v0.4-beta-stealth_edition")
+print("TheHunt Version: v0.5-beta-workshop_edition. Last shit added: ttt_skyscraper")
 end )
 
 concommand.Add( "Hidden", function()
