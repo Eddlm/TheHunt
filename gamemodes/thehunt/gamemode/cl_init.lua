@@ -61,7 +61,7 @@ if HALOS == 1 then
 	if v:GetClass() == "npc_tripmine" || v:GetClass() == "npc_satchel"  then
         effects.halo.Add( {v}, Color( 247,255,3 ), 1, 1, 1, true, false )
 	end
-	if v:GetClass() == "item_healthcharger" && LocalPlayer():Health() < HEALTHELP then
+	if v:GetClass() == "item_healthcharger" && LocalPlayer():Health() < HEALTHELP and LocalPlayer():Health() > 0 then
         effects.halo.Add( {v}, Color( 0,204,255 ), 1, 1, 1, true, true )
 	end
 	end

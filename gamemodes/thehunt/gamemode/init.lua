@@ -413,37 +413,35 @@ if EnemiesRemainining >= MINENEMIES then CanCheck = 1 end
 if CanCheck == 1 then 
 	if EnemiesRemainining < MINENEMIES then 
 	waveend()
+	CanCheck = 0
 	end
 end
 end
 
 function waveend()
+		OverwatchAmbientOne()
 		if Wave < 5 then
-			PrintMessage(HUD_PRINTCENTER, "Squad Nº"..Wave.." defeated!")
+			PrintMessage(HUD_PRINTTALK, "Squad Nº"..Wave.." defeated!")
 		end
 		timer.Simple(TIME_BETWEEN_WAVES, function()
 		WAVESPAWN = 1
-		timer.Simple( 10, function() WAVESPAWN = 0 print("wavespawn is now 0")end)		
+		timer.Simple( 10, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
+		timer.Simple( 10, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
 		if Wave == 1 then timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) end
 		if Wave == 2 then timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) end
 		if Wave == 3 then timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 	end
 		if Wave == 4 then timer.Create( "fifthwave", 2, CombineFifthWave, fifthwave )  end
 		end)
 		if Wave == 5 then 
-			if DEFAULTGAME == 1 then
+		--	if DEFAULTGAME == 1 then
 				if AUTOREPEAT == 1 then
 				timer.Simple(5, autofirstwave)
-				PrintMessage(HUD_PRINTCENTER, "Combine Defeated! Restarting Squads!")
+				PrintMessage(HUD_PRINTTALK, "Combine Defeated! Restarting Squads!")
 				else
-				PrintMessage(HUD_PRINTCENTER, "Combine Defeated!")
+				PrintMessage(HUD_PRINTTALK, "Combine Defeated!")
 				end
-				else
-				print("DEFAULTGAME isnt 1")
-			end
+		--	end
 		end
-		CanCheck = 0
-		OverwatchAmbientOne()
-	
 end
 function CreateHeliPath(pos)
 creating = ents.Create( "path_track" )
