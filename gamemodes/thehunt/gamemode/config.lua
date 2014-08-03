@@ -23,7 +23,7 @@ MAXDEATHS=3 --Maximun deaths before the game makes you wait.
 NOOBPUNISH=40 -- How much seconds to have noobs waiting before they spawn again.
 
 -- NOT editable in real time: These variables can only be changed via this config file.
-AUTOSTART = 0 -- does the game start automatically when you load the map? if not, you'll need to run firstwave on the console to start the combine raid.  1=yes, 0=no.
+AUTOSTART = 1 -- does the game start automatically when you load the map? if not, you'll need to run firstwave on the console to start the combine raid.  1=yes, 0=no.
 
 HALOS = 1 -- Should outlines be drawn around important entities? If 1, players will see Players outlined in green, enemies outlined in red, and dangerous items outlined in yellow.  1=yes, 0=no.
 HEALTHELP = 40 -- While a player's health is below this, nearby Healthchargers will be outlined in blue. Requires the HALOS setting set to 1.
