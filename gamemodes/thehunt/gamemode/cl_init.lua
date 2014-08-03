@@ -14,8 +14,8 @@ end )
 end)
 
 darkencolor = Color(255,0,0,255)
-HUDTEXT = "Hold on..."
-HUDCOLOR = Color(255,0,0,255)
+HUDTEXT = "Hidden"
+HUDCOLOR = Color(51,255,0)
 light_above_limit = 3
 
 
