@@ -59,9 +59,9 @@ Vector(120.340599, -3447.776367, 232.031250),
 }
 
 function FirstSpawn()
-PrintMessage(HUD_PRINTTALK, "The Combine are coming!")
-PrintMessage(HUD_PRINTTALK, "Hide and try to kill them without being noticed!")
-PrintMessage(HUD_PRINTTALK, "Be creative, and use map features to take advantage over them!")
+ply:PrintMessage(HUD_PRINTTALK, "This map features three full waves of Combines.")
+ply:PrintMessage(HUD_PRINTTALK, "The first wave it's coming. Hide!")
+ply:PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second wave will come.")
 end
 
 
