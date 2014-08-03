@@ -63,7 +63,7 @@ DARK_WEAPONS = { "weapon_frag", "weapon_crowbar" }
 
 
 SILENT_WEAPONS = { "weapon_frag", "weapon_crossbow", "weapon_crowbar", "suppressed_pistol", "suppressed_smg1" }
--- Any weapon that's not included on this table will be considered a loud weapon and it's gunshots will attrack combine.
+-- Any weapon that's not included on this table will be considered a loud weapon and it's gunshots will attract combine.
 
 SECONDARY_FIRE_WEAPONS = { "weapon_ar2", }
 -- Weapons that have a loud secondary fire.
