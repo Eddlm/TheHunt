@@ -12,7 +12,7 @@ Vector(318.459747, -686.967041, -7.707550),
 
 
 
-function FirstSpawn()
+function GM:PlayerInitialSpawn(ply)
 ply:PrintMessage(HUD_PRINTTALK, "This map features three full waves of Combines.")
 ply:PrintMessage(HUD_PRINTTALK, "The first wave it's coming. Hide!")
 ply:PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second wave will come.")

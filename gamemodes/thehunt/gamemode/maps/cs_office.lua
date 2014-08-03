@@ -48,11 +48,10 @@ Vector(-1192.216553, 1217.630005, -346.024506),
 Vector(-1209.991821, 480.031372, -266.932922),
 }
 
-
-function FirstSpawn()
-PrintMessage(HUD_PRINTTALK, "This map features three full waves of Combines.")
-PrintMessage(HUD_PRINTTALK, "The first wave it's coming. Hide!")
-PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second wave will come.")
+function GM:PlayerInitialSpawn(ply)
+ply:PrintMessage(HUD_PRINTTALK, "This map features three full waves of Combines.")
+ply:PrintMessage(HUD_PRINTTALK, "The first wave it's coming. Hide!")
+ply:PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second wave will come.")
 
 	for k,v in pairs(ents.FindByClass("func_door")) do
 		print (v:GetClass())
