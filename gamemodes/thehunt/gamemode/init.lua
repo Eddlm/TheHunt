@@ -58,6 +58,9 @@ function GM:Initialize()
 thereareplayers = 0
 RunConsoleCommand( "sk_helicopter_health", "1500") 
 RunConsoleCommand( "air_density", "0")
+RunConsoleCommand( "g_ragdoll_maxcount", "6")
+
+ 
 NODES = 0
 end
 
@@ -330,41 +333,63 @@ end )
 concommand.Add( "firstwave", function()
 Wave = 1
 timer.Create( "firstwave", 2, CombineFirstWave, firstwave ) 
---timer.Create( "wavefinishedchecker", 30, 1, wavefinishedchecker)
 end )
 concommand.Add( "secondwave", function()
 Wave = 2
 timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) 
---timer.Create( "wavefinishedchecker", 20, 1, wavefinishedchecker)
-
 end )
 concommand.Add( "thirdwave", function()
 Wave = 3
 timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) 
---timer.Create( "wavefinishedchecker", 20, 1, wavefinishedchecker)
-
 end )
 concommand.Add( "fourthwave", function()
 Wave = 4
 timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 
---timer.Create( "wavefinishedchecker", 20, 1, wavefinishedchecker)
-
 end )
 concommand.Add( "fifthwave", function()
 Wave = 5
 timer.Create( "fifthwave", 2, CombineFifthWave, fifthwave ) 
---timer.Create( "wavefinishedchecker", 20, 1, wavefinishedchecker)
-
 end )
 -- UTILITY COMMANDS ^
+
 
 -- UTILITY FUNCTIONS v (called by the commands or by game hooks)
 function OverwatchAmbientOne()
 		table.Random(player.GetAll()):EmitSound(table.Random(OverwatchAmbientSoundsOne), 100, 100)
 end
 
+function GM:PlayerDeathThink(ply)
+if ply:Deaths() == MAXDEATHS then
+if ply:KeyPressed(IN_ATTACK2) then
+ply:SpectateEntity(table.Random(player.GetAll()))
+end
+
+if !timer.Exists("Playernoobspawn") then
+timer.Create( "Playernoobspawn", NOOBPUNISH, 1, function() ply:UnSpectate() ply:SetDeaths(0) ply:SetFrags(0) ply:Spawn() end ) 
+end
+else
+--if !timer.Exists("Playerspawn") then
+if ply:KeyPressed(IN_ATTACK2) then
+ply:UnSpectate()
+ply:Spectate(4)
+ply:SetMoveType(10)
+
+ply:SpectateEntity(table.Random(player.GetAll()))
+end
+if ply:KeyPressed(IN_ATTACK) then
+ply:UnSpectate()
+ply:Spawn()
+--timer.Create( "Playerspawn", 3, 1, function() ply:UnSpectate()	ply:Spawn() end ) 
+end
+end
+end
+
+
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
+
+if attacker:IsNPC() then
 attacker:EmitSound(table.Random(CombineKillSounds), 100, 100)
+end
 
 -- One npc_sniper can only kill one player, then, it won't shoot players anymore. So I remove it and respawn another when he kills a player.
 if attacker:GetClass() == "npc_sniper" then
@@ -381,7 +406,28 @@ if key > 1 then
 print(value:GetClass())
 SpawnItem(value:GetClass(), ply:GetPos()+Vector(math.random(-30,30),math.random(-30,30),20), Angle(0,0,0))
 end
-end) 
+end)
+
+
+
+if MAXDEATHS == ply:Deaths() then
+ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left. You will respawn in "..NOOBPUNISH.." seconds.")
+ply:PrintMessage(HUD_PRINTTALK, "While you wait, think on a better strategy for the next time.")
+else
+ply:PrintMessage(HUD_PRINTTALK, "You have "..MAXDEATHS-ply:Deaths().." lifes left.")
+end
+timer.Create( "ddd", 3, 1, function()
+if ply:Deaths() == MAXDEATHS then
+--	ply:Spectate( OBS_MODE_FREEZECAM )
+--  ply:SpectateEntity( attacker ) 
+ply:Spectate(4)
+ply:SetMoveType(10)
+
+	else
+--ply:SpectateEntity(attacker)
+end
+end)
+
 end
 
 function NearbyEntities()
@@ -395,7 +441,8 @@ end
 function autofirstwave()
 timer.Create( "firstwave", 2, CombineFirstWave, firstwave )
 WAVESPAWN = 1
-timer.Simple( 10, function() WAVESPAWN = 0 end)		
+timer.Simple( 30, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
+timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
 end
 
 function wavefinishedchecker()
@@ -425,8 +472,8 @@ function waveend()
 		end
 		timer.Simple(TIME_BETWEEN_WAVES, function()
 		WAVESPAWN = 1
-		timer.Simple( 10, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
-		timer.Simple( 10, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
+		timer.Simple( 30, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
+		timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
 		if Wave == 1 then timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) end
 		if Wave == 2 then timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) end
 		if Wave == 3 then timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 	end
@@ -613,6 +660,8 @@ NPC = ents.Create( "npc_combine_s" )
 NPC:SetKeyValue("NumGrenades", "0") 
 NPC:SetPos( pos )
 NPC:SetKeyValue( "ignoreunseenenemies", 1 )
+NPC:SetKeyValue( "spawnflags", 512 )
+
 NPC:Spawn()
 NPC:Give("ai_weapon_ar2")
 combinen = combinen + 1
@@ -626,6 +675,8 @@ NPC = ents.Create( "npc_combine_s" )
 NPC:SetKeyValue("NumGrenades", ""..math.random(1,3).."") 
 NPC:SetPos( pos )
 NPC:SetKeyValue( "ignoreunseenenemies", 0 )
+NPC:SetKeyValue( "spawnflags", 512 )
+
 NPC:Spawn()
 NPC:Give("ai_weapon_ar2")
 combinen = combinen + 1
@@ -639,6 +690,8 @@ NPC = ents.Create( "npc_combine_s" )
 NPC:SetKeyValue("NumGrenades", "0") 
 NPC:SetPos( pos )
 NPC:SetKeyValue( "ignoreunseenenemies", 0 )
+NPC:SetKeyValue( "spawnflags", 512 )
+
 NPC:SetSkin(1)
 NPC:Spawn()
 NPC:Give("ai_weapon_shotgun")
@@ -652,6 +705,8 @@ NPC = ents.Create( "npc_combine_s" )
 NPC:SetKeyValue("NumGrenades", ""..math.random(2,3).."")
 NPC:SetPos( pos )
 NPC:SetKeyValue( "ignoreunseenenemies", 0 )
+NPC:SetKeyValue( "spawnflags", 512 )
+
 NPC:SetSkin(1)
 NPC:Spawn()
 NPC:Give("ai_weapon_shotgun")
@@ -667,6 +722,8 @@ NPC:SetKeyValue("Manhacks", math.random(0,1))
 NPC:SetKeyValue( "model", "models/Police.mdl" )
 NPC:SetPos( pos )
 NPC:SetKeyValue( "ignoreunseenenemies", 0 )
+NPC:SetKeyValue( "spawnflags", "512" )
+
 NPC:SetKeyValue("squadname", "")
 NPC:Spawn()
 NPC:Give("ai_weapon_pistol")
@@ -682,6 +739,8 @@ NPC:SetKeyValue( "model", "models/Police.mdl" )
 NPC:SetPos( pos )
 NPC:SetKeyValue( "ignoreunseenenemies", 0 )
 -- NPC:SetKeyValue("squadname", "heliaforce")
+NPC:SetKeyValue( "spawnflags", 512 )
+
 NPC:Spawn()
 NPC:Give("ai_weapon_smg1")
 combinen = combinen + 1
@@ -717,6 +776,8 @@ function SpawnCombineElite1( pos )
 	NPC:SetKeyValue("NumGrenades", "0") 
 	NPC:SetKeyValue( "model", "models/Combine_Super_Soldier.mdl" )
 	NPC:SetPos( pos )
+	NPC:SetKeyValue( "spawnflags", 512 )
+
 	NPC:Spawn()
 	NPC:Give( "ai_weapon_ar2" )
 	combinen = combinen + 1
@@ -731,6 +792,8 @@ function SpawnCombineElite2( pos )
 	NPC:SetKeyValue( "model", "models/Combine_Super_Soldier.mdl" )
 	NPC:SetKeyValue( "spawnflags", "256" )
 	NPC:SetPos( pos )
+	NPC:SetKeyValue( "spawnflags", 512 )
+
 	NPC:Spawn()
 	NPC:Give( "ai_weapon_ar2" )
 	combinen = combinen + 1

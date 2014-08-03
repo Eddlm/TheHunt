@@ -3,20 +3,19 @@ include( "config.lua" )
 
 timer.Simple(4,function()
 hook.Add( "HUDPaint", "HelloThere", function()
-	draw.DrawText( HUDTEXT, "TargetID", ScrW() * 0.92, ScrH() * 0.85, HUDCOLOR, TEXT_ALIGN_RIGHT )
+	draw.DrawText( HUDTEXT, "TargetID", ScrW() * 0.95, ScrH() * 0.82, HUDCOLOR, TEXT_ALIGN_RIGHT )
 	if LIGHT_BASED_STEALTH_SYSTEM == 1 then
 
-	draw.DrawText( "Illumination: "..math.Round(lightcol,1).."", "TargetID", ScrW() * 0.92, ScrH() * 0.87, darkencolor, TEXT_ALIGN_RIGHT )
+	draw.DrawText( "Illumination: "..math.Round(lightcol,1).."", "TargetID", ScrW() * 0.95, ScrH() * 0.80, darkencolor, TEXT_ALIGN_RIGHT )
 	--draw.DrawText( darken, "TargetID", ScrW() * 0.92, ScrH() * 0.83, darkencolor, TEXT_ALIGN_RIGHT )
 	--draw.RoundedBox(4,ScrW() * 0.92, ScrH() * 0.83,20,20,darkencolor)
 end
 end )
 end)
 
-darken = "Loading module..."
-darkencolor = Color(255,0,0,150)
-HUDTEXT = ""
-HUDCOLOR = Color(255,0,0,150)
+darkencolor = Color(255,0,0,255)
+HUDTEXT = "Hold on..."
+HUDCOLOR = Color(255,0,0,255)
 light_above_limit = 3
 
 
@@ -33,6 +32,7 @@ tabletrace.endpos = LocalPlayer():GetAimVector()*2
 tabletrace.filter = LocalPlayer()
 
 */
+
 net.Receive( "Spotted", function( length, client )
 	HUDTEXT = 'Spotted'
 	HUDCOLOR=Color(255,8,8)
@@ -40,19 +40,14 @@ end )
 
 
 net.Receive( "Hidden", function( length, client )
-	HUDTEXT='Hidden'
+	HUDTEXT='Safe'
 	HUDCOLOR=Color(51,255,0)
 end )
 
 hook.Add( "PreDrawHalos", "AddHalos", function()
-if HALOS == 1 then
-	for k, v in pairs(ents.FindByClass("player"))  do
-	if v:Health() > 1 then
-        effects.halo.Add( {v}, Color( 18,176,0 ), 1, 1, 3, true, true )
-	end
-	end
+if HALOS == 1 && LocalPlayer():Alive() then
 
-	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(),2000)) do
+	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(),100)) do
 	if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
 	if v:IsValid() then
         effects.halo.Add( {v}, Color( 84,2,2 ), 1, 1, 1, true, true )
@@ -64,9 +59,15 @@ if HALOS == 1 then
 	if v:GetClass() == "item_healthcharger" && LocalPlayer():Health() < HEALTHELP and LocalPlayer():Health() > 0 then
         effects.halo.Add( {v}, Color( 0,204,255 ), 1, 1, 1, true, true )
 	end
+	
+	if v:IsPlayer() then
+	if v:Health() > 1 then
+        effects.halo.Add( {v}, Color( 18,176,0 ), 1, 1, 3, true, true )
+	end
 	end
 end
-end )
+end 
+end)
 
 
 function GM:PostDrawViewModel( vm, ply, weapon )
@@ -94,18 +95,6 @@ end
 end
 end
 end
-function StatusChecker()
-timer.Create( "StatusChecker", 1, 1, StatusChecker ) 
-	if LocalPlayer():GetNWInt("status") == "spotted" then
-	HUDTEXT = 'Spotted'
-	HUDCOLOR=Color(255,8,8)
-	else
-	HUDTEXT='Hidden'
-	HUDCOLOR=Color(51,255,0)
-	end
-end
--- timer.Create( "StatusChecker", 1, 1, StatusChecker ) 
-
 function CombineBootsRun()
 
 if LocalPlayer() then
@@ -142,7 +131,11 @@ function PerceivedLuminance(colorvec)
 return (0.299*colorvec.x + 0.587*colorvec.y + 0.114*colorvec.z)
 end
 
-
+function GM:PlayerSpawn()
+if LIGHT_BASED_STEALTH_SYSTEM == 1 then
+light()
+end
+end
 
 function light()
 timer.Create( "Light", 0.1, 1, light )
@@ -159,21 +152,16 @@ if LocalPlayer():Crouching() then lightcol=lightcol-1 end
 if LocalPlayer():FlashlightIsOn() then if lightcol < 20 then lightcol = lightcol+30 end end
 end
 
-
---if lightcol < 0 then lightcol = 0 end
---print(lightcol)
---print(util.TraceLine(tabletrace).Entity)
-
 if lightcol <= 2 then
 	if light_above_limit != 0 then
 	darken = "dark place"
 	darkencolor = Color(5,54,0,255)
 		if LocalPlayer():GetVelocity():Length() < 40 then
-
+		if LocalPlayer():Alive() then
 		light_above_limit=0
 		net.Start("light_below_limit")
 		net.SendToServer()
-
+		end
 		end
 
 end
@@ -189,9 +177,11 @@ if lightcol > 2 then
 	darkencolor = Color(255,255,255,255)
 	end
 	if light_above_limit != 1 then
+	if LocalPlayer():Alive() then
 	light_above_limit=1
 	net.Start("light_above_limit")
 	net.SendToServer()
+	end
 	end
 end
 end

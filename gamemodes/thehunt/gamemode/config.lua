@@ -19,9 +19,11 @@ AUTOREPEAT = 1 -- Does the game start again automatically when you survive the f
 RPGMAX = 1 -- How many RPGs should spawn on helicopter-boss maps?
 MAXGUNSHOTINVESTIGATE = 4 -- Maximun number of combine who will come to investigate a gunshot. Default: 4
 KILL_UNUSED_WEAPONS = 0 -- If 1, it will remove any weapon left alone more than one minute, so it can respawn on a new place. Useful if you can't find weapons easily.  1=yes, 0=no.
+MAXDEATHS=3 --Maximun deaths before the game makes you wait.
+NOOBPUNISH=40 -- How much seconds to have noobs waiting before they spawn again.
 
 -- NOT editable in real time: These variables can only be changed via this config file.
-AUTOSTART = 1 -- does the game start automatically when you load the map? if not, you'll need to run firstwave on the console to start the combine raid.  1=yes, 0=no.
+AUTOSTART = 0 -- does the game start automatically when you load the map? if not, you'll need to run firstwave on the console to start the combine raid.  1=yes, 0=no.
 
 HALOS = 1 -- Should outlines be drawn around important entities? If 1, players will see Players outlined in green, enemies outlined in red, and dangerous items outlined in yellow.  1=yes, 0=no.
 HEALTHELP = 40 -- While a player's health is below this, nearby Healthchargers will be outlined in blue. Requires the HALOS setting set to 1.
