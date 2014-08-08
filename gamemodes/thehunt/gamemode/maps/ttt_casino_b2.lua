@@ -4,6 +4,7 @@ CombineSecondWave = 15
 CombineThirdWave = 15
 CombineFourthWave = 15
 CombineFifthWave = 20
+CombineInfiniteWave = 20
 
 zonescovered ={
 Vector(836.879578, -540.654480, -333.608490),
@@ -30,7 +31,7 @@ Vector(3085.746582, 1062.142090, -453.610748),
 }
 
 ITEMPLACES ={
-/*
+
 Vector(-55.533367, -657.813293, -330.130920),
 Vector(97.264153, 943.915649, -291.444733),
 Vector(-78.339119, 1197.247314, -291.444733),
@@ -41,7 +42,7 @@ Vector(393.465851, 221.868484, -145.659744),
 Vector(-272.442139, 1070.221680, -168.173691),
 Vector(1097.548706, 1297.175049, -190.173676),
 Vector(-436.397766, 743.798462, -317.603882),
-*/
+
 }
 
 combinespawnzones = {

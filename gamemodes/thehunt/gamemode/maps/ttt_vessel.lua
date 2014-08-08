@@ -3,6 +3,8 @@ CombineSecondWave = 10
 CombineThirdWave = 15
 CombineFourthWave = 20
 CombineFifthWave = 1
+CombineInfiniteWave = 20
+
 HeliCanSpotlight = 1
 
 ITEMPLACES ={
@@ -342,3 +344,16 @@ HeliA:Fire("gunon","",0)
 end
 
 
+function infinitewave()
+Wave = 6
+	if math.random (1,6) == 2 then 
+		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
+	elseif math.random (1,6) == 2 then 
+		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
+	else
+		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
+	end
+
+-- CanCheck = 1
+timer.Create( "coverzonesall", 0.4, 1, coverzones)
+end

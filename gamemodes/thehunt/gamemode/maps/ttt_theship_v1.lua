@@ -4,6 +4,7 @@ CombineSecondWave = 15
 CombineThirdWave = 15
 CombineFourthWave = 15
 CombineFifthWave = 20
+CombineInfiniteWave = 20
 
 ITEMPLACES ={
 Vector(315.101501, -2831.495605, 212.031250),

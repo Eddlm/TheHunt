@@ -4,6 +4,7 @@ CombineSecondWave = 15
 CombineThirdWave = 15
 CombineFourthWave = 15
 CombineFifthWave = 20
+CombineInfiniteWave = 20
 
 zonescovered ={
 Vector(550.441528, -368.682709, 528.031250),

@@ -108,8 +108,142 @@ ply:SetNoTarget(0)
 end )
 
 concommand.Add( "HuntVersion", function()
-print("TheHunt Version: v0.5-beta-workshop_edition. Last shit added: ttt_skyscraper")
+print("TheHunt Version: v0.6-beta-PRE_WORKSHOP_UPDATE edition. Last shit added: Silverlan's APC, Infinite waves and Headcrab Canisters.")
 end )
+
+
+concommand.Add( "LaunchCanister", function(ply)
+local canister = ents.Create( "env_headcrabcanister" )
+
+--RocketLauncher:SetKeyValue( "angles", "0 0 90" )
+canister:SetAngles(Angle(-70,math.random(180,-180),0))
+canister:SetPos(ply:GetEyeTraceNoCursor().HitPos /*+ Vector(math.random(200,-200),math.random(200,-200),0)*/)
+canister:SetKeyValue( "HeadcrabType", math.random(0,2) )
+canister:SetKeyValue( "HeadcrabCount", math.random(1,4) )
+canister:SetKeyValue( "FlightSpeed", "9000" )
+canister:SetKeyValue( "FlightTime", "3" )
+canister:SetKeyValue( "StartingHeight", "0" )
+canister:SetKeyValue( "Damage", "5" )
+canister:SetKeyValue( "DamageRadius", "5" )
+canister:SetKeyValue( "SmokeLifetime", "5" )
+canister:SetKeyValue( "MaxSkyboxRefireTime", "5" )
+canister:SetKeyValue( "MinSkyboxRefireTime", "1" )
+canister:SetKeyValue( "SkyboxCannisterCount", "30" )
+canister:Fire("FireCanister","",0.7)
+canister:Spawn()
+end)
+
+
+
+concommand.Add( "SpawnAPC", function(ply)
+local RocketLauncher = ents.Create( "monster_apc" )
+RocketLauncher:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,40))
+--RocketLauncher:SetKeyValue( "spawnflags", "1" )
+RocketLauncher:Spawn()
+end)
+
+concommand.Add( "SpawnSoldier", function(ply)
+local RocketLauncher = ents.Create( "combine_soldier" )
+RocketLauncher:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,40))
+--RocketLauncher:SetKeyValue( "spawnflags", "1" )
+RocketLauncher:Spawn()
+end)
+
+concommand.Add( "SpawnAPCLauncher", function(ply)
+
+
+local RocketLauncher = ents.Create( "func_tankapcrocket" )
+RocketLauncher:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,40))
+RocketLauncher:SetKeyValue( "spawnflags", "1" )
+RocketLauncher:Spawn()
+
+
+RocketLauncher:SetKeyValue( "yawrate", 30 )
+RocketLauncher:SetKeyValue( "yawrange", 180 )
+RocketLauncher:SetKeyValue( "yawtolerance", 15 )
+RocketLauncher:SetKeyValue( "pitchrate", 30 )
+RocketLauncher:SetKeyValue( "pitchrange", 30 )
+RocketLauncher:SetKeyValue( "pitchtolerance", 30 )
+
+RocketLauncher:SetKeyValue( "barrel", 0 )
+RocketLauncher:SetKeyValue( "barrely", 0 )
+RocketLauncher:SetKeyValue( "barrelz", 0 )
+RocketLauncher:SetKeyValue( "firespread", 0 )
+
+RocketLauncher:Fire("Activate","",0)
+/*
+minRange
+maxRange
+_minlight
+
+--RocketLauncher:Fire("SetEnemyEntity",ply,0)
+--RocketLauncher:Activate()
+print("RocketLauncher spawned")
+--timer.Simple( 1, function()
+RocketLauncher:Fire("FireOnce","",5)
+
+RocketLauncher:Fire("FireOnce","",1)
+print("RocketLauncher activated")
+
+ --end )
+*/
+
+end )
+
+
+concommand.Add( "SpawnRocketLauncher", function(ply)
+
+
+local creating = ents.Create( "path_corner" )
+creating:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,500))
+creating:SetName("ddd")
+creating:Spawn()
+
+
+local RocketLauncher = ents.Create( "npc_launcher" )
+RocketLauncher:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,100))
+RocketLauncher:SetKeyValue( "spawnflags", "65536" )
+
+RocketLauncher:SetKeyValue( "PathCornerName", "PATHLEL" )
+RocketLauncher:SetKeyValue( "MissileModel", "models/Weapons/W_missile.mdl" )
+--RocketLauncher:SetKeyValue( "StartOn", 1)
+RocketLauncher:SetKeyValue( "LaunchSmoke ", 1 )
+RocketLauncher:SetKeyValue( "SmokeTrail", 1 )
+--RocketLauncher:SetKeyValue( "LaunchSound", "weapons/rpg/rocket1.wav" )
+RocketLauncher:SetKeyValue( "LaunchDelay", 1 )
+RocketLauncher:SetKeyValue( "LaunchSpeed ", 100 )
+RocketLauncher:SetKeyValue( "PathCornerName", "ddd" )
+RocketLauncher:SetKeyValue( "HomingSpeed", 800 )
+RocketLauncher:SetKeyValue( "HomingStrength", 100 )
+RocketLauncher:SetKeyValue( "HomingDelay", 1)
+RocketLauncher:SetKeyValue( "HomingRampUp", 3 )
+RocketLauncher:SetKeyValue( "HomingDuration", 5 )
+RocketLauncher:SetKeyValue( "Gravity", 1 )
+RocketLauncher:SetKeyValue( "MinRange", 1 )
+RocketLauncher:SetKeyValue( "MaxRange", 100 )
+RocketLauncher:SetKeyValue( "SpinMagnitude", 100 )
+RocketLauncher:SetKeyValue( "SpinSpeed", 100 )
+RocketLauncher:SetKeyValue( "Damage", 1 )
+RocketLauncher:SetKeyValue( "DamageRadius", 100 )
+RocketLauncher:Fire("SetEnemyEntity",ply,0)
+RocketLauncher:Spawn()
+--RocketLauncher:Activate()
+print("RocketLauncher spawned")
+
+
+RocketLauncher:Fire("TurnOn","",0)
+--timer.Simple( 1, function()
+RocketLauncher:Fire("FireOnce","",5)
+
+RocketLauncher:Fire("FireOnce","",1)
+print("RocketLauncher activated")
+
+ --end )
+
+
+end )
+
+
 
 concommand.Add( "Hidden", function()
 net.Start( "Hidden" )
@@ -332,24 +466,62 @@ end )
 
 concommand.Add( "firstwave", function()
 Wave = 1
-timer.Create( "firstwave", 2, CombineFirstWave, firstwave ) 
+timer.Create( "firstwave", 2, CombineFirstWave, firstwave )
+WAVESPAWN = 1
+timer.Simple( 30, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
+timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )	
 end )
 concommand.Add( "secondwave", function()
 Wave = 2
 timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) 
+WAVESPAWN = 1
+timer.Simple( 30, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
+timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )	
+
 end )
 concommand.Add( "thirdwave", function()
 Wave = 3
 timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) 
+WAVESPAWN = 1
+timer.Simple( 30, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
+timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )	
+
 end )
 concommand.Add( "fourthwave", function()
 Wave = 4
 timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 
+WAVESPAWN = 1
+timer.Simple( 30, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
+timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )	
+
 end )
 concommand.Add( "fifthwave", function()
 Wave = 5
 timer.Create( "fifthwave", 2, CombineFifthWave, fifthwave ) 
+WAVESPAWN = 1
+timer.Simple( 30, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
+timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )	
 end )
+
+concommand.Add( "infinitewave", function()
+Wave = 6
+infinitewavehandler()
+end )
+concommand.Add( "combinehatecrates", function()
+for k, v in pairs(ents.FindByClass("npc_combine_s")) do
+v:AddRelationship("prop_physics D_HT 999")
+v:AddRelationship("prop_physics_multiplayer D_HT 999")
+
+end
+end)
+
+function NUMPLAYERS()
+PLAYERSINMAP=0
+for k, v in pairs(ents.FindByClass("player")) do
+PLAYERSINMAP=PLAYERSINMAP+1
+end
+end
+
 -- UTILITY COMMANDS ^
 
 
@@ -359,7 +531,8 @@ function OverwatchAmbientOne()
 end
 
 function GM:PlayerDeathThink(ply)
-if ply:Deaths() == MAXDEATHS then
+if PLAYERSINMAP > 1 then 
+if MAXDEATHS == ply:Deaths() or MAXDEATHS > ply:Deaths() then
 if ply:KeyPressed(IN_ATTACK2) then
 ply:SpectateEntity(table.Random(player.GetAll()))
 end
@@ -367,26 +540,31 @@ end
 if !timer.Exists("Playernoobspawn") then
 timer.Create( "Playernoobspawn", NOOBPUNISH, 1, function() ply:UnSpectate() ply:SetDeaths(0) ply:SetFrags(0) ply:Spawn() end ) 
 end
+
 else
+
 --if !timer.Exists("Playerspawn") then
 if ply:KeyPressed(IN_ATTACK2) then
 ply:UnSpectate()
 ply:Spectate(4)
 ply:SetMoveType(10)
-
 ply:SpectateEntity(table.Random(player.GetAll()))
 end
+
 if ply:KeyPressed(IN_ATTACK) then
 ply:UnSpectate()
 ply:Spawn()
---timer.Create( "Playerspawn", 3, 1, function() ply:UnSpectate()	ply:Spawn() end ) 
 end
+end
+
+elseif ply:KeyPressed(IN_ATTACK) then
+ply:Spawn()
 end
 end
 
 
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
-
+NUMPLAYERS()
 if attacker:IsNPC() then
 attacker:EmitSound(table.Random(CombineKillSounds), 100, 100)
 end
@@ -408,26 +586,18 @@ SpawnItem(value:GetClass(), ply:GetPos()+Vector(math.random(-30,30),math.random(
 end
 end)
 
-
-
-if MAXDEATHS == ply:Deaths() then
+timer.Create( "ddd", 3, 1, function()
+if PLAYERSINMAP > 1 then 
+if MAXDEATHS == ply:Deaths() or MAXDEATHS > ply:Deaths() then
+ply:Spectate(4)
+ply:SetMoveType(10)
 ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left. You will respawn in "..NOOBPUNISH.." seconds.")
 ply:PrintMessage(HUD_PRINTTALK, "While you wait, think on a better strategy for the next time.")
 else
 ply:PrintMessage(HUD_PRINTTALK, "You have "..MAXDEATHS-ply:Deaths().." lifes left.")
 end
-timer.Create( "ddd", 3, 1, function()
-if ply:Deaths() == MAXDEATHS then
---	ply:Spectate( OBS_MODE_FREEZECAM )
---  ply:SpectateEntity( attacker ) 
-ply:Spectate(4)
-ply:SetMoveType(10)
-
-	else
---ply:SpectateEntity(attacker)
 end
 end)
-
 end
 
 function NearbyEntities()
@@ -466,29 +636,57 @@ end
 end
 
 function waveend()
+		WAVESPAWN = 1
+
 		OverwatchAmbientOne()
 		if Wave < 5 then
-			PrintMessage(HUD_PRINTTALK, "Squad Nº"..Wave.." defeated!")
+			PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..Wave.." proven unable to contain hostiles.")
 		end
 		timer.Simple(TIME_BETWEEN_WAVES, function()
-		WAVESPAWN = 1
 		timer.Simple( 30, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
 		timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
-		if Wave == 1 then timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) end
-		if Wave == 2 then timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) end
-		if Wave == 3 then timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 	end
-		if Wave == 4 then timer.Create( "fifthwave", 2, CombineFifthWave, fifthwave )  end
+		if Wave == 1 then timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) 
+		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
+		if Wave == 2 then timer.Create( "thirdwave", 2, CombineThirdWave, thirdwave ) 
+		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
+		if Wave == 3 then timer.Create( "fourthwave", 2, CombineFourthWave, fourthwave ) 
+		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
+		if Wave == 4 then timer.Create( "fifthwave", 2, CombineFifthWave, fifthwave )  
+		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
 		end)
-		if Wave == 5 then 
-		--	if DEFAULTGAME == 1 then
-				if AUTOREPEAT == 1 then
+		if Wave == 5 or Wave == 6 then 
+				if INFINITE_MODE == 1 then
+				infinitewavehandler()
+				elseif AUTOREPEAT == 1 then
 				timer.Simple(5, autofirstwave)
 				PrintMessage(HUD_PRINTTALK, "Combine Defeated! Restarting Squads!")
-				else
-				PrintMessage(HUD_PRINTTALK, "Combine Defeated!")
 				end
-		--	end
+
 		end
+		end
+		
+function infinitewavehandler()
+		WAVESPAWN = 1
+
+CanCheck = 0
+Wave=6
+PrintMessage(HUD_PRINTTALK, "[Overwatch]: Dude you fucked up.")
+
+if math.random(1,2) == 2 then
+	timer.Simple(20, function()
+	timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
+	timer.Create( "infinitewave", 2, CombineInfiniteWave, infinitewave )
+	timer.Simple(20, function() CanCheck = 0 end)
+	end)
+	timer.Create( "launchanisters", 3, 5, function()
+	SpawnCanister(table.Random(player.GetAll()):GetPos())
+	end	) 
+
+else
+	timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
+	timer.Create( "infinitewave", 2, CombineInfiniteWave, infinitewave )
+end
+
 end
 function CreateHeliPath(pos)
 creating = ents.Create( "path_track" )
@@ -630,6 +828,27 @@ NPCSpotlight:Spawn()
 NPCSpotlight:Activate()
 end
 
+function SpawnCanister( pos )
+
+local canister = ents.Create( "env_headcrabcanister" )
+
+--RocketLauncher:SetKeyValue( "angles", "0 0 90" )
+canister:SetAngles(Angle(-70,math.random(180,-180),0))
+canister:SetPos(pos + Vector(math.random(200,-200),math.random(200,-200),0))
+canister:SetKeyValue( "HeadcrabType", math.random(0,2) )
+canister:SetKeyValue( "HeadcrabCount", math.random(1,4) )
+canister:SetKeyValue( "FlightSpeed", "9000" )
+canister:SetKeyValue( "FlightTime", "3" )
+canister:SetKeyValue( "StartingHeight", "0" )
+canister:SetKeyValue( "Damage", "5" )
+canister:SetKeyValue( "DamageRadius", "5" )
+canister:SetKeyValue( "SmokeLifetime", "5" )
+canister:SetKeyValue( "MaxSkyboxRefireTime", "5" )
+canister:SetKeyValue( "MinSkyboxRefireTime", "1" )
+canister:SetKeyValue( "SkyboxCannisterCount", "30" )
+canister:Fire("FireCanister","",0.7)
+canister:Spawn()
+end
 function SpawnRebel( pos )
 NPC = ents.Create( "npc_citizen" )
 NPC:SetPos( pos )
@@ -1065,6 +1284,7 @@ value.spotted = 0
 end)
 table.foreach(MainEnemies, function(key,enemy)
 for k, v in pairs(ents.FindByClass(enemy)) do 
+v:SetKeyValue("squadname", "")
 if v:GetEnemy() then if v:GetEnemy():IsPlayer() then
 --v:GetEnemy():PrintMessage(HUD_PRINTTALK, ""..v:GetName().." lost "..v:GetEnemy():GetName().."")
 v:ClearEnemyMemory() 
@@ -1130,8 +1350,9 @@ for k, npc in pairs(ents.FindByClass(enemy)) do
 if npc:Health() > 0 then
 
 if npc:GetEnemy() then
+	if npc:IsCurrentSchedule(SCHED_FORCED_GO) or npc:IsCurrentSchedule(SCHED_IDLE_WANDER) or npc:IsCurrentSchedule(SCHED_FORCED_GO_RUN)	then npc:ClearSchedule() end
 if npc:GetEnemy():IsPlayer() then
---npc:SetKeyValue("squadname", "CombineSquad")
+npc:SetKeyValue("squadname", "CombineSquad")
 if npc:GetEnemy().spotted != 1 then
 if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
 npc:EmitSound(table.Random(ContactConfirmed), 100, 100) end
@@ -1140,7 +1361,7 @@ net.Start("Spotted")
 net.Send(npc:GetEnemy())
 npc:GetEnemy().spotted = 1
 end
-	if npc:IsCurrentSchedule(SCHED_FORCED_GO) || npc:IsCurrentSchedule(SCHED_FORCED_GO_RUN)	then npc:ClearSchedule() end
+
 	if npc:HasCondition(10) then
 		if timer.Exists("npcforgettimer") then
 		timer.Destroy( "npcforgettimer")
@@ -1196,7 +1417,7 @@ if HeliIsDead != 1 then
 				helispotlight:Fire("Target", ""..tostring(HeliA:GetEnemy():GetName()).."focus", 0)
 				end
 if HeliA:HasCondition(10) then
-nearbycombinecome(HeliA:GetEnemy())
+nearbycombinecome(HeliA,HeliA:GetEnemy())
 end
 		end
 end
@@ -1431,6 +1652,11 @@ end
 end
 
 function GM:EntityTakeDamage(damaged,damage)
+if damage:GetAttacker():GetClass() =="monster_apc" then
+damage:ScaleDamage(NPCSCALEDAMAGE)
+end
+
+
 
 if !damaged:IsNPC() then
 nearbycombinecomecasual(damage:GetAttacker())
@@ -1468,11 +1694,7 @@ if FRIENDLYFIRE != 1 then
 	end
 	if damaged:IsNPC() && damage:GetAttacker():IsNPC() then
 	if damaged:GetClass() == damage:GetAttacker():GetClass() then
-		if damaged:EntIndex() == damage:GetAttacker():EntIndex() then
-		damage:ScaleDamage(NPCSCALEDAMAGE)
-		else
 		damage:ScaleDamage(0)
-		end
 	end
 	end
 end
@@ -1480,7 +1702,7 @@ end
 if damaged:GetClass() == "npc_helicopter" then
 if damaged:Health() < 800 && HeliIsDead != 1 then
 if HeliAangered == 0 then
-PrintMessage(HUD_PRINTTALK, "The helicopter is now desesperate.")
+PrintMessage(HUD_PRINTTALK, "[Overwatch]: Air enforcement unit, you are now free to employ aggresive containment tactics.")
 
 RunConsoleCommand( "g_helicopter_chargetime", "1") 
 HeliA:Fire("BlindfireOn","",0)
@@ -1508,7 +1730,7 @@ HeliAangered = 1
 end
 
 if damaged:Health() < 151 then
-PrintMessage(HUD_PRINTTALK, "The helicopter is almost dead. Beware...")
+PrintMessage(HUD_PRINTTALK, "[Overwatch]: All units, "..damaged:GetName().." state changed to: inoperative.")
 timer.Simple(1 , helideath)
 creating = ents.Create( "info_target_helicopter_crash" )
 creating:SetPos(damage:GetAttacker():GetPos() + Vector(0, 0, 500))
@@ -1527,7 +1749,6 @@ damaged:SetHealth(0)
 PrintMessage(HUD_PRINTTALK, ""..damage:GetAttacker():GetName().." got that Sniper out of the way ")
 end
 end
-
 
 if damaged:GetClass() == "npc_turret_ceiling" then
 if damage:IsDamageType(64) then

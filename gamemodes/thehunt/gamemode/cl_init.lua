@@ -47,7 +47,7 @@ end )
 hook.Add( "PreDrawHalos", "AddHalos", function()
 if HALOS == 1 && LocalPlayer():Alive() then
 
-	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(),100)) do
+	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(),1000)) do
 	if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
 	if v:IsValid() then
         effects.halo.Add( {v}, Color( 84,2,2 ), 1, 1, 1, true, true )
@@ -68,6 +68,7 @@ if HALOS == 1 && LocalPlayer():Alive() then
 end
 end 
 end)
+
 
 
 function GM:PostDrawViewModel( vm, ply, weapon )
@@ -131,11 +132,6 @@ function PerceivedLuminance(colorvec)
 return (0.299*colorvec.x + 0.587*colorvec.y + 0.114*colorvec.z)
 end
 
-function GM:PlayerSpawn()
-if LIGHT_BASED_STEALTH_SYSTEM == 1 then
-light()
-end
-end
 
 function light()
 timer.Create( "Light", 0.1, 1, light )
@@ -243,7 +239,7 @@ draw.SimpleText( text, font, x, y, self:GetTeamColor( trace.Entity ) )
 end
 
 if LIGHT_BASED_STEALTH_SYSTEM == 1 then
-timer.Create( "Light", 2, 1, light )
+timer.Create( "Light", 5, 1, light )
 lightcol = 0
 end
 

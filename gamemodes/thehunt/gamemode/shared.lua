@@ -49,6 +49,20 @@ function nearbycombinecome(suspect)
 end
 end
 
+function nearbycombinecomeheli(spotter,suspect)
+		for k, v in pairs(ents.FindInSphere(spotter:GetPos(),2024)) do
+				if (v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s") then 
+						if !v:GetEnemy() then
+						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
+							print(""..v:GetName().." heard that.")
+							v:SetLastPosition(suspect:GetPos())
+							v:SetSchedule(SCHED_FORCED_GO_RUN)
+							end
+						end
+					end
+end
+end
+
 
 
 function nearbycombinecomecasual(suspect)
@@ -200,7 +214,6 @@ end
 timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 print("")
 end
-
 
 MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
 MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_turret_ceiling"}

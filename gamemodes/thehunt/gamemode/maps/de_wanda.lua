@@ -1,10 +1,10 @@
-
 include( "basewaves.lua" )
 CombineFirstWave = 8
 CombineSecondWave = 10
 CombineThirdWave = 15
 CombineFourthWave = 15
 CombineFifthWave = 20
+CombineInfiniteWave = 20
 
 ITEMPLACES ={
 Vector(318.459747, -686.967041, -7.707550),

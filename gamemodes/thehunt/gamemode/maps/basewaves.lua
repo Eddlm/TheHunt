@@ -63,3 +63,19 @@ PrintMessage(HUD_PRINTCENTER, "Final Squad!")
 -- CanCheck = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
+
+
+
+function infinitewave()
+Wave = 6
+	if math.random (1,6) == 2 then 
+		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
+	elseif math.random (1,6) == 2 then 
+		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
+	else
+		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
+	end
+
+-- CanCheck = 1
+timer.Create( "coverzonesall", 0.4, 1, coverzones)
+end
