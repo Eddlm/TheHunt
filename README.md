@@ -1,3 +1,6 @@
+
+Workshop version: http://steamcommunity.com/sharedfiles/filedetails/?id=292275126
+
 HOW TO INSTALL
 ==============
 Click https://github.com/Eddlm/TheHunt to get the latest version. You can go https://github.com/Eddlm/TheHunt/archive/master.zip for a direct download.
@@ -18,6 +21,7 @@ and fill the tables with the new weapons/items.
 
 TheHunt
 =======
+
 This gamemode is about a hunt, in which you are the prey.
 
 On each map, multiple NPCs will come in squads and will try to find the players. If one player is found, more combine will go to that place, while the ones who spotted the player will try to kill him.
