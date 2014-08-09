@@ -10,7 +10,12 @@ Select a map. If you select multiple players, some options will appear below. Co
 
 Done.
 
-=======
+HOW TO INSTALL CUSTOM WEAPONS/ITEMS
+==============
+First, make sure your server/game has the weapons installed and you can use them.
+Then, go to this file https://github.com/Eddlm/TheHunt/blob/master/gamemodes/thehunt/gamemode/config.lua
+and fill the tables with the new weapons/items.
+
 TheHunt
 =======
 This gamemode is about a hunt, in which you are the prey.
