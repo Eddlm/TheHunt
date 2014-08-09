@@ -7,26 +7,9 @@ GM.Website = "http://facepunch.com/showthread.php?t=1391522"
 
 
 
-function GM:ShouldCollide(ent1,ent2)
-if SERVER then
-if ent1:IsPlayer() or ent2:IsPlayer() then
-if ent1:IsNPC() or ent2:IsNPC() then
-if ent1:GetPos():Distance(ent2:GetPos()) < 50 then
-if ent1:IsPlayer() and ent2:GetClass() != "npc_turret_floor" then print("Bumped into something, lost hiding")
- ent1:SetNoTarget(false) end
-if ent2:IsPlayer() and ent1:GetClass() != "npc_turret_floor" then print("Bumped into something, lost hiding")
- ent2:SetNoTarget(false) end
-end
-end
-end
-end
-return true
-
-end
-
 function ISaid( ply, text, public )
     if text == "!remain" then
-	PrintMessage(HUD_PRINTTALK, "[Ovewatch]: Squad Nº"..Wave..", you have "..EnemiesRemainining.." units remaining.")
+	PrintMessage(HUD_PRINTTALK, "[Ovewatch]: Squad N?"..Wave..", you have "..EnemiesRemainining.." units remaining.")
     end
 	        return false
 
@@ -70,6 +53,7 @@ end
 function nearbycombinecomecasual(suspect)
 local come=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
+		if v:IsValid() then
 				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
 				if come < math.random(1,3) then
 					if !v:GetEnemy() then
@@ -81,6 +65,7 @@ local come=0
 							end
 						end
 					end
+				end
 				end
 end
 end

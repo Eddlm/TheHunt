@@ -286,7 +286,6 @@ CreateHeliPath(Vector(159.281540, 136.682281, 1252.971191))
 for k, v in pairs(ents.FindByClass("func_tracktrain")) do
 v:Remove()
 end
-
 end
 
 
@@ -340,6 +339,7 @@ function fifthwave()
 Wave = 5
 RPGCANSPAWN = 1
 HeliA:Fire("gunon","",0)
+BossHeliAlive = 1
 
 end
 

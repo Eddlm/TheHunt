@@ -15,13 +15,7 @@ util.PrecacheModel("models/Police.mdl")
 if GetConVarNumber("H_AUTOSTART") == 1 then
 print("H_AUTOSTART madafaka")
 end
-  /*
-if GetConVarNumber("h_minenemies") then
-h_maxhelp
-end
-Silverlan@Train: probably best to disable vvis and vrad when compiling
 
-*/
 net.Receive( "light_above_limit", function( length, client )
 client:PrintMessage(HUD_PRINTTALK, "You are visible.")
 client:SetNoTarget(false)
@@ -36,15 +30,8 @@ if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
 if v:Health() > 0 then
 if v:GetEnemy() == client then
 
---if !timer.Exists("npcforgettimer") then
---if v:Visible(client) then
 client:PrintMessage(HUD_PRINTTALK, "You can't hide now. "..v:GetName().." is actively looking for you.")
 hidden=0
---else
---enemy:ClearEnemyMemory()
---enemy:SetEnemy(nil)
---end
---end
 
 end
 end
@@ -60,7 +47,7 @@ end)
 NPC:SetKeyValue( "model", "models/elite_synth/elite_synth.mdl" )
 NPC:SetSkin(1)
 Get info from an entity typing this on the console while facing at it
-lua_run print(player.GetByID(1):GetEyeTrace().Entity:GetAngles()) print(player.GetByID(1):GetEyeTrace().Entity:GetPos()) print(player.GetByID(1):GetEyeTrace().Entity) print(player.GetByID(1):GetEyeTrace().Entity:GetModel())
+lua_run print(player.GetByID(1):GetEyeTrace().Entity:GetAngles()) print(player.GetByID(1):GetEyeTrace().Entity:GetPos()) print(player.GetByID(1):GetEyeTrace().Entity) print(player.GetByID(1):GetEyeTrace().Entity:GetModel()) print(player.GetByID(1):GetEyeTrace().Entity:GetCollisionGroup())
 */
 
 function GM:Initialize()
@@ -69,7 +56,6 @@ RunConsoleCommand( "sk_helicopter_health", "1500")
 RunConsoleCommand( "air_density", "0")
 RunConsoleCommand( "g_ragdoll_maxcount", "6")
 
- 
 NODES = 0
 end
 
@@ -108,19 +94,6 @@ net.Send(player.GetByID(1))
 end )
 
 
-concommand.Add( "checkCVARH_AUTOSTART", function()
-if GetConVar("H_AUTOSTART") then
-print("CVAR H_AUTOSTART EXISTS")
-print( GetConVarNumber( "H_AUTOSTART" ) )
-
-else
-print("CVAR H_AUTOSTART DOESN'T EXIST")
-print( GetConVarNumber( "H_AUTOSTART" ) )
-CreateConVar("H_AUTOSTART", 1, {FCVAR_ARCHIVE, FCVAR_REPLICATED } , "Should the game start automatically?")
-print( GetConVarNumber( "H_AUTOSTART" ) )
-end
-end )
-
 concommand.Add( "clnotarget", function(ply)
 ply:SetNoTarget(1)
 end )
@@ -130,14 +103,13 @@ ply:SetNoTarget(0)
 end )
 
 concommand.Add( "HuntVersion", function()
-print("TheHunt Version: v0.6-beta-PRE_WORKSHOP_UPDATE edition. Last shit added: Silverlan's APC, Infinite waves and Headcrab Canisters.")
+print("TheHunt Version: v0.7-beta-WORKSHOP_UPDATE edition. Last shit added: Fixed combine making love on spawnpoints.")
 end )
 
 
 concommand.Add( "LaunchCanister", function(ply)
 SpawnCanister(ply:GetPos())
 end)
-
 
 
 concommand.Add( "SpawnAPC", function(ply)
@@ -147,63 +119,11 @@ RocketLauncher:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,40))
 RocketLauncher:Spawn()
 end)
 
-concommand.Add( "SpawnSoldier", function(ply)
-local RocketLauncher = ents.Create( "combine_soldier" )
-RocketLauncher:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,40))
---RocketLauncher:SetKeyValue( "spawnflags", "1" )
-RocketLauncher:Spawn()
-end)
-
-concommand.Add( "SpawnAPCLauncher", function(ply)
-
-
-local RocketLauncher = ents.Create( "func_tankapcrocket" )
-RocketLauncher:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,40))
-RocketLauncher:SetKeyValue( "spawnflags", "1" )
-RocketLauncher:Spawn()
-
-
-RocketLauncher:SetKeyValue( "yawrate", 30 )
-RocketLauncher:SetKeyValue( "yawrange", 180 )
-RocketLauncher:SetKeyValue( "yawtolerance", 15 )
-RocketLauncher:SetKeyValue( "pitchrate", 30 )
-RocketLauncher:SetKeyValue( "pitchrange", 30 )
-RocketLauncher:SetKeyValue( "pitchtolerance", 30 )
-
-RocketLauncher:SetKeyValue( "barrel", 0 )
-RocketLauncher:SetKeyValue( "barrely", 0 )
-RocketLauncher:SetKeyValue( "barrelz", 0 )
-RocketLauncher:SetKeyValue( "firespread", 0 )
-
-RocketLauncher:Fire("Activate","",0)
-/*
-minRange
-maxRange
-_minlight
-
---RocketLauncher:Fire("SetEnemyEntity",ply,0)
---RocketLauncher:Activate()
-print("RocketLauncher spawned")
---timer.Simple( 1, function()
-RocketLauncher:Fire("FireOnce","",5)
-
-RocketLauncher:Fire("FireOnce","",1)
-print("RocketLauncher activated")
-
- --end )
-*/
-
-end )
-
-
 concommand.Add( "SpawnRocketLauncher", function(ply)
-
-
 local creating = ents.Create( "path_corner" )
 creating:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,500))
 creating:SetName("ddd")
 creating:Spawn()
-
 
 local RocketLauncher = ents.Create( "npc_launcher" )
 RocketLauncher:SetPos(ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,100))
@@ -244,8 +164,6 @@ RocketLauncher:Fire("FireOnce","",1)
 print("RocketLauncher activated")
 
  --end )
-
-
 end )
 
 
@@ -258,6 +176,13 @@ end )
 concommand.Add( "NearbyEntities", function()
 NearbyEntities()
 end )
+
+
+
+concommand.Add( "KillCombine", function()
+KillCombine()
+end )
+
 
 concommand.Add( "revealzones", function()
 table.foreach(zonescovered, function(key,value)
@@ -312,27 +237,14 @@ end
 end)
 
 concommand.Add( "seesettings", function()
-/*
+
 --print("GetConVarNumber("h_playerscaledamage"): "..GetConVarNumber("h_playerscaledamage").."")
 --print("GetConVarNumber("h_npcscaledamage"): "..GetConVarNumber("h_npcscaledamage").."")
-print("GetConVarNumber("h_friendlyfire"): "..GetConVarNumber("h_friendlyfire").."")
-print("HEALTHELP: "..HEALTHELP.."")
-print("HALOS: "..HALOS.."")
-print("")
-print("H_AUTOSTART: "..H_AUTOSTART.."")
-print("GetConVarNumber("h_autorepeat"): "..GetConVarNumber("h_autorepeat").."")
-print("MINENEMIES: "..MINENEMIES.."")
-print("MAXHELP: "..MAXHELP.."")
-print("GetConVarNumber("h_maxgunshotinvestigate"): "..GetConVarNumber("h_maxgunshotinvestigate").."")
-print("GetConVarNumber("h_lostplayertimeout"): "..GetConVarNumber("h_lostplayertimeout").."")
-print("TIME_BETWEEN_WAVES: "..TIME_BETWEEN_WAVES.."")
-print("")
-print("GetConVarNumber("h_weaponoffset"): "..GetConVarNumber("h_weaponoffset").."")
-print("GetConVarNumber("h_rpgmax"): "..GetConVarNumber("h_rpgmax").."")
-print("KILL_UNUSED_WEAPONS: "..KILL_UNUSED_WEAPONS.."")
+print("Friendly fire: "..GetConVarNumber("h_friendlyfire").."")
+
 print("Weapons that TheHunt spawns: ")
 PrintTable(MEDIUMWEAPONS)
-*/
+
 end)
 
 concommand.Add( "helpme", function()
@@ -353,6 +265,7 @@ print("assploded")
 ent:Fire("Explode",0,0)
 end
 end )
+
 concommand.Add( "assplodeinv", function(ply)
 if ply:IsAdmin() then
 ent = ents.Create( "env_physexplosion" )
@@ -375,14 +288,14 @@ local laser = ents.Create( "env_beam" )
 	laser:SetKeyValue( "rendercolor", "200 200 255" )
 	laser:SetKeyValue( "texture", "sprites/laserbeam.spr" )
 	laser:SetKeyValue( "TextureScroll", "1" )
-	laser:SetKeyValue( "Damage", "11" )
+	laser:SetKeyValue( "Damage", "20" )
 	--laser:SetKeyValue( "renderfx", "6" )
 	laser:SetKeyValue( "NoiseAmplitude", ""..math.random(5,2) )
 	laser:SetKeyValue( "BoltWidth", "1" )
 	laser:SetKeyValue( "TouchType", "0" )
 --	laser:SetKeyValue( "LightningStart",  )
 --	laser:SetKeyValue( "LightningEnd",  )
-	laser:SetKeyValue("Radius", "100")
+	laser:SetKeyValue("Radius", "1000")
 	laser:SetKeyValue("life", "0.5")
 	laser:Spawn()
 	laser:Activate()
@@ -619,6 +532,13 @@ print(""..v:GetClass()..", "..v:GetName().."")
  print("End of entities")
 end
 
+
+function KillCombine()
+for k, v in pairs(ents.FindByClass("npc_combine_s")) do
+v:Remove()
+ end
+end
+
 function autofirstwave()
 timer.Create( "firstwave", 2, CombineFirstWave, firstwave )
 WAVESPAWN = 1
@@ -636,13 +556,14 @@ EnemiesRemainining=EnemiesRemainining+1
 end
 end)
 
-if EnemiesRemainining >= GetConVarNumber("h_minenemies") then CanCheck = 1 end
-
+-- if EnemiesRemainining >= GetConVarNumber("h_minenemies") then CanCheck = 1 end
+if BossHeliAlive == 0 or BossHeliAlive == nil then
 if CanCheck == 1 then 
 	if EnemiesRemainining < GetConVarNumber("h_minenemies") then 
 	waveend()
 	CanCheck = 0
 	end
+end
 end
 end
 
@@ -684,7 +605,10 @@ CanCheck = 0
 Wave=6
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: Dude you fucked up.")
 
-if math.random(1,2) == 2 then
+if math.random(1,3) == 2 then
+	timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
+	timer.Create( "infinitewave", 2, CombineInfiniteWave, infinitewave )
+else
 	timer.Simple(20, function()
 	timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
 	timer.Create( "infinitewave", 2, CombineInfiniteWave, infinitewave )
@@ -693,10 +617,6 @@ if math.random(1,2) == 2 then
 	timer.Create( "launchanisters", 3, 5, function()
 	SpawnCanister(table.Random(player.GetAll()):GetPos())
 	end	) 
-
-else
-	timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
-	timer.Create( "infinitewave", 2, CombineInfiniteWave, infinitewave )
 end
 
 end
@@ -1226,8 +1146,10 @@ for k, v in pairs(ents.FindByClass("npc_combine_s")) do
 		if 	!v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
 		v:SetLastPosition(table.Random(zonescovered) + Vector(math.random(-20,20), math.random(-20,20), -30))
 			if WAVESPAWN == 1 then
+			v:SetCollisionGroup(1)
 			v:SetSchedule(SCHED_FORCED_GO_RUN)
 			else
+			v:SetCollisionGroup(9)
 			v:SetSchedule(SCHED_FORCED_GO)
 			end
 		print(""..v:GetName().." changed patrol area")
@@ -1252,15 +1174,31 @@ end
 end
 end
 
-function wander()
---	print("NPC on map:")
-	for k, v in pairs(ents.FindByClass("npc_*") ) do
-	if v:IsNPC() then --print(v:GetName())
-	end
-	end
-timer.Create( "CountNPC", 50, 0, wander)
---print("")
+
+
+function GM:ShouldCollide(ent1,ent2)
+
+if ent1:IsPlayer() then
+if ent2:GetClass() == "npc_combine_s" then
+if ent1:GetPos():Distance(ent2:GetPos()) < 50 then
+ent1:SetNoTarget(false)
 end
+end
+end
+
+
+if ent1:GetClass() == "npc_combine_s" then
+if ent2:GetClass():IsPlayer() then
+if ent1:GetPos():Distance(ent2:GetPos()) < 50 then
+ent1:SetNoTarget(false)
+end
+end
+end
+
+return true
+
+end
+
 
 function metropolicewander()
 for k, v in pairs(ents.FindByClass("npc_metropolice")) do
@@ -1332,15 +1270,7 @@ end
 
 
 
-function GM:PlayerConnect( name, address )
---if thereareplayers == 0 then
---timer.Simple(10, autofirstwave)
---thereareplayers = 1
---end
-end
-
 function GM:InitPostEntity()
---if GetConVar("H_AUTOSTART") then
 
 if GetConVarString("h_autostart") == "1" then
 print("H_AUTOSTART is 1")
@@ -1350,11 +1280,8 @@ end
 else
 print("H_AUTOSTART is not 1")
 end
---else
---print("H_AUTOSTART doesn't exist")
 
---end
-timer.Create( "CountNPC", 3, 1, wander )
+Wave=0
 timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 timer.Create( "CombineIdleSpeech", math.random(5,15), 0, CombineIdleSpeech ) 
 timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo ) 
@@ -1362,20 +1289,13 @@ timer.Create( "coverzones", 10, 1, coverzones )
 timer.Create( "wavefinishedchecker", 5, 1, wavefinishedchecker)
 CanCheck = 0
 MapSetup()
-/*
-for k, v in pairs(ents.FindByClass("prop_physics")) do
-if v:GetModel() == "models/props_c17/furnituredrawer001a.mdl" or v:GetModel() == "models/props_c17/furnitureshelf002a.mdl" or v:GetModel() == "models/props_interiors/furniture_desk01a.mdl" or v:GetModel() == "models/warby/wan_prop_caffe_table_01.mdl" or v:GetModel() == "models/props_junk/trashdumpster01a.mdl" or v:GetModel() == "models/props_c17/bench01a.mdl" or v:GetModel() == "models/props_wasteland/cafeteria_table001a.mdl" then 
 
-table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,30))
-print("found one, "..v:GetModel().."")
-end
-end
-*/
 end
 
 function GM:GetFallDamage( ply, speed )
 	return ( speed / 60 )
 end
+
 function GM:OnEntityCreated(entity)
 wavefinishedchecker()
 	if entity:IsNPC() && entity:GetClass() != "npc_helicopter" && entity:GetClass() != "npc_combinegunship"  && entity:GetClass() != "npc_combine_s" && entity:GetClass() != "npc_metropolice" && entity:GetName() == "" then
@@ -1411,7 +1331,7 @@ end
 		print("npcforget STOPPED")
 		end
 		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),2000)) do 
-		if ThisEnt:GetClass() == "npc_combine_s" || ThisEnt:GetClass() == "npc_metropolice" then
+		if ThisEnt:GetClass() == "npc_combine_s" or ThisEnt:GetClass() == "npc_metropolice" then
 				if ThisEnt:GetEnemy() == nil  then 
 					if CombineAssisting < GetConVarNumber("h_maxhelp") then
 					print("combine palla")
@@ -1686,6 +1606,7 @@ end
 end
 
 function helideath()
+BossHeliAlive = 0
 if HeliA:IsValid() && HeliIsDead != 1 then
 HeliIsDead = 1
 helispotlight:Remove()
