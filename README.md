@@ -1,3 +1,16 @@
+HOW TO INSTALL
+==============
+Click https://github.com/Eddlm/TheHunt to get the latest version. You can go https://github.com/Eddlm/TheHunt/archive/master.zip for a direct download.
+
+Open that zip and you will see two folders, "gamemodes" and "maps". Copy them on \Where You Have Steam Installed\Steam\SteamApps\common\GarrysMod\garrysmod. If Windows asks you about overwrigint, you're doing it right. Click yes.
+
+You've installed the gamemode. Start Garry's Mod and change the Gamemode to The Hunt. The background should change.
+
+Select a map. If you select multiple players, some options will appear below. Configure them and load the map.
+
+Done.
+
+=======
 TheHunt
 =======
 This gamemode is about a hunt, in which you are the prey.
