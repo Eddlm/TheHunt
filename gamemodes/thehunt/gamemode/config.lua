@@ -6,7 +6,7 @@ Remember that certain settings (like the AUTOSTART feature) only allow two value
 ----------------------------------------------------------------------------*/
 
 -- Editable in real time: you can change the variable values running lua_run VARIABLE = VALUE on the Console (for example, lua_run MAXHELP = 2). The change will be only applied to the current map. If you wish to change the variable for the next maps, change it on this config file.
-
+/*
 TIME_BETWEEN_WAVES = 5 -- When a wave is defeated, the game will wait this time before it starts spawning more combine. Default: 5
 MINENEMIES = 4 -- If the combine number is below this, the wave is defeated. Default: 4
 MAXHELP = 4 -- How many combine are able to help the one who spotted you? Default: 4
@@ -19,23 +19,25 @@ AUTOREPEAT = 1 -- Does the game start again automatically when you survive the f
 RPGMAX = 1 -- How many RPGs should spawn on helicopter-boss maps?
 MAXGUNSHOTINVESTIGATE = 4 -- Maximun number of combine who will come to investigate a gunshot. Default: 4
 KILL_UNUSED_WEAPONS = 0 -- If 1, it will remove any weapon left alone more than one minute, so it can respawn on a new place. Useful if you can't find weapons easily.  1=yes, 0=no.
-MAXDEATHS=3 --Maximun deaths before the game makes you wait.
+GetConVarNumber("h_max_player_deaths")=3 --Maximun deaths before the game makes you wait.
 NOOBPUNISH=40 -- How much seconds to have noobs waiting before they spawn again.
 
 -- NOT editable in real time: These variables can only be changed via this config file.
 AUTOSTART = 0 -- does the game start automatically when you load the map? if not, you'll need to run firstwave on the console to start the combine raid.  1=yes, 0=no.
-INFINITE_MODE = 1
+INFINITE_MODE = 0
 HALOS = 1 -- Should outlines be drawn around important entities? If 1, players will see Players outlined in green, enemies outlined in red, and dangerous items outlined in yellow.  1=yes, 0=no.
 HEALTHELP = 40 -- While a player's health is below this, nearby Healthchargers will be outlined in blue. Requires the HALOS setting set to 1.
 LIGHT_BASED_STEALTH_SYSTEM = 1 -- If enabled, you can hide in the shadows from enemies.
 
-
+*/
 
 
 
 /*--------------------WEAPON SETUP---------------------
 Here you must configure your custom weapons so the game reacts apropiately.
 -------------------------------------------------------*/
+
+RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade", "XBowBolt"}
 
 CRATEITEMS = { "weapon_shotgun", "weapon_357", "weapon_frag", "weapon_slam", "item_healthkit", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black","npc_rollermine","item_dynamic_resupply" }
 --Normal crates can spawn these items.
@@ -62,8 +64,8 @@ DARK_WEAPONS = { "weapon_frag", "weapon_crowbar" }
 -- Weapons that don't have any bright items on them. It's easier to hide while carrying this weapon.
 
 
-SILENT_WEAPONS = { "weapon_frag", "weapon_crossbow", "weapon_crowbar", "suppressed_pistol", "suppressed_smg1" }
+SILENT_WEAPONS = { "weapon_frag", "weapon_crossbow", "weapon_crowbar", "suppressed_pistol", "suppressed_smg1","weapon_slam" }
 -- Any weapon that's not included on this table will be considered a loud weapon and it's gunshots will attrack combine.
 
-SECONDARY_FIRE_WEAPONS = { "weapon_ar2", }
+SECONDARY_FIRE_WEAPONS = { "weapon_ar2", "weapon_shotgun"}
 -- Weapons that have a loud secondary fire.

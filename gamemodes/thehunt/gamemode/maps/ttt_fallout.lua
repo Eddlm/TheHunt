@@ -20,6 +20,8 @@ Vector(-901.148926, 1378.361206, 64.031250),
 SPECIALITEMPLACES = {}
 
 ITEMPLACES ={
+Vector(-768.822937, -1100.280884, -153.996948),
+
 }
 
 combinespawnzones = {

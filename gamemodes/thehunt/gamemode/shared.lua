@@ -26,8 +26,10 @@ end
 
 function ISaid( ply, text, public )
     if text == "!remain" then
-        return ""..EnemiesRemainining.." enemies left"
+	PrintMessage(HUD_PRINTTALK, "[Ovewatch]: Squad Nº"..Wave..", you have "..EnemiesRemainining.." units remaining.")
     end
+	        return false
+
 end
 hook.Add( "PlayerSay", "ISaid", ISaid )
 
@@ -37,7 +39,7 @@ end
 
 function nearbycombinecome(suspect)
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
-				if (v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s") then 
+				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
 						if !v:GetEnemy() then
 						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
 							print(""..v:GetName().." heard that.")
@@ -68,7 +70,7 @@ end
 function nearbycombinecomecasual(suspect)
 local come=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
-				if (v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s") then 
+				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
 				if come < math.random(1,3) then
 					if !v:GetEnemy() then
 						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
@@ -87,6 +89,7 @@ end
 
 
 function allthecombinecome(suspect,MAXCOMBINERUSH)
+print("got it")
 local coming=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
 				if v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s" then 
@@ -101,7 +104,7 @@ local coming=0
 						end
 					end
 		for k, v in pairs(ents.GetAll()) do
-				if v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s" then 
+				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
 						if !v:GetEnemy() then
 							if coming < MAXCOMBINERUSH then
 							print(""..v:GetName().." heard that.")
@@ -129,38 +132,13 @@ CANPICKUP = nil
 return true end
 
 function ItemRespawnSystem()
-if KILL_UNUSED_WEAPONS == 1 then
-for k,v in pairs(ents.GetAll()) do 
-local canadd=1
-	if v:IsWeapon() then
-		for k, player in pairs(ents.FindInSphere(v:GetPos(),200)) do
-		if player:IsPlayer() || player:IsNPC() then
-		canadd = 0
-		print("player/npc found, wont touch "..v:GetClass().."")
-		end
-		end
-		if canadd==1 then
-			if v.alone then
-			v.alone=v.alone+1
-			print(""..v:GetClass().." is not used")
-			else
-			v.alone=1
-			print(""..v:GetClass().." is not used")
-			end
-		if v.alone > 4 then
-			v:Remove()
-			print(""..v:GetClass().." removed")
-		end
-		end
-	end
-end
-end
+
 local PLAYERS = 0
 local NUMBER = 0
 for k,weapon in pairs(ents.FindByClass("player")) do 
 PLAYERS = PLAYERS + 1
 end
-local OFFSET = PLAYERS + WEAPONOFFSET
+local OFFSET = PLAYERS + GetConVarNumber("h_weaponoffset")
 print("")
 
 table.foreach(MEDIUMWEAPONS, function(key,value)
@@ -204,7 +182,7 @@ if RPGCANSPAWN == 1 then
 	RPG_IN_MAP = RPG_IN_MAP + 1
 	end
 	print("RPG's on map: "..RPG_IN_MAP.."")
-	RPGSPAWN = RPGMAX - RPG_IN_MAP
+	RPGSPAWN = GetConVarNumber("h_rpgmax") - RPG_IN_MAP
 	while RPGSPAWN > 0 && RPGCANSPAWN == 1 do
 	print("RPG's that will spawn: "..RPGSPAWN.."")
 	SpawnItem("weapon_rpg", Vector(-26.358618, -2012.917847, 412.450073), Angle(0.945, 74.805, 79.540) )

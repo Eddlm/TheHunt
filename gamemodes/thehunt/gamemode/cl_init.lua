@@ -1,17 +1,7 @@
 include( "shared.lua" )
 include( "config.lua" )
 
-timer.Simple(4,function()
-hook.Add( "HUDPaint", "HelloThere", function()
-	draw.DrawText( HUDTEXT, "TargetID", ScrW() * 0.95, ScrH() * 0.82, HUDCOLOR, TEXT_ALIGN_RIGHT )
-	if LIGHT_BASED_STEALTH_SYSTEM == 1 then
 
-	draw.DrawText( "Illumination: "..math.Round(lightcol,1).."", "TargetID", ScrW() * 0.95, ScrH() * 0.80, darkencolor, TEXT_ALIGN_RIGHT )
-	--draw.DrawText( darken, "TargetID", ScrW() * 0.92, ScrH() * 0.83, darkencolor, TEXT_ALIGN_RIGHT )
-	--draw.RoundedBox(4,ScrW() * 0.92, ScrH() * 0.83,20,20,darkencolor)
-end
-end )
-end)
 
 darkencolor = Color(255,0,0,255)
 HUDTEXT = "Hidden"
@@ -44,8 +34,10 @@ net.Receive( "Hidden", function( length, client )
 	HUDCOLOR=Color(51,255,0)
 end )
 
+
 hook.Add( "PreDrawHalos", "AddHalos", function()
-if HALOS == 1 && LocalPlayer():Alive() then
+if GetConVarNumber("h_halos") == 1 && LocalPlayer():Alive() then
+--if HALOS == 1 && LocalPlayer():Alive() then
 
 	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(),1000)) do
 	if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
@@ -56,7 +48,8 @@ if HALOS == 1 && LocalPlayer():Alive() then
 	if v:GetClass() == "npc_tripmine" || v:GetClass() == "npc_satchel"  then
         effects.halo.Add( {v}, Color( 247,255,3 ), 1, 1, 1, true, false )
 	end
-	if v:GetClass() == "item_healthcharger" && LocalPlayer():Health() < HEALTHELP and LocalPlayer():Health() > 0 then
+	if v:GetClass() == "item_healthcharger" and LocalPlayer():Health() < GetConVarNumber("h_min_health_help")
+ and LocalPlayer():Health() > 0 then
         effects.halo.Add( {v}, Color( 0,204,255 ), 1, 1, 1, true, true )
 	end
 	
@@ -66,9 +59,8 @@ if HALOS == 1 && LocalPlayer():Alive() then
 	end
 	end
 end
-end 
+end
 end)
-
 
 
 function GM:PostDrawViewModel( vm, ply, weapon )
@@ -96,6 +88,7 @@ end
 end
 end
 end
+
 function CombineBootsRun()
 
 if LocalPlayer() then
@@ -136,7 +129,6 @@ end
 function light()
 timer.Create( "Light", 0.1, 1, light )
 lightcol = (render.GetLightColor(LocalPlayer():GetPos())*Vector(100,100,100)):Length()
-
 if LocalPlayer():Health() > 0 then
 table.foreach(DARK_WEAPONS, function(key,value)
 if LocalPlayer():GetActiveWeapon():GetClass() != value then lightcol=lightcol+1 end
@@ -182,6 +174,26 @@ if lightcol > 2 then
 end
 end
 
+
+if GetConVarNumber("h_light_stealth") == 1 then
+print("Light based system ok")
+timer.Create( "Light", 3, 1, light )
+lightcol = 0
+
+timer.Simple(2,function()
+hook.Add( "HUDPaint", "HelloThere", function()
+	draw.DrawText( HUDTEXT, "TargetID", ScrW() * 0.95, ScrH() * 0.82, HUDCOLOR, TEXT_ALIGN_RIGHT )
+	if GetConVarNumber("h_light_stealth") == 1 then
+
+	draw.DrawText( "Illumination: "..math.Round(lightcol,1).."", "TargetID", ScrW() * 0.95, ScrH() * 0.80, darkencolor, TEXT_ALIGN_RIGHT )
+	--draw.DrawText( darken, "TargetID", ScrW() * 0.92, ScrH() * 0.83, darkencolor, TEXT_ALIGN_RIGHT )
+	--draw.RoundedBox(4,ScrW() * 0.92, ScrH() * 0.83,20,20,darkencolor)
+end
+end )
+end)
+
+
+end
 
 
 function GM:HUDDrawTargetID()
@@ -237,9 +249,3 @@ draw.SimpleText( text, font, x+1, y+1, Color(0,0,0,120) )
 draw.SimpleText( text, font, x+2, y+2, Color(0,0,0,50) )
 draw.SimpleText( text, font, x, y, self:GetTeamColor( trace.Entity ) )
 end
-
-if LIGHT_BASED_STEALTH_SYSTEM == 1 then
-timer.Create( "Light", 5, 1, light )
-lightcol = 0
-end
-

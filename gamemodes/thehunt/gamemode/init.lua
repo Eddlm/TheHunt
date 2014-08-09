@@ -12,7 +12,16 @@ util.PrecacheModel("models/Combine_Soldier.mdl")
 util.PrecacheModel("models/Combine_Super_Soldier.mdl")
 util.PrecacheModel("models/Police.mdl")
 
+if GetConVarNumber("H_AUTOSTART") == 1 then
+print("H_AUTOSTART madafaka")
+end
+  /*
+if GetConVarNumber("h_minenemies") then
+h_maxhelp
+end
+Silverlan@Train: probably best to disable vvis and vrad when compiling
 
+*/
 net.Receive( "light_above_limit", function( length, client )
 client:PrintMessage(HUD_PRINTTALK, "You are visible.")
 client:SetNoTarget(false)
@@ -99,6 +108,19 @@ net.Send(player.GetByID(1))
 end )
 
 
+concommand.Add( "checkCVARH_AUTOSTART", function()
+if GetConVar("H_AUTOSTART") then
+print("CVAR H_AUTOSTART EXISTS")
+print( GetConVarNumber( "H_AUTOSTART" ) )
+
+else
+print("CVAR H_AUTOSTART DOESN'T EXIST")
+print( GetConVarNumber( "H_AUTOSTART" ) )
+CreateConVar("H_AUTOSTART", 1, {FCVAR_ARCHIVE, FCVAR_REPLICATED } , "Should the game start automatically?")
+print( GetConVarNumber( "H_AUTOSTART" ) )
+end
+end )
+
 concommand.Add( "clnotarget", function(ply)
 ply:SetNoTarget(1)
 end )
@@ -113,24 +135,7 @@ end )
 
 
 concommand.Add( "LaunchCanister", function(ply)
-local canister = ents.Create( "env_headcrabcanister" )
-
---RocketLauncher:SetKeyValue( "angles", "0 0 90" )
-canister:SetAngles(Angle(-70,math.random(180,-180),0))
-canister:SetPos(ply:GetEyeTraceNoCursor().HitPos /*+ Vector(math.random(200,-200),math.random(200,-200),0)*/)
-canister:SetKeyValue( "HeadcrabType", math.random(0,2) )
-canister:SetKeyValue( "HeadcrabCount", math.random(1,4) )
-canister:SetKeyValue( "FlightSpeed", "9000" )
-canister:SetKeyValue( "FlightTime", "3" )
-canister:SetKeyValue( "StartingHeight", "0" )
-canister:SetKeyValue( "Damage", "5" )
-canister:SetKeyValue( "DamageRadius", "5" )
-canister:SetKeyValue( "SmokeLifetime", "5" )
-canister:SetKeyValue( "MaxSkyboxRefireTime", "5" )
-canister:SetKeyValue( "MinSkyboxRefireTime", "1" )
-canister:SetKeyValue( "SkyboxCannisterCount", "30" )
-canister:Fire("FireCanister","",0.7)
-canister:Spawn()
+SpawnCanister(ply:GetPos())
 end)
 
 
@@ -307,30 +312,30 @@ end
 end)
 
 concommand.Add( "seesettings", function()
-print("PLAYERSCALEDAMAGE: "..PLAYERSCALEDAMAGE.."")
-print("NPCSCALEDAMAGE: "..NPCSCALEDAMAGE.."")
-print("FRIENDLYFIRE: "..FRIENDLYFIRE.."")
+/*
+--print("GetConVarNumber("h_playerscaledamage"): "..GetConVarNumber("h_playerscaledamage").."")
+--print("GetConVarNumber("h_npcscaledamage"): "..GetConVarNumber("h_npcscaledamage").."")
+print("GetConVarNumber("h_friendlyfire"): "..GetConVarNumber("h_friendlyfire").."")
 print("HEALTHELP: "..HEALTHELP.."")
 print("HALOS: "..HALOS.."")
 print("")
-print("AUTOSTART: "..AUTOSTART.."")
-print("AUTOREPEAT: "..AUTOREPEAT.."")
+print("H_AUTOSTART: "..H_AUTOSTART.."")
+print("GetConVarNumber("h_autorepeat"): "..GetConVarNumber("h_autorepeat").."")
 print("MINENEMIES: "..MINENEMIES.."")
 print("MAXHELP: "..MAXHELP.."")
-print("MAXGUNSHOTINVESTIGATE: "..MAXGUNSHOTINVESTIGATE.."")
-print("LostPlayerTimeout: "..LostPlayerTimeout.."")
+print("GetConVarNumber("h_maxgunshotinvestigate"): "..GetConVarNumber("h_maxgunshotinvestigate").."")
+print("GetConVarNumber("h_lostplayertimeout"): "..GetConVarNumber("h_lostplayertimeout").."")
 print("TIME_BETWEEN_WAVES: "..TIME_BETWEEN_WAVES.."")
 print("")
-print("WEAPONOFFSET: "..WEAPONOFFSET.."")
-print("RPGMAX: "..RPGMAX.."")
+print("GetConVarNumber("h_weaponoffset"): "..GetConVarNumber("h_weaponoffset").."")
+print("GetConVarNumber("h_rpgmax"): "..GetConVarNumber("h_rpgmax").."")
 print("KILL_UNUSED_WEAPONS: "..KILL_UNUSED_WEAPONS.."")
 print("Weapons that TheHunt spawns: ")
 PrintTable(MEDIUMWEAPONS)
+*/
 end)
+
 concommand.Add( "helpme", function()
-print("Commands")
-print("seesettings: See the current settings. You can change them (for this map only) by typing lua_run VARIABLE=VALUE, like lua_run RPGMAX=25")
-print("This section is in development right now.")
 
 end )
 concommand.Add( "hidezones", function()
@@ -389,6 +394,14 @@ SpawnMetropolice( ply:GetEyeTraceNoCursor().HitPos )
 print("Spawned.")
 end
 end )
+concommand.Add( "SpawnMetropoliceStunstick", function(ply)
+if ply:IsAdmin() then
+SpawnMetropoliceStunstick( ply:GetEyeTraceNoCursor().HitPos )
+print("Spawned.")
+end
+end )
+
+
 concommand.Add( "SpawnFastZombie", function(ply)
 if ply:IsAdmin() then
 SpawnFastZombie( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
@@ -532,17 +545,15 @@ end
 
 function GM:PlayerDeathThink(ply)
 if PLAYERSINMAP > 1 then 
-if MAXDEATHS == ply:Deaths() or MAXDEATHS > ply:Deaths() then
+if GetConVarNumber("h_max_player_deaths") == ply:Deaths() or GetConVarNumber("h_max_player_deaths") > ply:Deaths() then
 if ply:KeyPressed(IN_ATTACK2) then
 ply:SpectateEntity(table.Random(player.GetAll()))
 end
-
 if !timer.Exists("Playernoobspawn") then
-timer.Create( "Playernoobspawn", NOOBPUNISH, 1, function() ply:UnSpectate() ply:SetDeaths(0) ply:SetFrags(0) ply:Spawn() end ) 
+timer.Create( "Playernoobspawn", GetConVarNumber("h_punish_deaths_timer"), 1, function() ply:UnSpectate() ply:SetDeaths(0) ply:SetFrags(0) ply:Spawn() end ) 
 end
 
 else
-
 --if !timer.Exists("Playerspawn") then
 if ply:KeyPressed(IN_ATTACK2) then
 ply:UnSpectate()
@@ -588,13 +599,13 @@ end)
 
 timer.Create( "ddd", 3, 1, function()
 if PLAYERSINMAP > 1 then 
-if MAXDEATHS == ply:Deaths() or MAXDEATHS > ply:Deaths() then
+if GetConVarNumber("h_max_player_deaths") == ply:Deaths() or GetConVarNumber("h_max_player_deaths") > ply:Deaths() then
 ply:Spectate(4)
 ply:SetMoveType(10)
-ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left. You will respawn in "..NOOBPUNISH.." seconds.")
+ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left. You will respawn in "..GetConVarNumber("h_punish_deaths_timer").." seconds.")
 ply:PrintMessage(HUD_PRINTTALK, "While you wait, think on a better strategy for the next time.")
 else
-ply:PrintMessage(HUD_PRINTTALK, "You have "..MAXDEATHS-ply:Deaths().." lifes left.")
+ply:PrintMessage(HUD_PRINTTALK, "You have "..GetConVarNumber("h_max_player_deaths")-ply:Deaths().." lifes left.")
 end
 end
 end)
@@ -625,10 +636,10 @@ EnemiesRemainining=EnemiesRemainining+1
 end
 end)
 
-if EnemiesRemainining >= MINENEMIES then CanCheck = 1 end
+if EnemiesRemainining >= GetConVarNumber("h_minenemies") then CanCheck = 1 end
 
 if CanCheck == 1 then 
-	if EnemiesRemainining < MINENEMIES then 
+	if EnemiesRemainining < GetConVarNumber("h_minenemies") then 
 	waveend()
 	CanCheck = 0
 	end
@@ -642,7 +653,8 @@ function waveend()
 		if Wave < 5 then
 			PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..Wave.." proven unable to contain hostiles.")
 		end
-		timer.Simple(TIME_BETWEEN_WAVES, function()
+		
+		timer.Simple(GetConVarNumber("h_time_between_waves"), function()
 		timer.Simple( 30, function() CanCheck = 1 print("Can check is 1, wave can be defeated now.") end )
 		timer.Simple( 20, function() WAVESPAWN = 0 print("wavespawn is now 0") end )		
 		if Wave == 1 then timer.Create( "secondwave", 2, CombineSecondWave, secondwave ) 
@@ -655,9 +667,9 @@ function waveend()
 		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
 		end)
 		if Wave == 5 or Wave == 6 then 
-				if INFINITE_MODE == 1 then
+				if GetConVarNumber("h_infinite_waves") == 1 then
 				infinitewavehandler()
-				elseif AUTOREPEAT == 1 then
+				elseif GetConVarNumber("h_autorepeat") == 1 then
 				timer.Simple(5, autofirstwave)
 				PrintMessage(HUD_PRINTTALK, "Combine Defeated! Restarting Squads!")
 				end
@@ -840,7 +852,7 @@ canister:SetKeyValue( "HeadcrabCount", math.random(1,4) )
 canister:SetKeyValue( "FlightSpeed", "9000" )
 canister:SetKeyValue( "FlightTime", "3" )
 canister:SetKeyValue( "StartingHeight", "0" )
-canister:SetKeyValue( "Damage", "5" )
+canister:SetKeyValue( "Damage", "20" )
 canister:SetKeyValue( "DamageRadius", "5" )
 canister:SetKeyValue( "SmokeLifetime", "5" )
 canister:SetKeyValue( "MaxSkyboxRefireTime", "5" )
@@ -848,14 +860,20 @@ canister:SetKeyValue( "MinSkyboxRefireTime", "1" )
 canister:SetKeyValue( "SkyboxCannisterCount", "30" )
 canister:Fire("FireCanister","",0.7)
 canister:Spawn()
+
+timer.Simple(100, function() canister:Remove() end)
 end
 function SpawnRebel( pos )
 NPC = ents.Create( "npc_citizen" )
 NPC:SetPos( pos )
 NPC:SetKeyValue("squadname", "Rebels")
-NPC:Spawn()
-NPC:SetHealth("100")
+NPC:SetKeyValue("citizentype", "3")
 NPC:Give("ai_weapon_ar2")
+NPC:SetKeyValue("ammosupply", ""..table.Random(RebelsGiveAmmo).."")
+NPC:SetKeyValue("spawnflags", "524288")
+NPC:Spawn()
+NPC:SetHealth("400")
+
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )	
 NPC:Fire("StartPatrolling","",0)
 end
@@ -863,7 +881,7 @@ function SpawnFastZombie( pos )
 NPC = ents.Create( "npc_fastzombie" )
 NPC:SetPos( pos )
 NPC:Spawn()
-NPC:SetHealth("90000")
+NPC:SetHealth("9000")
 end
 function spawnSNPC ( pos )
 NPC = ents.Create( "npc_megacombine" )
@@ -934,7 +952,23 @@ NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )	
 NPC:Fire("StartPatrolling","",0)
 end
+function SpawnMetropoliceStunstick( pos )
+NPC = ents.Create( "npc_metropolice" )
+NPC:SetKeyValue("Manhacks", math.random(0,1)) 
+NPC:SetKeyValue( "model", "models/Police.mdl" )
+NPC:SetPos( pos )
+NPC:SetKeyValue( "ignoreunseenenemies", 0 )
+NPC:SetKeyValue( "spawnflags", "512" )
 
+NPC:SetKeyValue("squadname", "")
+NPC:Spawn()
+NPC:Give("ai_weapon_stunstick")
+combinen = combinen + 1
+NPC:SetName("Combine nº"..combinen.."")
+NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_POOR )	
+NPC:Fire("StartPatrolling","",0)
+NPC:Fire("ActivateBaton","",0)
+end
 function SpawnMetropolice( pos )
 NPC = ents.Create( "npc_metropolice" )
 NPC:SetKeyValue("Manhacks", math.random(0,1)) 
@@ -1306,12 +1340,20 @@ function GM:PlayerConnect( name, address )
 end
 
 function GM:InitPostEntity()
+--if GetConVar("H_AUTOSTART") then
 
-
-if AUTOSTART == 1 && win == 1 then
+if GetConVarString("h_autostart") == "1" then
+print("H_AUTOSTART is 1")
+if win == 1 then
 timer.Simple(10, autofirstwave)
 end
+else
+print("H_AUTOSTART is not 1")
+end
+--else
+--print("H_AUTOSTART doesn't exist")
 
+--end
 timer.Create( "CountNPC", 3, 1, wander )
 timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 timer.Create( "CombineIdleSpeech", math.random(5,15), 0, CombineIdleSpeech ) 
@@ -1335,6 +1377,7 @@ function GM:GetFallDamage( ply, speed )
 	return ( speed / 60 )
 end
 function GM:OnEntityCreated(entity)
+wavefinishedchecker()
 	if entity:IsNPC() && entity:GetClass() != "npc_helicopter" && entity:GetClass() != "npc_combinegunship"  && entity:GetClass() != "npc_combine_s" && entity:GetClass() != "npc_metropolice" && entity:GetName() == "" then
 	ManuallySpawnedEntity = ManuallySpawnedEntity + 1
 	entity:SetName("NPC nº"..ManuallySpawnedEntity.."")
@@ -1344,14 +1387,14 @@ end
 
 function CicloUnSegundo()
 
-
 table.foreach(MainEnemiesCoop, function(key,enemy)
 for k, npc in pairs(ents.FindByClass(enemy)) do
 if npc:Health() > 0 then
 
 if npc:GetEnemy() then
 	if npc:IsCurrentSchedule(SCHED_FORCED_GO) or npc:IsCurrentSchedule(SCHED_IDLE_WANDER) or npc:IsCurrentSchedule(SCHED_FORCED_GO_RUN)	then npc:ClearSchedule() end
-if npc:GetEnemy():IsPlayer() then
+	
+if npc:GetEnemy():IsPlayer() or npc:GetEnemy():IsNPC() then
 npc:SetKeyValue("squadname", "CombineSquad")
 if npc:GetEnemy().spotted != 1 then
 if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
@@ -1370,20 +1413,20 @@ end
 		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),2000)) do 
 		if ThisEnt:GetClass() == "npc_combine_s" || ThisEnt:GetClass() == "npc_metropolice" then
 				if ThisEnt:GetEnemy() == nil  then 
-					if CombineAssisting < MAXHELP then
+					if CombineAssisting < GetConVarNumber("h_maxhelp") then
 					print("combine palla")
 					print(ThisEnt:GetName().." is helping "..npc:GetName().."")
 					ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
 					ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
 					CombineAssisting = CombineAssisting+1
-				--	print("Combines helping: "..CombineAssisting.." of "..MAXHELP.."")
+				--	print("Combines helping: "..CombineAssisting.." of "..GetConVarNumber("h_maxhelp").."")
 					end
 				end
 		end
 		end
 	else
 		if !timer.Exists("npcforgettimer") then
-		timer.Create( "npcforgettimer", LostPlayerTimeout, 1, npcforget ) 
+		timer.Create( "npcforgettimer", GetConVarNumber("h_lostplayertimeout"), 1, npcforget ) 
 		print("npcforget ACTIVE")
 		end
 	end		
@@ -1392,7 +1435,7 @@ end
 end
 end
 end)
-/*
+/* 
 	for k, turret in pairs(ents.FindByClass("npc_turret_floor")) do 
 		for num, v in pairs(ents.FindInSphere(turret:GetPos(), 40)) do
 			if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
@@ -1410,7 +1453,7 @@ if HeliIsDead != 1 then
 		if HeliA:GetEnemy() then
 			print ("heli has enemy: "..HeliA:GetEnemy():GetName().."")
 				if HeliA:GetEnemy():IsNPC() && HeliCanSpotlight == 1 then
-					helispotlight:Fire("Target", HeliA:GetEnemy():GetName(), 0)
+					helispotlight:Fire("Target", ""..HeliA:GetEnemy():GetName().."", 0)
 					end
 				if HeliA:GetEnemy():IsPlayer() && HeliCanSpotlight == 1 then
 				HeliA:GetEnemy():SetName(""..tostring(HeliA:GetEnemy():GetName()).."focus")
@@ -1509,6 +1552,7 @@ end
 
 -- GM HOOKS v
 function GM:OnNPCKilled(victim, killer, weapon)
+wavefinishedchecker()
 -- Uncomment to for-the-lulz explosion kills
 /*
 ent = ents.Create( "env_explosion" )
@@ -1554,6 +1598,11 @@ timer.Stop( "helibehavior")
 end
 
 if killer:IsNPC() then
+
+if killer:GetClass() == "npc_citizen" then
+nearbycombinecome(killer)
+end
+
 if killer:Health() > 0 then
 	if killer:GetClass() == "npc_combine_s" then
 	killer:EmitSound(table.Random(CombineKillSounds), 100, 100)
@@ -1628,10 +1677,12 @@ if killer:Alive() then
 			end
 		end
 	end
+killer:AddFrags(1)
 
 end
-killer:AddFrags(1)
 end
+
+
 end
 
 function helideath()
@@ -1653,9 +1704,8 @@ end
 
 function GM:EntityTakeDamage(damaged,damage)
 if damage:GetAttacker():GetClass() =="monster_apc" then
-damage:ScaleDamage(NPCSCALEDAMAGE)
+damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
 end
-
 
 
 if !damaged:IsNPC() then
@@ -1670,9 +1720,9 @@ end
 end
 	if damaged:GetClass() != "npc_helicopter" && damaged:GetClass() != "npc_combinegunship" then
 		if damaged:GetEnemy() == nil then
-		damage:ScaleDamage(NPCSCALEDAMAGE*2)
+		damage:ScaleDamage(GetConVarNumber("h_npcscaledamage")*2)
 		else
-		damage:ScaleDamage(NPCSCALEDAMAGE)
+		damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
 		end
 		if damaged:Health() > damage:GetDamage() then
 		damaged:SetEnemy(damage:GetAttacker())
@@ -1680,14 +1730,14 @@ end
 	end
 end
 if damaged:IsPlayer() then
-damage:ScaleDamage(PLAYERSCALEDAMAGE)
+damage:ScaleDamage(GetConVarNumber("h_playerscaledamage"))
 end
 
 
-if FRIENDLYFIRE != 1 then
+if GetConVarNumber("h_friendlyfire") != 1 then
 	if damaged:IsPlayer() && damage:GetAttacker():IsPlayer() then
 		if damaged:EntIndex() == damage:GetAttacker():EntIndex() then
-		damage:ScaleDamage(PLAYERSCALEDAMAGE)
+		damage:ScaleDamage(GetConVarNumber("h_playerscaledamage"))
 		else
 		damage:ScaleDamage(0)
 		end
@@ -1777,23 +1827,10 @@ function GetAmmoForCurrentWeapon( ply )
 	print(ply:GetAmmoCount(wep:GetPrimaryAmmoType()))
 end
 function GM:KeyPress(player,key)
+if player:Alive() then
 
-	if player:Alive() then
-	
-		if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) < 2 && player:GetActiveWeapon():GetClass() == "weapon_frag" then
-		if key == IN_ATTACK2 or key == IN_ATTACK then
-		timer.Simple(1, function()
-		player:StripWeapon("weapon_frag")
-		end)
-		end
-		end
-		
-		if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) > 0 then
-			if key == IN_ATTACK2 then
-				if player:GetActiveWeapon():GetClass() == "weapon_shotgun" then allthecombinecome(player,MAXGUNSHOTINVESTIGATE)	print("combine come (shotgun)") end
-			end
-			if key == IN_ATTACK then
-				if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) > 0 then			
+if key == IN_ATTACK then
+if player:GetActiveWeapon():Clip1() > 0 then
 				local silent=0
 				table.foreach(SILENT_WEAPONS, function(key,value)
 				if player:GetActiveWeapon():GetClass() == value then
@@ -1803,24 +1840,28 @@ function GM:KeyPress(player,key)
 				end)
 				if silent==0 then
 				print("combine come (not silent)")
-				allthecombinecome(player,MAXGUNSHOTINVESTIGATE)
+				allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate"))
 				end
-				end		
-			end
-		end
-		
-		if player:GetAmmoCount(player:GetActiveWeapon():GetSecondaryAmmoType()) > 0 then
-			if key == IN_ATTACK2 then
-				table.foreach(SECONDARY_FIRE_WEAPONS, function(key,value)
+end
+end
+
+		if key == IN_ATTACK2 then
+			if player:GetAmmoCount(player:GetActiveWeapon():GetSecondaryAmmoType()) > 0 or (player:GetActiveWeapon():GetClass() == "weapon_shotgun") then
+					table.foreach(SECONDARY_FIRE_WEAPONS, function(key,value)
 					if player:GetActiveWeapon():GetClass() == value then
-					allthecombinecome(player,MAXGUNSHOTINVESTIGATE)
+					allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate"))
 					print("combine come (not silent secondary fire)")
 					end
-				end)
+					end)
 			end
 		end
-	end
 end
+end
+concommand.Add( "PrintWeapons", function(player, command, arguments )
+for k,v in pairs( weapons.GetList() ) do 
+print( v.ClassName )
+end 
+end )
 
 function GM:PlayerSetHandsModel( ply, ent )
 	local simplemodel = player_manager.TranslateToPlayerModelName( ply:GetModel() )
