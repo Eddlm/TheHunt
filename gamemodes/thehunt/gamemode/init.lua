@@ -185,8 +185,8 @@ end )
 
 concommand.Add( "h_version", function()
 print("TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition.")
-print("Last shit added: Tweaked Combine AI (they now flee from fire) (12/08/2014)")
-
+print("Last shit added: tweaked grenades (players no longer have a grenade with no ammo') (12/08/2014)")
+print("Running the Workshop version.")
 end )
 
 
@@ -2041,6 +2041,15 @@ end
 					end
 					end)
 			end
+		end
+
+
+		if key == IN_ATTACK2 or key == IN_ATTACK then
+		if player:GetActiveWeapon():GetClass() == "weapon_frag" then
+		if player:GetAmmoCount(player:GetActiveWeapon():GetPrimaryAmmoType()) < 2 then
+		timer.Simple(1, function() player:StripWeapon("weapon_frag") end)
+		end
+		end
 		end
 end
 end
