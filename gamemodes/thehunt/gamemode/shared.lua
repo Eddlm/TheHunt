@@ -42,7 +42,7 @@ function nearbycombinecomeheli(spotter,suspect)
 				if (v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s") then 
 						if !v:GetEnemy() then
 						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
-							print(""..v:GetName().." heard that.")
+							print(""..v:GetName().." is guided by the heli.")
 							v:SetLastPosition(suspect:GetPos())
 							v:SetSchedule(SCHED_FORCED_GO_RUN)
 							end
@@ -54,7 +54,6 @@ end
 
 
 function nearbycombinecomecasual(suspect)
-print("called")
 local come=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
 		if v:IsValid() then

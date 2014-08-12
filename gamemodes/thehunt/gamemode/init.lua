@@ -103,7 +103,7 @@ combinen = 0
 CombineAssisting = 0
 ManuallySpawnedEntity = 0
 HeliAangered = 0
-
+CAN_HEAR_BREAK = 1
 -- VARIABLES USED BY THE GAME ^
 
 -- UTILITY COMMANDS v
@@ -183,7 +183,7 @@ ply:SetNoTarget(0)
 end
 end )
 
-concommand.Add( "HuntVersion", function()
+concommand.Add( "h_version", function()
 print("TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition.")
 print("Last shit added: Added cs_italy (12/08/2014)")
 print("This is the GitHub version.")
@@ -685,6 +685,8 @@ ply:Spectate(5)
 ply:SetMoveType(10)
 ply:SpectateEntity(attacker)
 
+if PLAYERSINMAP > 1 then
+
 if GetConVarNumber("h_max_player_deaths") == ply:Deaths() or ply:Deaths() > GetConVarNumber("h_max_player_deaths")  then
 ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left. You will respawn in "..GetConVarNumber("h_punish_deaths_timer").." seconds.")
 ply:PrintMessage(HUD_PRINTTALK, "While you wait, think on a better strategy for the next time.")
@@ -700,8 +702,14 @@ else
 ply:PrintMessage(HUD_PRINTTALK, "You have "..GetConVarNumber("h_max_player_deaths") - ply:Deaths().." lifes left.")
 ply.canspawn = 1
 end
-end)
+else
 
+ply.canspawn = 1
+
+
+end
+
+end)
 end
 
 function NearbyEntities()
@@ -1879,7 +1887,11 @@ damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
 end
 
 if !damaged:IsNPC() and !damaged:IsPlayer() then
+if CAN_HEAR_BREAK == 1 then
+CAN_HEAR_BREAK = 0
+timer.Simple(5, function() CAN_HEAR_BREAK = 1 end)
 nearbycombinecomecasual(damaged)
+end
 end
 
 if damaged:IsNPC() then

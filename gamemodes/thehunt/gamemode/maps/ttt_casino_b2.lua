@@ -156,10 +156,11 @@ v:Remove()
 end
 
 SpawnItem("info_player_start", Vector(-429.867126, 619.942383, -394.978424), Angle(0,180,0) )
-SpawnItem("info_player_start", Vector(1982.917114, 1202.584351, -543.610748), Angle(0,0,0) )
 SpawnItem("info_player_start", Vector(1996.031250, 379.810242, -543.610779), Angle(0,40,0) )
 SpawnItem("info_player_start", Vector(2786.576172, 910.185669, -553.610779), Angle(11,-60,0) )
-SpawnItem("info_player_start", Vector(1972.139160, 1328.204102, -543.610748), Angle(0,0,0) )
-SpawnItem("info_player_start", Vector(1971.831055, 1081.172485, -543.610748), Angle(0,180,0) )
+SpawnItem("info_player_start", Vector(1972.139160, 1328.204102, -476.610748), Angle(0,0,0) )
+SpawnItem("info_player_start", Vector(1971.831055, 1081.172485, -476.610748), Angle(0,0,0) )
+SpawnItem("info_player_start", Vector(1982.917114, 1202.584351, -476.610748), Angle(0,0,0) )
+
 end
 
