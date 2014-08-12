@@ -56,3 +56,7 @@ SILENT_WEAPONS = { "weapon_frag", "weapon_crossbow", "weapon_crowbar", "suppress
 
 SECONDARY_FIRE_WEAPONS = { "weapon_ar2", "weapon_shotgun"}
 -- Weapons that have a loud secondary fire.
+
+
+ONLY_PICKUP_ONCE = { "weapon_physcannon", }
+-- The game will prevent people from picking up this weapons if they already have them. Useful for weapons with infinite uses, preventing the player from picking up a weapon he doesn't need to, leaving the weapon for others.

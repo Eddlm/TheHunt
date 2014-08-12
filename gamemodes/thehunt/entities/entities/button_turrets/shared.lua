@@ -6,6 +6,7 @@ ENT.Author	= "Alig96"
 ENT.Contact	= "Don't"
 ENT.Purpose	= ""
 ENT.Instructions	= ""
+
 function ENT:Initialize()
 if SERVER then
 ARMED=0

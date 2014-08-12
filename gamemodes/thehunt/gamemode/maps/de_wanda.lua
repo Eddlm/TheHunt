@@ -5,17 +5,23 @@ CombineThirdWave = 15
 CombineFourthWave = 15
 CombineFifthWave = 20
 CombineInfiniteWave = 20
+REUSE_MAP_PROPS = 1
 
 ITEMPLACES ={
 Vector(318.459747, -686.967041, -7.707550),
+
 }
-
-
-
+/*
+3621.914307 -778.340027 566.737122
+3523.331543 -777.012390 566.936707
+2994.465332 661.679626 -437.572266
+2132.862305 -1315.914917 -477.815369
+*/
 function GM:PlayerInitialSpawn(ply)
-ply:PrintMessage(HUD_PRINTTALK, "This map features three full waves of Combines.")
-ply:PrintMessage(HUD_PRINTTALK, "The first wave it's coming. Hide!")
-ply:PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second wave will come.")
+timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Protection team alert, evidence of anticivil activity in this community.") end )
+timer.Simple(4, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Code: assemble, plan, contain.") end )
+
+--ply:PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second wave will come.")
 end
 
 
@@ -59,8 +65,8 @@ SpawnItem("item_healthvial", Vector(2210.340820 ,-1369.255981 ,-509.763672), Ang
 SpawnItem("item_healthvial", Vector(2215.512451, -1383.142700, -509.112366), Angle(63.156, 6.902, 89.997))
 
 
-SpawnItem("weapon_slam", Vector(-1039.689697, -506.408478, -365.325348), Angle(-0.750, 50.493, -0.097))
-SpawnItem("weapon_slam", Vector(-997.100281, -530.088257, -365.326782), Angle(-1.302, -104.776, -0.467))
+--SpawnItem("weapon_slam", Vector(-1039.689697, -506.408478, -365.325348), Angle(-0.750, 50.493, -0.097))
+--SpawnItem("weapon_slam", Vector(-997.100281, -530.088257, -365.326782), Angle(-1.302, -104.776, -0.467))
 
 if game.SinglePlayer() then
 SpawnMine( Vector(1337.636230, -15.646374, -191.641296) )

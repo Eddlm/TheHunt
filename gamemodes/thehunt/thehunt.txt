@@ -156,6 +156,14 @@
 			"type"		"Numeric"
 			"default"	"10"
 		}
+		20
+		{
+			"name"		"h_hudleft"
+			"text"		"HUD below chat"
+			"help"		"Changes the HUD position between to possible places. Only works before loading a map."
+			"type"		"CheckBox"
+			"default"	"1"
+		}
 	}
 
 }

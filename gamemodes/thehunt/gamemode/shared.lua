@@ -4,16 +4,19 @@ GM.Email = "eddmalaga@gmail.com"
 GM.Website = "http://facepunch.com/showthread.php?t=1391522"
 
 
+include( "config.lua" )
 
 
 
 function ISaid( ply, text, public )
     if text == "!remain" then
-	PrintMessage(HUD_PRINTTALK, "[Ovewatch]: Squad N?"..Wave..", you have "..EnemiesRemainining.." units remaining.")
+	PrintMessage(HUD_PRINTTALK, "[Ovewatch]: Squad Number "..Wave..", you have "..EnemiesRemainining.." units remaining.")
+		        return false
+
     end
-	        return false
 
 end
+
 hook.Add( "PlayerSay", "ISaid", ISaid )
 
 function GM:Initialize()
@@ -51,15 +54,17 @@ end
 
 
 function nearbycombinecomecasual(suspect)
+print("called")
 local come=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
 		if v:IsValid() then
 				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
-				if come < math.random(1,3) then
+				if come < math.random(1,2) then
 					if !v:GetEnemy() then
 						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
-						come=come+1
+							come=come+1
 							print(""..v:GetName().." investigates.")
+							PrintMessage(HUD_PRINTTALK, ""..v:GetName()..": "..table.Random(CombineHearBreak).."")
 							v:SetLastPosition(suspect:GetPos())
 							v:SetSchedule(SCHED_FORCED_GO)
 							end
@@ -74,7 +79,6 @@ end
 
 
 function allthecombinecome(suspect,MAXCOMBINERUSH)
-print("got it")
 local coming=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
 				if v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s" then 
@@ -103,15 +107,21 @@ local coming=0
 end
 
 function GM:PlayerCanPickupWeapon(ply, wep)
+print(""..ply:GetName().." trying to get " ..wep:GetClass().."")
+print(""..ply:GetName().." has "..(wep:Clip2()).."")
+
 CANPICKUP = 1
-if wep:GetClass() == "weapon_physcannon" then
+table.foreach(ONLY_PICKUP_ONCE, function(key,value)
+if wep:GetClass() == value then
 	for k,v in pairs (ply:GetWeapons()) do
-		if v:GetClass() == "weapon_physcannon" then 
-		print(v:GetClass())
+		if v:GetClass() == value then
+		print(""..ply:GetName().." already has " ..v:GetClass().."")
 		CANPICKUP = 0 
 		end
 	end
 end
+end)
+
 if CANPICKUP == 0 then return false end
 CANPICKUP = nil
 return true end
@@ -180,6 +190,9 @@ end
 
 MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
 MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_turret_ceiling"}
+
+
+CombineHearBreak = {"I think I heard something.","What was that?","Something broke nearby.","Heard something broke.","...the fuck...","I think I hear dubstep somewhere.","Suspicious sounds near my position.","...going to check that.","Nearby units, the suspect must be in this area.","Here you are."}
 
 
 OverwatchAmbientSoundsOne = {
@@ -308,4 +321,5 @@ playermodelsfemale = {
 "models/player/group03/female_03.mdl",
 "models/player/group03/female_04.mdl",
 "models/player/group03/female_05.mdl",
-"models/player/group03/female_06.mdl",}
+"models/player/group03/female_06.mdl",
+}
