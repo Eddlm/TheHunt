@@ -186,7 +186,6 @@ end )
 concommand.Add( "h_version", function()
 print("TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition.")
 print("Last shit added: Tweaked Combine AI (they now flee from fire) (12/08/2014)")
-print("This is the GitHub version.")
 
 end )
 
