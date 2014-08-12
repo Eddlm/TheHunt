@@ -22,9 +22,14 @@ SPECIALITEMPLACES = {}
 
 ITEMPLACES ={
 Vector(-768.822937, -1100.280884, -153.996948),
+Vector(-806.619263, -1214.258545, 95.731735),
+Vector(-1281.053467, -129.556610, 107.298103),
+Vector(-1966.575317, -225.405731, 101.822296),
 
 }
 
+ 
+ 
 combinespawnzones = {
 
 Vector(-1955.583130, -712.272705, 72.031250),
@@ -71,6 +76,9 @@ end
 SpawnItem("info_player_start", Vector(-596.434753, -1080.971680, -170.446259)+Vector(0,0,-45), Angle(20,144,0))
 SpawnItem("info_player_start", Vector(-592.727966, -854.056519, -168.595154)+Vector(0,0,-45), Angle(10,127,0))
 SpawnItem("info_player_start", Vector(-844.508057, -1008.122559, -165.020630)+Vector(0,0,-45), Angle(20,9,0))
+SpawnItem("info_player_start", Vector(164.938263, -1443.621338, 320.031250)+Vector(0,0,-45), Angle(0,0,0))
+SpawnItem("info_player_start", Vector(354.959442, -1425.662720, 320.031250)+Vector(0,0,-45), Angle(0,-180,0))
+SpawnItem("info_player_start", Vector(95.127441, 29.479046, 320.031250)+Vector(0,0,-45), Angle(0,-90,0))
 --SpawnTurret(Vector(-491.003052, -1442.955566, -239.262634),Angle(0.397, 167.418, 0.522))
 
 

@@ -56,7 +56,6 @@ end
 function nearbycombinecomecasual(suspect)
 local come=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
-		if v:IsValid() then
 				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
 				if come < math.random(1,2) then
 					if !v:GetEnemy() then
@@ -69,7 +68,6 @@ local come=0
 							end
 						end
 					end
-				end
 				end
 end
 end

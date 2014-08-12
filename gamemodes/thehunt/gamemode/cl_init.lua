@@ -57,11 +57,9 @@ end)
 hook.Add( "PreDrawHalos", "AddHalos", function()
 if GetConVarNumber("h_halos") == 1 && LocalPlayer():Alive() then
 	--for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(), 1000)) do
-
-	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetEyeTraceNoCursor().HitPos, 2000)) do
+	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetEyeTraceNoCursor().HitPos, 1000)) do
 	if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
 		if v:IsValid() then
-				--combine=combine+1
 				halo.Add( {v}, Color( 84,2,2 ), 1, 1, 1, true, true )
 		end
 	end

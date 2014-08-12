@@ -185,7 +185,7 @@ end )
 
 concommand.Add( "h_version", function()
 print("TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition.")
-print("Last shit added: Added cs_italy (12/08/2014)")
+print("Last shit added: Tweaked Combine AI (they now flee from fire) (12/08/2014)")
 print("This is the GitHub version.")
 
 end )
@@ -405,7 +405,10 @@ concommand.Add( "helpme", function(ply)
 print("Useful Commands")
 print("firstwave: starts the firstwave")
 print("h_fixtimers: use it if any feature stops working")
-print("infinite wave: starts the infinite wave system")
+print("infinitewave: starts the infinite wave system")
+print("h_version: Info about the current The Hunt version.")
+
+
 print("")
 print("Facepunch thread: http://facepunch.com/showthread.php?t=1394695")
 print("GitHub download: https://github.com/Eddlm/TheHunt <- This version is updated regularly and fully customizable.")
@@ -1886,7 +1889,7 @@ if damage:GetAttacker():GetClass() =="monster_apc" then
 damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
 end
 
-if !damaged:IsNPC() and !damaged:IsPlayer() then
+if !damaged:IsNPC() and !damaged:IsPlayer() and !damage:IsDamageType(8) then
 if CAN_HEAR_BREAK == 1 then
 CAN_HEAR_BREAK = 0
 timer.Simple(5, function() CAN_HEAR_BREAK = 1 end)
@@ -1894,7 +1897,9 @@ nearbycombinecomecasual(damaged)
 end
 end
 
+
 if damaged:IsNPC() then
+	if damage:IsDamageType(8) then damaged:SetSchedule(SCHED_MOVE_AWAY) end
 if damage:GetAttacker():IsPlayer() then
 if damaged:Health() > damage:GetDamage() then
 damage:GetAttacker():SetNoTarget(false)
