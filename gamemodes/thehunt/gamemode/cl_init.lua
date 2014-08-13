@@ -14,6 +14,7 @@ LIGHTCOLOR = Color(255,0,0)
 lightcol = 0
 CLDARKNESS = 0
 
+
 net.Receive( "cvarstoClientVariables", function( length, client )
 	LIGHTEXT = 'Not Visible'
 	LIGHTCOLOR = Color(0,255,0) 
@@ -69,10 +70,8 @@ if cl_halos == 1 && LocalPlayer():Alive() then
 				halo.Add( {v}, Color( 84,2,2 ), 1, 1, 1, true, true )
 		end
 	end
-	if v:GetClass() == "npc_tripmine" || v:GetClass() == "npc_satchel"  then
- halo.Add( {v}, Color( 247,255,3 ), 1, 1, 1, true, false )
-	end
-	if v:GetClass() == "item_healthcharger" and LocalPlayer():Health() < h_min_health_help
+
+	if v:GetClass() == "item_healthcharger" and LocalPlayer():Health() < cl_min_health_help
  and LocalPlayer():Health() > 0 then
          halo.Add( {v}, Color( 0,204,255 ), 1, 1, 1, true, true )
 	end
@@ -133,21 +132,24 @@ CombineBootSound = {
 
 
 
-
-function stealthsystemchecker()
+/*
+function ClInitialSpawn(ply)
 if cl_light_stealth == 1 then
 print("[The Hunt]: Light based system ok")
-timer.Simple( 1, light )
+timer.Simple( 5, light )
 lightcol = 0
 end
-end
 
+end
+*/
 
 function light()
 --print("[The Hunt]: Light based system cycling")
-if cl_light_stealth == 1 then
-
 timer.Simple( 0.2, light )
+
+if cl_light_stealth == 1 then
+--print("[The Hunt]: Light based system ok")
+
 lightcol = (render.GetLightColor(LocalPlayer():GetPos())*Vector(100,100,100)):Length()
 if LocalPlayer():Health() > 0 then
 table.foreach(DARK_WEAPONS, function(key,value)
@@ -252,4 +254,4 @@ draw.SimpleText( text, font, x, y, self:GetTeamColor( trace.Entity ) )
 end
 
 timer.Simple ( 5, CombineBoots)
-timer.Simple ( 2, stealthsystemchecker)
+hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", light )

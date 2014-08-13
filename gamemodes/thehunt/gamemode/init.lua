@@ -72,7 +72,11 @@ NPC:SetKeyValue( "model", "models/elite_synth/elite_synth.mdl" )
 NPC:SetSkin(1)
 
 Get info from an entity typing this on the console while facing at it
-lua_run print(player.GetByID(1):GetEyeTrace().Entity:GetAngles()) print(player.GetByID(1):GetEyeTrace().Entity:GetPos()) print(player.GetByID(1):GetEyeTrace().Entity) print(player.GetByID(1):GetEyeTrace().Entity:GetModel()) print(player.GetByID(1):GetEyeTrace().Entity:GetCollisionGroup())
+lua_run print("Entity: ") print(player.GetByID(1):GetEyeTrace().Entity) print("Position: ") print(player.GetByID(1):GetEyeTrace().Entity:GetPos()) print("Angles: ") print(player.GetByID(1):GetEyeTrace().Entity:GetAngles())
+
+lua_run print("Model: ") print(player.GetByID(1):GetEyeTrace().Entity:GetModel())
+
+
 */
 
 function GM:Initialize()
@@ -188,7 +192,7 @@ end )
 
 concommand.Add( "h_version", function()
 print("[The Hunt]: TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition.")
-print("[The Hunt]: Last shit added: fixed players not using the clientside features (13/08/2014)")
+print("[The Hunt]: Last shit added: added gm_construct as an example. Check the gm_construct.lua file of this addon. (13/08/2014)")
 print("[The Hunt]: Running the GitHub version.")
 end )
 
@@ -686,10 +690,11 @@ end)
 
 
 timer.Create( "Delaywhenkilled", 1, 1, function()
+if attacker:IsNPC() then
 ply:Spectate(5)
 ply:SetMoveType(10)
 ply:SpectateEntity(attacker)
-
+end
 if PLAYERSINMAP > 1 then
 
 if GetConVarNumber("h_max_player_deaths") == ply:Deaths() or ply:Deaths() > GetConVarNumber("h_max_player_deaths")  then
@@ -977,7 +982,7 @@ canister:SetAngles(Angle(-70,math.random(180,-180),0))
 canister:SetPos(pos + Vector(math.random(200,-200),math.random(200,-200),0))
 canister:SetKeyValue( "HeadcrabType", math.random(0,2) )
 canister:SetKeyValue( "HeadcrabCount", math.random(3,6) )
-canister:SetKeyValue( "FlightSpeed", "9000" )
+canister:SetKeyValue( "FlightSpeed", "8000" )
 canister:SetKeyValue( "FlightTime", "3" )
 canister:SetKeyValue( "StartingHeight", "0" )
 canister:SetKeyValue( "Damage", "20" )
@@ -1355,20 +1360,25 @@ ITEM:SetAngles(ang)
 ITEM:SetModel(model)
 ITEM:Spawn()
 ITEM:Fire("DisableMotion","",0)
-ITEM:SetKeyValue("minhealthdmg", 6000)
+--ITEM:SetKeyValue("minhealthdmg", 6000)
 end
+
+
+function SpawnProp( pos, ang, model )
+ITEM = ents.Create("prop_physics" )
+ITEM:SetPos( pos )
+ITEM:SetAngles(ang)
+ITEM:SetModel(model)
+ITEM:Spawn()
+
+end
+
 -- UTILITY FUNCTIONS ^
 
 
 -- v PRE-PLAY THINGS
 
-function FirstSpawn()
-SetUpClientConfig()
-
-end
-
 function GM:PlayerSpawn(ply)
-SetUpClientConfig()
 -- MapLoadout() Placeholder
 --	ply.safe=yes
     ply:SetCustomCollisionCheck(true)
@@ -2121,4 +2131,4 @@ end
 
 -- GM HOOKS ^
 hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", FirstSpawn )
-hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", SetUpClientConfig )
+hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", HandlePlayerJoin )

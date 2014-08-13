@@ -4,10 +4,29 @@ GM.Email = "eddmalaga@gmail.com"
 GM.Website = "http://facepunch.com/showthread.php?t=1391522"
 include( "config.lua" )
 
+
+
+
 cl_halos = GetConVarNumber("h_halos")
 cl_hudleft = GetConVarNumber("h_hudleft")
 cl_light_stealth = GetConVarNumber("h_light_stealth")
 cl_min_health_help = GetConVarNumber("h_min_health_help")
+
+function HandlePlayerJoin()
+
+if CLIENT then
+print("CLIENT")
+
+
+cl_halos = GetConVarNumber("h_halos")
+cl_hudleft = GetConVarNumber("h_hudleft")
+cl_light_stealth = GetConVarNumber("h_light_stealth")
+cl_min_health_help = GetConVarNumber("h_min_health_help")
+if SERVER then
+print("SERVER")
+end
+end
+end
 
 
 function ISaid( ply, text, public )
@@ -142,7 +161,7 @@ end
 print("[The Hunt]: There are "..NUMBER.." "..value.."")
 while NUMBER < OFFSET do
 print("[The Hunt]: Added 1 of "..value.."")
-SpawnItem(value, table.Random(ITEMPLACES)+Vector(0,0,math.random(0,30)), Angle(0,0,90) )
+SpawnItem(value, table.Random(ITEMPLACES), Angle(0,0,math.random(-180,180)) )
 NUMBER = NUMBER+1
 end
 NUMBER=0
@@ -187,6 +206,9 @@ timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 print("")
 end
 
+
+
+
 MainEnemiesGround = { "npc_combine_s", "npc_metropolice"}
 
 MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
@@ -208,7 +230,8 @@ OverwatchAmbientSoundsOne = {
 "npc/overwatch/cityvoice/f_trainstation_offworldrelocation_spkr.wav",
 "npc/overwatch/cityvoice/f_trainstation_assemble_spkr.wav",
 "npc/overwatch/cityvoice/f_unrestprocedure1_spkr.wav",
-"npc/overwatch/cityvoice/fprison_restrictorsdisengaged.wav",
+"npc/overwatch/cityvoice/fprison_restrictorsdisengaged.wav","npc/overwatch/cityvoice/f_protectionresponse_5_spkr.wav",
+
 }
 
 ContactConfirmed = {
@@ -219,7 +242,6 @@ ContactConfirmed = {
 "npc/combine_soldier/vo/contactconfirmprosecuting.wav",
 "npc/combine_soldier/vo/goactiveintercept.wav",
 "npc/combine_soldier/vo/overwatchreportspossiblehostiles.wav",
-"npc/overwatch/cityvoice/f_protectionresponse_5_spkr.wav",
 }
 
 CombineKillSounds = {
@@ -281,13 +303,7 @@ CombineKilledSounds = {
 "npc/metropolice/vo/officerdowniam10-99.wav",
 "npc/metropolice/vo/reinforcementteamscode3.wav",
 }
-/*
-"vo/npc/male01/combine01.wav",
-"vo/npc/male01/combine02.wav",
 
-"vo/npc/female01/combine01.wav",
-"vo/npc/female01/combine02.wav",
-*/
 malecomments={
 "vo/npc/male01/yeah02.wav",
 "vo/npc/male01/gotone02.wav",
