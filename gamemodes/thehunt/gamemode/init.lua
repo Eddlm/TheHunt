@@ -15,13 +15,16 @@ util.PrecacheModel("models/Combine_Soldier.mdl")
 util.PrecacheModel("models/Combine_Super_Soldier.mdl")
 util.PrecacheModel("models/Police.mdl")
 
+SPAWNPOINTS_TO_DELETE = {"info_player_terrorist", "info_player_counterterrorist", "info_player_start", "info_player_deathmatch",
+}
+
 OVERWATCH_TAUNTS = { "I'd get ready if I were you.", "Hope you like bloodbaths.", "Let's get this farce over with.", "I've calculated who will win to a 99.93% certainty, if you're interested. ", "So at least your teammates know what they're doing. ", "Your teammates are doing a really great job. ", "This is probably the most heroic thing anyone's ever done while sitting motionless in their parents' rec room. ", "You were almost helpful this time. ", " It's a good feeling, isn't it? I wouldn't get used to it. ", "Let's be honest: it probably won't help. ", "That's funny, I didn't even see you cheat. ", "That should delay the inevitable slightly. ", "Great teamwork, you vicious thugs. ", "Your entire life has been a mathematical error. A mathematical error I'm about to correct.", "Someone is going to get badly hurt.", "I hate you so much.", "Did anything happen while I was out?", "Just stop it already.", "Are you testing me?" , "You really aren't getting tired of that, are you?" , "I'm done." , "That isn't science." , "Do you need real encouragement? Let's see if this helps." , "Now, you are just wasting my time." , "If you are wondering what that smell is, that is the smell of human fear." }
 
 
 net.Receive( "light_above_limit", function( length, client )
---client:PrintMessage(HUD_PRINTTALK, "You are visible.")
+--PrintMessage(HUD_PRINTTALK, ""..client:GetName() .." is  visible.")
 net.Start( "Visible" )
-net.Send(player.GetByID(1))
+net.Send(client)
 client:SetNoTarget(false)
 end )
 
@@ -43,9 +46,9 @@ end
 end
 end
 if hidden==1 then client:SetNoTarget(true)
---client:PrintMessage(HUD_PRINTTALK, "You are hidden.")
+--PrintMessage(HUD_PRINTTALK, ""..client:GetName() .." is NOT visible.")
 net.Start( "NotVisible" )
-net.Send(player.GetByID(1))
+net.Send(client)
 end
 end)
 
@@ -185,7 +188,7 @@ end )
 
 concommand.Add( "h_version", function()
 print("[The Hunt]: TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition.")
-print("[The Hunt]: Last shit added: tweaked dynamic weapon spawnpoints (13/08/2014)")
+print("[The Hunt]: Last shit added: fixed players not using the clientside features (13/08/2014)")
 print("[The Hunt]: Running the GitHub version.")
 end )
 
@@ -1358,8 +1361,14 @@ end
 
 
 -- v PRE-PLAY THINGS
-function GM:PlayerSpawn(ply)
 
+function FirstSpawn()
+SetUpClientConfig()
+
+end
+
+function GM:PlayerSpawn(ply)
+SetUpClientConfig()
 -- MapLoadout() Placeholder
 --	ply.safe=yes
     ply:SetCustomCollisionCheck(true)
@@ -2112,3 +2121,4 @@ end
 
 -- GM HOOKS ^
 hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", FirstSpawn )
+hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", SetUpClientConfig )

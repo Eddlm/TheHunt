@@ -1,3 +1,5 @@
+AddCSLuaFile( "shared.lua" )
+AddCSLuaFile( "config.lua" )
 include( "shared.lua" )
 include( "config.lua" )
 
@@ -12,6 +14,10 @@ LIGHTCOLOR = Color(255,0,0)
 lightcol = 0
 CLDARKNESS = 0
 
+net.Receive( "cvarstoClientVariables", function( length, client )
+	LIGHTEXT = 'Not Visible'
+	LIGHTCOLOR = Color(0,255,0) 
+end )
 
 net.Receive( "NotVisible", function( length, client )
 	LIGHTEXT = 'Not Visible'
@@ -39,7 +45,7 @@ end )
 
 hook.Add( "HUDPaint", "HuntHud", function()
 
-if GetConVarNumber("h_hudleft") == 0 then
+if cl_hudleft == 0 then
 
 	draw.RoundedBox(6 , ScrW()*0.885, ScrH() * 0.90, 140, 67, Color(255,255,255,20))
 	draw.DrawText( "Illumination: "..math.Round(lightcol,1).."", "TargetID", ScrW() * 0.89, ScrH() * 0.93, darkencolor, TEXT_ALIGN_LEFT )
@@ -55,7 +61,7 @@ end)
 
 
 hook.Add( "PreDrawHalos", "AddHalos", function()
-if GetConVarNumber("h_halos") == 1 && LocalPlayer():Alive() then
+if cl_halos == 1 && LocalPlayer():Alive() then
 	--for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(), 1000)) do
 	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetEyeTraceNoCursor().HitPos, 1000)) do
 	if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
@@ -66,7 +72,7 @@ if GetConVarNumber("h_halos") == 1 && LocalPlayer():Alive() then
 	if v:GetClass() == "npc_tripmine" || v:GetClass() == "npc_satchel"  then
  halo.Add( {v}, Color( 247,255,3 ), 1, 1, 1, true, false )
 	end
-	if v:GetClass() == "item_healthcharger" and LocalPlayer():Health() < GetConVarNumber("h_min_health_help")
+	if v:GetClass() == "item_healthcharger" and LocalPlayer():Health() < h_min_health_help
  and LocalPlayer():Health() > 0 then
          halo.Add( {v}, Color( 0,204,255 ), 1, 1, 1, true, true )
 	end
@@ -129,7 +135,7 @@ CombineBootSound = {
 
 
 function stealthsystemchecker()
-if GetConVarNumber("h_light_stealth") == 1 then
+if cl_light_stealth == 1 then
 print("[The Hunt]: Light based system ok")
 timer.Simple( 1, light )
 lightcol = 0
@@ -138,6 +144,9 @@ end
 
 
 function light()
+--print("[The Hunt]: Light based system cycling")
+if cl_light_stealth == 1 then
+
 timer.Simple( 0.2, light )
 lightcol = (render.GetLightColor(LocalPlayer():GetPos())*Vector(100,100,100)):Length()
 if LocalPlayer():Health() > 0 then
@@ -157,6 +166,7 @@ if lightcol <= 2 then
 		if LocalPlayer():GetVelocity():Length() < 40 then
 		if LocalPlayer():Alive() then
 		light_above_limit=0
+		--PrintMessage(HUD_PRINTTALK, ""..LocalPlayer():GetName() .." is NOT visible.")
 		net.Start("light_below_limit")
 		net.SendToServer()
 		end
@@ -175,12 +185,15 @@ if lightcol > 2 then
 	if light_above_limit != 1 then
 	if LocalPlayer():Alive() then
 	light_above_limit=1
+	--PrintMessage(HUD_PRINTTALK, ""..LocalPlayer():GetName() .." is NOT visible.")
 	net.Start("light_above_limit")
 	net.SendToServer()
 	end
 	end
 end
 end
+end
+timer.Simple( 1, light )
 
 function GM:HUDDrawTargetID()
 

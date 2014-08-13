@@ -13,12 +13,7 @@ ITEMPLACES ={
 Vector(318.459747, -686.967041, -7.707550),
 
 }
-/*
-3621.914307 -778.340027 566.737122
-3523.331543 -777.012390 566.936707
-2994.465332 661.679626 -437.572266
-2132.862305 -1315.914917 -477.815369
-*/
+
 function GM:PlayerInitialSpawn(ply)
 timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Protection team alert, evidence of anticivil activity in this community.") end )
 timer.Simple(4, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Code: assemble, plan, contain.") end )

@@ -4,6 +4,10 @@ GM.Email = "eddmalaga@gmail.com"
 GM.Website = "http://facepunch.com/showthread.php?t=1391522"
 include( "config.lua" )
 
+cl_halos = GetConVarNumber("h_halos")
+cl_hudleft = GetConVarNumber("h_hudleft")
+cl_light_stealth = GetConVarNumber("h_light_stealth")
+cl_min_health_help = GetConVarNumber("h_min_health_help")
 
 
 function ISaid( ply, text, public )
