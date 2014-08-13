@@ -130,7 +130,7 @@ CombineBootSound = {
 
 function stealthsystemchecker()
 if GetConVarNumber("h_light_stealth") == 1 then
-print("Light based system ok")
+print("[The Hunt]: Light based system ok")
 timer.Simple( 1, light )
 lightcol = 0
 end

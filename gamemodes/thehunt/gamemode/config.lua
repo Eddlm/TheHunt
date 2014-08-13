@@ -4,7 +4,7 @@ Be sure to configure all the fields or the gamemode won't work properly.
 
 List of HL2 entities: https://developer.valvesoftware.com/wiki/List_of_HL2_entities
 To know the classname of an item/weapon: http://i.imgur.com/OkNNLe3.jpg an paste it here.
-You can spawn NPCs, Entities or Weapons. DO NOT ADD "PROP_PHYSICS" OR ANYTHING SIMILAR OR IT WILL EXPLODE.
+You can spawn NPCs, Entities or Weapons. DO NOT USE "PROP_PHYSICS" OR ANYTHING SIMILAR OR IT WILL EXPLODE.
 ----------------------------------------------------------------------------*/
 
 /*--------------------WEAPON SETUP---------------------
@@ -14,15 +14,10 @@ Here you must configure your custom weapons so the game reacts apropiately.
 RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade", "XBowBolt"}
 -- Don't add anything to this. Is what kind of ammo the NPC rebels will give you. You can prevent them for giving X type of ammo if you delete it from this table, but you can't add new values here. It will explode.
 
-CRATEITEMS = { "weapon_shotgun", "weapon_357", "weapon_frag", "weapon_slam", "item_healthkit", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black", "npc_rollermine","item_dynamic_resupply","combine_mine","grenade_helicopter" }
--- Normal crates can spawn these items. 
-
-GOODCRATEITEMS = { "item_dynamic_resupply","weapon_frag", "weapon_slam","item_healthkit", "item_ammo_smg1_grenade","item_box_buckshot","item_ammo_smg1_large","item_ammo_crossbow","item_ammo_ar2_large","item_ammo_ar2_altfire"}
--- Ammo crates can spawn these items.
-
 
 MEDIUMWEAPONS = { "weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1" }
 -- Weapons the gamemode will spawn around. 
+
 
 /*--------------Stealth (lighting)----------------------------
 This section covers the light-based stealth value of the weapons.

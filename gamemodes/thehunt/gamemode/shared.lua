@@ -2,8 +2,6 @@ GM.Name = "The Hunt"
 GM.Author = "Eddlm"
 GM.Email = "eddmalaga@gmail.com"
 GM.Website = "http://facepunch.com/showthread.php?t=1391522"
-
-
 include( "config.lua" )
 
 
@@ -57,7 +55,7 @@ function nearbycombinecomecasual(suspect)
 local come=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
 				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
-				if come < math.random(1,2) then
+				if come < 1 then
 					if !v:GetEnemy() then
 						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
 							come=come+1
@@ -105,7 +103,7 @@ end
 
 function GM:PlayerCanPickupWeapon(ply, wep)
 print(""..ply:GetName().." trying to get " ..wep:GetClass().."")
-print(""..ply:GetName().." has "..(wep:Clip2()).."")
+--print(""..ply:GetName().." has "..(wep:Clip1()).." on clip1, "..(wep:Clip1()).." on clip2, "..GetAmmoCount(ply:GetActiveWeapon():GetPrimaryAmmoType()).." primary ammo, "..GetAmmoCount(ply:GetActiveWeapon():GetSecondaryAmmoType()).." secondary ammo")
 
 CANPICKUP = 1
 table.foreach(ONLY_PICKUP_ONCE, function(key,value)
@@ -137,9 +135,9 @@ table.foreach(MEDIUMWEAPONS, function(key,value)
 for k,weapon in pairs(ents.FindByClass(value)) do 
 NUMBER=NUMBER+1
 end
-print("There are "..NUMBER.." "..value.."")
+print("[The Hunt]: There are "..NUMBER.." "..value.."")
 while NUMBER < OFFSET do
-print("Added 1 of "..value.."")
+print("[The Hunt]: Added 1 of "..value.."")
 SpawnItem(value, table.Random(ITEMPLACES)+Vector(0,0,math.random(0,30)), Angle(0,0,90) )
 NUMBER = NUMBER+1
 end
@@ -155,11 +153,11 @@ for k,v in pairs(ents.FindByClass("item_healthcharger")) do
 		for k, player in pairs(ents.FindInSphere(v:GetPos(),100)) do
 			if player:IsPlayer() then
 			canrespawn = 0
-			print("player found, wont respawn charger")
+			print("[The Hunt]: player found, wont respawn charger")
 			end
 		end
 	if canrespawn == 1 then
-	print("player not found, will respawn charger")
+	print("[The Hunt]: player not found, will respawn charger")
 	v:Remove()
 	SpawnItem("item_healthcharger", chargerpos, chargerangles )
 	end
@@ -173,10 +171,10 @@ if RPGCANSPAWN == 1 then
 	for k,weapon in pairs(ents.FindByClass("weapon_rpg")) do 
 	RPG_IN_MAP = RPG_IN_MAP + 1
 	end
-	print("RPG's on map: "..RPG_IN_MAP.."")
+	print("[The Hunt]: RPG's on map: "..RPG_IN_MAP.."")
 	RPGSPAWN = GetConVarNumber("h_rpgmax") - RPG_IN_MAP
 	while RPGSPAWN > 0 && RPGCANSPAWN == 1 do
-	print("RPG's that will spawn: "..RPGSPAWN.."")
+	print("[The Hunt]: RPG's that will spawn: "..RPGSPAWN.."")
 	SpawnItem("weapon_rpg", Vector(-26.358618, -2012.917847, 412.450073), Angle(0.945, 74.805, 79.540) )
 	RPGSPAWN=RPGSPAWN - 1
 	end
@@ -184,6 +182,8 @@ end
 timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 print("")
 end
+
+MainEnemiesGround = { "npc_combine_s", "npc_metropolice"}
 
 MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
 MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_turret_ceiling"}

@@ -7,6 +7,11 @@ CombineFifthWave = 20
 CombineInfiniteWave = 20
 DARKNESS = 3
 
+MAP_PROPS = {"models/props_c17/oildrum001.mdl","",""}
+
+
+
+
 zonescovered ={
 Vector(-268.598877, -852.607239, 64.031250),
 Vector(785.468140, 1082.210327, 64.031250),
