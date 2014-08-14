@@ -7,16 +7,8 @@
 
 	"settings"
 	{
+
 		1
-		{
-			"name"		"h_halos"
-			"text"		"Allow Enemy Outlining"
-			"help"		"If enabled, the most important enemies will be outlined to help players hide from them."
-			"type"		"CheckBox"
-			"default"	"1"
-		}
-		
-		2
 		{
 			"name"		"h_autostart"
 			"text"		"Allow autostart"
@@ -96,7 +88,7 @@
 		{
 			"name"		"h_rpgmax"
 			"text"		"Max RPG to spawn"
-			"help"		"Anytime a Player takes damage, it will be multiplied by this value. You can use decimal values, like 0.2."
+			"help"		"Maximun number of RPGs that would spawn on an rpg-allowed map."
 			"type"		"Numeric"
 			"default"	"1"
 		}		
@@ -108,7 +100,7 @@
 			"type"		"Numeric"
 			"default"	"4"
 		}
-		14
+		13
 		{
 			"name"		"h_max_player_deaths"
 			"text"		"Max player deaths"
@@ -116,7 +108,7 @@
 			"type"		"Numeric"
 			"default"	"4"
 		}	
-		15
+		14
 		{
 			"name"		"h_punish_deaths_timer"
 			"text"		"Player dead punish time"
@@ -124,7 +116,7 @@
 			"type"		"Numeric"
 			"default"	"30"
 		}	
-		16
+		15
 		{
 			"name"		"h_infinite_waves"
 			"text"		"Infinite waves"
@@ -132,15 +124,8 @@
 			"type"		"CheckBox"
 			"default"	"1"
 		}	
-		17
-		{
-			"name"		"h_min_health_help"
-			"text"		"Minimun health help"
-			"help"		"While a player's health is below this, nearby Healthchargers will be outlined in blue. Requires the h_halos cvar enabled."
-			"type"		"Numeric"
-			"default"	"40"
-		}	
-		18
+
+		16
 		{
 			"name"		"h_light_stealth"
 			"text"		"Enable lighting stealth"
@@ -148,7 +133,7 @@
 			"type"		"CheckBox"
 			"default"	"1"
 		}		
-		19
+		17
 		{
 			"name"		"h_time_between_waves"
 			"text"		"Time between waves"
@@ -156,14 +141,8 @@
 			"type"		"Numeric"
 			"default"	"10"
 		}
-		20
-		{
-			"name"		"h_hudleft"
-			"text"		"HUD below chat"
-			"help"		"Changes the HUD position between to possible places. Only works before loading a map."
-			"type"		"CheckBox"
-			"default"	"1"
-		}
+
+
 	}
 
 }

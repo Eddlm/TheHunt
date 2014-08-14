@@ -45,24 +45,27 @@ end )
 
 
 hook.Add( "HUDPaint", "HuntHud", function()
-
-if cl_hudleft == 0 then
+/*
+--if cl_hudleft == 0 then
 
 	draw.RoundedBox(6 , ScrW()*0.885, ScrH() * 0.90, 140, 67, Color(255,255,255,20))
 	draw.DrawText( "Illumination: "..math.Round(lightcol,1).."", "TargetID", ScrW() * 0.89, ScrH() * 0.93, darkencolor, TEXT_ALIGN_LEFT )
 	draw.DrawText( LIGHTEXT, "TargetID", ScrW() * 0.89, ScrH() * 0.91, LIGHTCOLOR, TEXT_ALIGN_LEFT )
 	draw.DrawText( HUDTEXT, "TargetID", ScrW() * 0.89, ScrH() * 0.95, HUDCOLOR, TEXT_ALIGN_LEFT )
-else
+
+	else
+*/
 	draw.RoundedBox(6 , ScrW()*0.025, ScrH() * 0.83, 140, 67, Color(255,255,255,20))
 	draw.DrawText( "Illumination: "..math.Round(lightcol,1).."", "TargetID", ScrW() * 0.03, ScrH() * 0.86, darkencolor, TEXT_ALIGN_LEFT )
 	draw.DrawText( LIGHTEXT, "TargetID", ScrW() * 0.03, ScrH() * 0.84, LIGHTCOLOR, TEXT_ALIGN_LEFT )
 	draw.DrawText( HUDTEXT, "TargetID", ScrW() * 0.03, ScrH() * 0.88, HUDCOLOR, TEXT_ALIGN_LEFT )
-end
+--end
+
 end)
 
 
 hook.Add( "PreDrawHalos", "AddHalos", function()
-if cl_halos == 1 && LocalPlayer():Alive() then
+if LocalPlayer():Alive() then
 	--for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(), 1000)) do
 	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetEyeTraceNoCursor().HitPos, 1000)) do
 	if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
@@ -71,13 +74,13 @@ if cl_halos == 1 && LocalPlayer():Alive() then
 		end
 	end
 
-	if v:GetClass() == "item_healthcharger" and LocalPlayer():Health() < cl_min_health_help
+	if v:GetClass() == "item_healthcharger" and LocalPlayer():Health() < 40
  and LocalPlayer():Health() > 0 then
          halo.Add( {v}, Color( 0,204,255 ), 1, 1, 1, true, true )
 	end
 	
 	if v:IsPlayer() then
-	if v:Health() > 1 then
+	if v:Health() > 0 then
          halo.Add( {v}, Color( 18,176,0 ), 1, 1, 3, true, true )
 	end
 	end
@@ -132,22 +135,12 @@ CombineBootSound = {
 
 
 
-/*
-function ClInitialSpawn(ply)
-if cl_light_stealth == 1 then
-print("[The Hunt]: Light based system ok")
-timer.Simple( 5, light )
-lightcol = 0
-end
-
-end
-*/
 
 function light()
 --print("[The Hunt]: Light based system cycling")
 timer.Simple( 0.2, light )
 
-if cl_light_stealth == 1 then
+--if cl_light_stealth == 1 then
 --print("[The Hunt]: Light based system ok")
 
 lightcol = (render.GetLightColor(LocalPlayer():GetPos())*Vector(100,100,100)):Length()
@@ -193,7 +186,7 @@ if lightcol > 2 then
 	end
 	end
 end
-end
+--end
 end
 timer.Simple( 1, light )
 

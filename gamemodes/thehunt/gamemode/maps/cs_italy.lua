@@ -1,11 +1,10 @@
 include( "basewaves.lua" )
 CombineFirstWave = 7
-CombineSecondWave = 15
-CombineThirdWave = 15
-CombineFourthWave = 15
-CombineFifthWave = 20
+CombineSecondWave = 10
+CombineThirdWave = 10
+CombineFourthWave = 10
+CombineFifthWave = 10
 CombineInfiniteWave = 20
-REUSE_MAP_PROPS = 1
 
 zonescovered ={
 Vector(-715.801270, -1541.449219, -175.968750),

@@ -7,26 +7,6 @@ include( "config.lua" )
 
 
 
-cl_halos = GetConVarNumber("h_halos")
-cl_hudleft = GetConVarNumber("h_hudleft")
-cl_light_stealth = GetConVarNumber("h_light_stealth")
-cl_min_health_help = GetConVarNumber("h_min_health_help")
-
-function HandlePlayerJoin()
-
-if CLIENT then
-print("CLIENT")
-
-
-cl_halos = GetConVarNumber("h_halos")
-cl_hudleft = GetConVarNumber("h_hudleft")
-cl_light_stealth = GetConVarNumber("h_light_stealth")
-cl_min_health_help = GetConVarNumber("h_min_health_help")
-if SERVER then
-print("SERVER")
-end
-end
-end
 
 
 function ISaid( ply, text, public )

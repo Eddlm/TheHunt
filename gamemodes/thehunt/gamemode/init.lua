@@ -30,6 +30,17 @@ end )
 
 net.Receive( "light_below_limit", function( length, client )
 local hidden=1
+/*
+for k, v in pairs(ents.FindInSphere(client:GetPos(),1000)) do
+if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
+if v:Visible(client) then
+hidden=0
+client:PrintMessage(HUD_PRINTTALK, ""..v:GetName().." saw you hide.")
+end
+end
+end
+*/
+
 for k, v in pairs(ents.FindByClass("npc_*")) do
 if v:IsValid() then
 --if v:IsNPC() then
@@ -45,8 +56,11 @@ end
 end
 end
 end
+
 if hidden==1 then client:SetNoTarget(true)
+
 --PrintMessage(HUD_PRINTTALK, ""..client:GetName() .." is NOT visible.")
+
 net.Start( "NotVisible" )
 net.Send(client)
 end
@@ -192,8 +206,8 @@ end )
 
 concommand.Add( "h_version", function()
 print("[The Hunt]: TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition.")
-print("[The Hunt]: Last shit added: added gm_construct as an example. Check the gm_construct.lua file of this addon. (13/08/2014)")
-print("[The Hunt]: Running the GitHub version.")
+print("[The Hunt]: Last shit added: Removed some useless client configs. (13/08/2014)")
+print("[The Hunt]: Running the CAN'T WORK FOR SHIT version.")
 end )
 
 
@@ -384,7 +398,6 @@ end)
 concommand.Add( "seesettings", function(ply)
 print("[The Hunt]: Here you go")
 
-print("[The Hunt]: h_halos: "..GetConVarNumber("h_halos").."")
 print("[The Hunt]: h_autostart: "..GetConVarNumber("h_autostart").."")
 print("[The Hunt]: h_minenemies: "..GetConVarNumber("h_minenemies").."")
 print("[The Hunt]: h_maxhelp: "..GetConVarNumber("h_maxhelp").."")
@@ -398,8 +411,6 @@ print("[The Hunt]: h_maxgunshotinvestigate: "..GetConVarNumber("h_maxgunshotinve
 print("[The Hunt]: h_max_player_deaths: "..GetConVarNumber("h_max_player_deaths").."")
 print("[The Hunt]: h_punish_deaths_timer: "..GetConVarNumber("h_punish_deaths_timer").."")
 print("[The Hunt]: h_infinite_waves: "..GetConVarNumber("h_infinite_waves").."")
-print("[The Hunt]: h_min_health_help: "..GetConVarNumber("h_min_health_help").."")
-print("[The Hunt]: h_light_stealth: "..GetConVarNumber("h_light_stealth").."")
 print("[The Hunt]: h_time_between_waves: "..GetConVarNumber("h_time_between_waves").."")
 print("[The Hunt]: Friendly fire: "..GetConVarNumber("h_friendlyfire").."")
 print("[The Hunt]: Weapons that The Hunt spawns: ")
@@ -659,6 +670,7 @@ end
 
 
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
+timer.Simple(1, npcforget)
 ply:CreateRagdoll()
 ply:AddDeaths(1)
 NUMPLAYERS()
@@ -1084,7 +1096,7 @@ NPC:Spawn()
 NPC:Give("ai_weapon_ar2")
 combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
-NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_AVERAGE )
+NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )
 NPC:Fire("StartPatrolling","",0)
 
 end
@@ -1146,7 +1158,7 @@ NPC:Spawn()
 NPC:Give("ai_weapon_stunstick")
 combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
-NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_POOR )	
+NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
 NPC:Fire("StartPatrolling","",0)
 NPC:Fire("ActivateBaton","",0)
 end
@@ -1163,7 +1175,7 @@ NPC:Spawn()
 NPC:Give("ai_weapon_pistol")
 combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
-NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_POOR )	
+NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
 NPC:Fire("StartPatrolling","",0)
 end
 function SpawnMetropoliceHard( pos )
@@ -1379,6 +1391,9 @@ end
 -- v PRE-PLAY THINGS
 
 function GM:PlayerSpawn(ply)
+	--net.Start( "NotVisible" )
+	--net.Send(ply)
+	--ply:SetNoTarget(true)
 -- MapLoadout() Placeholder
 --	ply.safe=yes
     ply:SetCustomCollisionCheck(true)
@@ -1964,9 +1979,10 @@ if damaged:IsNPC() then
 	--if  then damaged:SetSchedule(SCHED_MOVE_AWAY) end -- f
 
 if damage:GetAttacker():IsPlayer() then
-if damaged:Health() > damage:GetDamage() then
-damage:GetAttacker():SetNoTarget(false)
-end
+
+--if damaged:Health() > damage:GetDamage() then
+--damage:GetAttacker():SetNoTarget(false)
+--end
 end
 	if damaged:GetClass() != "npc_helicopter" && damaged:GetClass() != "npc_combinegunship" then
 		if damaged:GetEnemy() == nil then
