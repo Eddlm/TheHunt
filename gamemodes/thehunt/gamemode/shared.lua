@@ -10,11 +10,12 @@ include( "config.lua" )
 
 
 function ISaid( ply, text, public )
-    if text == "!remain" then
+    if text == "!remain" or text == !REMAIN then
 	PrintMessage(HUD_PRINTTALK, "[Ovewatch]: Squad Number "..Wave..", you have "..EnemiesRemainining.." units remaining.")
 		        return false
 
     end
+
 
 end
 
@@ -23,6 +24,7 @@ hook.Add( "PlayerSay", "ISaid", ISaid )
 function GM:Initialize()
 	self.BaseClass.Initialize( self )
 end
+
 
 function nearbycombinecome(suspect)
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
@@ -147,6 +149,29 @@ end
 NUMBER=0
 end)
 
+
+if MISCELANEOUS_ITEMS_PLACES then
+table.foreach(MISCELANEOUS_ITEMS_PLACES, function(key,value)
+local canspawnitem=1
+for k,item in pairs(ents.FindInSphere(value,100)) do 
+table.foreach(MISCELANEOUS_ITEMS, function(key,itemstable)
+print("[The Hunt]:  found item")
+if item:GetClass() == itemstable then
+print("[The Hunt]: item class matched")
+
+canspawnitem=0
+end
+end)
+end
+if canspawnitem==1 then
+SpawnItem(table.Random(MISCELANEOUS_ITEMS),value, Angle(0,0,0))
+end
+end)
+end
+--  
+-- 
+-- 
+-- 
 
 
 for k,v in pairs(ents.FindByClass("item_healthcharger")) do 

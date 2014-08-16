@@ -137,6 +137,9 @@ end
 print("")
 end )
 
+
+
+
 concommand.Add( "h_fixtimers", function(ply)
 
 print("[The Hunt]: Rebooting: Item Respawn System")
@@ -153,9 +156,7 @@ timer.Create( "coverzones", 10, 1, coverzones )
 
 print("[The Hunt]: Rebooting: wavefinishedchecker")
 timer.Create( "wavefinishedchecker", 5, 1, wavefinishedchecker)
-
 print("")
-
 print("[The Hunt]: Plz report the bug to the Facepunch Thread, the autor itself or the workshop page.")
 end)
 
@@ -166,7 +167,7 @@ net.Send(player.GetByID(1))
 end
 end )
 
-concommand.Add( "RespawnWeapons", function(ply)
+concommand.Add( "h_respawnweapons", function(ply)
 
 if ply:IsAdmin() then
 table.foreach(MEDIUMWEAPONS, function(key,value)
@@ -206,14 +207,13 @@ end )
 
 concommand.Add( "h_version", function()
 print("[The Hunt]: TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition.")
-print("[The Hunt]: Last shit added: Removed some useless client configs. (13/08/2014)")
-print("[The Hunt]: Running the CAN'T WORK FOR SHIT version.")
+print("[The Hunt]: Last shit added: Added a basic help panel. (16/08/2014)")
+print("[The Hunt]: Running the GitHub version.")
 end )
 
 
 concommand.Add( "LaunchCanister", function(ply)
 print("[The Hunt]: Will go to you.")
-
 if ply:IsAdmin() then
 SpawnCanister(ply:GetPos())
 end
@@ -1391,9 +1391,9 @@ end
 -- v PRE-PLAY THINGS
 
 function GM:PlayerSpawn(ply)
-	--net.Start( "NotVisible" )
-	--net.Send(ply)
-	--ply:SetNoTarget(true)
+--	net.Start( "NotVisible" )
+--	net.Send(ply)
+--	ply:SetNoTarget(true)
 -- MapLoadout() Placeholder
 --	ply.safe=yes
     ply:SetCustomCollisionCheck(true)
@@ -1715,7 +1715,7 @@ if HeliIsDead != 1 then
 				helispotlight:Fire("Target", ""..tostring(HeliA:GetEnemy():GetName()).."focus", 0)
 				end
 if HeliA:HasCondition(10) then
-nearbycombinecome(HeliA,HeliA:GetEnemy())
+nearbycombinecomeheli(HeliA,HeliA:GetEnemy())
 end
 		end
 end
@@ -1824,7 +1824,7 @@ ent:Fire("Explode",0,0)
 if victim:GetClass() == "npc_turret_floor" then
 print("[The Hunt]: turret killed")
 nearbycombinecome(victim)
-
+end
 /*
 for k, v in pairs(ents.FindInSphere(victim:GetPos(),1024)) do
 if v:IsPlayer() then
@@ -1834,9 +1834,8 @@ killer.spotted = 0
 print("[The Hunt]: Player killed it")
 end
 end
-
 */
-end
+
 if victim:GetClass() == "npc_turret_ceiling" then
 nearbycombinecome(killer)
 end
@@ -2095,7 +2094,6 @@ end
 
 function GM:KeyPress(player,key)
 if player:Alive() then
-
 if key == IN_ATTACK then
 if player:GetActiveWeapon():Clip1() > 0 then
 				local silent=0
@@ -2147,4 +2145,3 @@ end
 
 -- GM HOOKS ^
 hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", FirstSpawn )
-hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", HandlePlayerJoin )

@@ -29,8 +29,15 @@ Vector(-471.744293, 472.556305, 72.031250),
 }
 
 
+MISCELANEOUS_ITEMS = { "item_healthkit" }
 
 
+MISCELANEOUS_ITEMS_PLACES = {
+Vector(-596.337158, 2053.319092, -115.211304),
+Vector(613.793701, -729.269226, -104.564911),
+Vector(948.682373, 1925.878662, 51.591042),
+Vector(-775.073425, 1114.353516, -102.172470),
+}
 
 
 
@@ -43,8 +50,8 @@ Vector(-1089.937134, -1855.745605, -87.968750)
 function GM:PlayerInitialSpawn(ply)
 timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Protection team alert, evidence of anticivil activity in this community.") end )
 timer.Simple(4, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Code: assemble, plan, contain.") end )
+timer.Simple(10, function()ply:PrintMessage(HUD_PRINTTALK, "Type !help to see the game mechanics. ") end )
 
---ply:PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second wave will come.")
 end
 
 

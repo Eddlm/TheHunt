@@ -61,9 +61,10 @@ Vector(120.340599, -3447.776367, 232.031250),
 
 
 function GM:PlayerInitialSpawn(ply)
-ply:PrintMessage(HUD_PRINTTALK, "This map features three full waves of Combines.")
-ply:PrintMessage(HUD_PRINTTALK, "The first wave it's coming. Hide!")
-ply:PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second wave will come.")
+timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Protection team alert, evidence of anticivil activity in this community.") end )
+timer.Simple(4, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Code: assemble, plan, contain.") end )
+timer.Simple(10, function()ply:PrintMessage(HUD_PRINTTALK, "Type !help to see the game mechanics. ") end )
+
 end
 
 

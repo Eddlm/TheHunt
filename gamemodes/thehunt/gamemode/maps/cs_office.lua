@@ -24,7 +24,7 @@ Vector(104.910156, -1802.716431, -318.667389),
 Vector(1084.016113, -1428.655518, -315.430908),
 }
 
-
+MAP_PROPS = {"models/props_junk/trashdumpster01a.mdl", }
 
 
 
@@ -37,7 +37,7 @@ Vector(2171.060303, -268.845703, -102.953552),
 Vector(2131.773926, -37.425266, -108.965073),
 Vector(-1438.419922, -1458.935913, -279.867950),
 Vector(-693.724304, -1146.022461, -191.640594),
-Vector(-56.639225, -724.146973, -176.947861),
+Vector(-344.726959, -725.520874, -240.393250),
 Vector(-384.318817, -32.022541, -101.968750),
 Vector(-667.256470, 148.832520, -101.968750),
 }
@@ -50,9 +50,9 @@ Vector(-1209.991821, 480.031372, -266.932922),
 }
 
 function GM:PlayerInitialSpawn(ply)
-ply:PrintMessage(HUD_PRINTTALK, "This map features three full waves of Combines.")
-ply:PrintMessage(HUD_PRINTTALK, "The first wave it's coming. Hide!")
-ply:PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second wave will come.")
+timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Protection team alert, evidence of anticivil activity in this community.") end )
+timer.Simple(4, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Code: assemble, plan, contain.") end )
+timer.Simple(10, function()ply:PrintMessage(HUD_PRINTTALK, "Type !help to see the game mechanics. ") end )
 
 	for k,v in pairs(ents.FindByClass("func_door")) do
 		print (v:GetClass())
@@ -63,26 +63,23 @@ ply:PrintMessage(HUD_PRINTTALK, "Kill the majority of Combines. then, the second
 end
 
 function MapSetup()
-SpawnItem("item_healthcharger", Vector(-456.275421, 479.784363, -414.434113), Angle(-90.000, 90.000, 45.000) )
-SpawnItem("item_healthcharger", Vector(2426.728027, 1045.636841, -503.854034), Angle(0.000, 0.000, 0.000) )
-SpawnItem("item_healthcharger", Vector(2652.968750, 1045.645264, -502.366577), Angle(0.000, -180.000, 0.000) )
-SpawnItem("item_healthcharger", Vector(2179.817871, 1431.281738, -427.116882), Angle(0.000, -180.000, 0.000) )
-SpawnItem("item_healthcharger", Vector(2188.407715, 1016.049683, -426.366516), Angle(0.000, -180.000, 0.000) )
 
-for k, v in pairs(ents.FindByClass("info_player_start")) do
+-- 
+
+
+SpawnItem("item_healthcharger", Vector(-64.968750, -2096.217285, -281.618439), Angle(0,0,0) )
+SpawnItem("item_healthcharger", Vector(-801.182800, 79.031235, -316.246277), Angle(0.000, 90.000, 0.000) )
+SpawnItem("item_healthcharger", Vector(-255.031250, 427.936035, -107.724518), Angle(0.000, -180.000, 0.000) )
+SpawnItem("item_healthcharger", Vector(-1538.991577, -31.031250, -189.724503), Angle(0.000, -90.000, 0.000) )
+SpawnItem("item_healthcharger", Vector(1477.891357, -351.031250, -105.174438), Angle(0.000, -90.000, 0.000) )
+
+table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value)
+for k, v in pairs(ents.FindByClass(value)) do
 print(v:GetClass())
 v:Remove()
 end
+end)
 
-for k, v in pairs(ents.FindByClass("info_player_counterterrorist")) do
-print(v:GetClass())
-v:Remove()
-end
-
-for k, v in pairs(ents.FindByClass("info_player_terrorist")) do
-print(v:GetClass())
-v:Remove()
-end
 
 SpawnStaticProp(Vector(-1313.221558, -1243.587769, -310.317780),Angle(0,0,0),"models/props_junk/trashdumpster01a.mdl")
 SpawnStaticProp(Vector(-1313.120972, -1328.330322, -310.333618),Angle(0,0,0),"models/props_junk/trashdumpster01a.mdl")
