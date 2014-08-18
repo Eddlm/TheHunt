@@ -24,6 +24,7 @@ Vector(-313.237091, 551.117920, -181.610748),
 Vector(345.607849, 561.957825, -181.610748),
 }
 
+MAP_PROPS = {"models/props_c17/furnituredrawer001a.mdl","models/props_c17/furnitureshelf002a.mdl","models/props_interiors/furniture_desk01a.mdl"}
 
 SPECIALITEMPLACES = {
 Vector(3085.746582, 1062.142090, -453.610748),
