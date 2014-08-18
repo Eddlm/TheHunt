@@ -16,12 +16,15 @@ Vector(882.647705, -644.181396, 128.031250),
 Vector(442.664307, 71.864281, 128.031250),
 
 }
+MAP_PROPS = {"models/props_wasteland/cafeteria_table001a.mdl","models/props/cs_office/table_coffee.mdl"}
 
 
 SPECIALITEMPLACES = {}
 
 ITEMPLACES ={
-Vector(-456.275421, 479.784363, -414.434113),
+Vector(458.391083, -311.116547, 526.864624),
+Vector(223.788071, -223.005692, 324.847839),
+Vector(112.935486, -676.375610, 307.477173),
 }
 
 combinespawnzones = {

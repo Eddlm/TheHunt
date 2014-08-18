@@ -124,16 +124,7 @@
 			"type"		"CheckBox"
 			"default"	"1"
 		}	
-
 		16
-		{
-			"name"		"h_light_stealth"
-			"text"		"Enable lighting stealth"
-			"help"		"Enables the light based stealth system."
-			"type"		"CheckBox"
-			"default"	"1"
-		}		
-		17
 		{
 			"name"		"h_time_between_waves"
 			"text"		"Time between waves"
@@ -141,8 +132,16 @@
 			"type"		"Numeric"
 			"default"	"10"
 		}
-
+		17
+		{
+			"name"		"h_combine_killed_to_win"
+			"text"		"Combine limit:"
+			"help"		"When you reach this limit, you automatically win."
+			"type"		"Numeric"
+			"default"	"200"
+		}
 
 	}
 
 }
+

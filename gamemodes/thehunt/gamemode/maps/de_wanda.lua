@@ -8,6 +8,7 @@ CombineInfiniteWave = 20
 CUSTOMWAVESPAWN = 50
 
 MAP_PROPS = {"models/props_junk/trashdumpster01a.mdl","models/props_c17/furnituredrawer001a.mdl","models/props_c17/furnitureshelf002a.mdl","models/props_wasteland/kitchen_shelf001a.mdl","models/props_interiors/furniture_desk01a.mdl","models/warby/wan_prop_caffe_table_01.mdl","models/props_c17/bench01a.mdl",}
+models/props_wasteland/cafeteria_table001a.mdl
 
 ITEMPLACES ={
 Vector(318.459747, -686.967041, -7.707550),

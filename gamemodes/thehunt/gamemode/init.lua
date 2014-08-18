@@ -10,7 +10,8 @@ util.AddNetworkString( "light_above_limit" )
 util.AddNetworkString( "Visible" )
 util.AddNetworkString( "NotVisible" )
 
-
+MAX_COMBINE_KILLED = 10
+COMBINE_KILLED = 0
 util.PrecacheModel("models/Combine_Soldier.mdl")
 util.PrecacheModel("models/Combine_Super_Soldier.mdl")
 util.PrecacheModel("models/Police.mdl")
@@ -19,6 +20,7 @@ SPAWNPOINTS_TO_DELETE = {"info_player_terrorist", "info_player_counterterrorist"
 }
 
 OVERWATCH_TAUNTS = { "I'd get ready if I were you.", "Hope you like bloodbaths.", "Let's get this farce over with.", "I've calculated who will win to a 99.93% certainty, if you're interested. ", "So at least your teammates know what they're doing. ", "Your teammates are doing a really great job. ", "This is probably the most heroic thing anyone's ever done while sitting motionless in their parents' rec room. ", "You were almost helpful this time. ", " It's a good feeling, isn't it? I wouldn't get used to it. ", "Let's be honest: it probably won't help. ", "That's funny, I didn't even see you cheat. ", "That should delay the inevitable slightly. ", "Great teamwork, you vicious thugs. ", "Your entire life has been a mathematical error. A mathematical error I'm about to correct.", "Someone is going to get badly hurt.", "I hate you so much.", "Did anything happen while I was out?", "Just stop it already.", "Are you testing me?" , "You really aren't getting tired of that, are you?" , "I'm done." , "That isn't science." , "Do you need real encouragement? Let's see if this helps." , "Now, you are just wasting my time." , "If you are wondering what that smell is, that is the smell of human fear." }
+
 
 
 net.Receive( "light_above_limit", function( length, client )
@@ -139,6 +141,42 @@ end )
 
 
 
+concommand.Add( "h_revealcombinespawnpoints", function(player, command, arguments )
+table.foreach(combinespawnzones, function(key,value)
+
+local sprite = ents.Create( "env_sprite" )
+sprite:SetPos(value)
+sprite:SetColor( Color( 145,0,0 ) )
+sprite:SetKeyValue( "model", "sprites/light_glow01.vmt" )
+sprite:SetKeyValue( "scale", 0.50 )
+sprite:SetKeyValue( "rendermode", 5 )
+sprite:SetKeyValue( "renderfx", 7 )
+sprite:Spawn()
+sprite:Activate()
+sprite:SetName("ZoneReveal")
+end)
+
+end )
+
+concommand.Add( "h_revealplayerspawnpoints", function(player, command, arguments )
+table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value)
+for k, v in pairs(ents.FindByClass(value)) do
+print(v:GetClass())
+local sprite = ents.Create( "env_sprite" )
+sprite:SetPos(v:GetPos())
+sprite:SetColor( Color( 0, 255, 0 ) )
+sprite:SetKeyValue( "model", "sprites/light_glow01.vmt" )
+sprite:SetKeyValue( "scale", 0.50 )
+sprite:SetKeyValue( "rendermode", 5 )
+sprite:SetKeyValue( "renderfx", 7 )
+sprite:Spawn()
+sprite:Activate()
+sprite:SetName("ZoneReveal")
+end
+end)
+
+end )
+
 
 concommand.Add( "h_fixtimers", function(ply)
 
@@ -205,10 +243,13 @@ ply:SetNoTarget(0)
 end
 end )
 
-concommand.Add( "h_version", function()
+concommand.Add( "h_version", function(ply)
 print("[The Hunt]: TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition.")
-print("[The Hunt]: Last shit added: Added a basic help panel. (16/08/2014)")
+print("[The Hunt]: Last shit added: Changed panel for URL (16/08/2014)")
 print("[The Hunt]: Running the GitHub version.")
+ply:PrintMessage(HUD_PRINTTALK, "TheHunt Version: v0.9-beta-WORKSHOP_UPDATE edition")
+ply:PrintMessage(HUD_PRINTTALK, "Last shit added: Changed panel for URL (16/08/2014)")
+ply:PrintMessage(HUD_PRINTTALK, "Running the GitHub version.")
 end )
 
 
@@ -220,6 +261,52 @@ end
 
 end)
 
+concommand.Add( "LaunchMortar", function(ply)
+
+if ply:IsAdmin() then
+LaunchMortarRound(ply)
+end
+
+end)
+
+function LaunchMortarRound(ply)	// Find where the player is aiming.
+	local targetTrace = util.QuickTrace( ply:GetShootPos(), ply:GetUp(), ply )
+	
+	// If we hit the sky/walls/ceilings, don't bother.
+	if ( targetTrace.HitSky ) then return end
+	
+	// Trace up to find the sky.
+	local skyTrace = util.TraceLine( { start = targetTrace.HitPos, endpos = targetTrace.HitPos + Vector( 0, 0, 16383 ), filter = ply, mask = MASK_NPCWORLDSTATIC } )
+	if ( !skyTrace.HitSky ) then return end
+	// Prevents rare crash when mortar is below the target.
+	if ( skyTrace.HitPos.z <= targetTrace.HitPos.z ) then return end
+	
+	
+	// Create the mortar.
+	local mortar = ents.Create( "func_tankmortar" )	
+		mortar:SetPos( skyTrace.HitPos )
+		mortar:SetAngles( Angle( 90, 0, 0 ) )
+		mortar:SetKeyValue( "iMagnitude", 90000) // Damage.
+		mortar:SetKeyValue( "firedelay", "1" ) // Time before hitting.
+		mortar:SetKeyValue( "warningtime", "1" ) // Time to play incoming sound before hitting.
+		mortar:SetKeyValue( "incomingsound", "Weapon_Mortar.Incomming" ) // Incoming sound.
+	mortar:Spawn()
+	
+	// Create the target.
+	local target = ents.Create( "info_target" )
+		target:SetPos( targetTrace.HitPos )
+		target:SetName( tostring( target ) )
+	target:Spawn()
+	mortar:DeleteOnRemove( target )
+	
+	// Fire.
+	mortar:Fire( "SetTargetEntity", target:GetName(), 0 )
+	mortar:Fire( "Activate", "", 0 )
+	mortar:Fire( "FireAtWill", "", 0 )
+	mortar:Fire( "Deactivate", "", 2 )
+	mortar:Fire( "kill", "", 1 )
+	
+end
 
 concommand.Add( "SpawnAPC", function(ply)
 if ply:IsAdmin() then
@@ -771,8 +858,13 @@ end)
 if BossHeliAlive == 0 or BossHeliAlive == nil then
 if CanCheck == 1 then 
 	if EnemiesRemainining < GetConVarNumber("h_minenemies") then 
+	if COMBINE_KILLED > GetConVarNumber("h_combine_killed_to_win") then
+	PrintMessage(HUD_PRINTTALK, "You win!")
+	CanCheck = 0
+	else
 	waveend()
 	CanCheck = 0
+	end
 	end
 end
 end
@@ -810,6 +902,10 @@ function waveend()
 		end
 		
 function infinitewavehandler()
+	if COMBINE_KILLED > GetConVarNumber("h_combine_killed_to_win") then
+	PrintMessage(HUD_PRINTTALK, "You win!")
+	CanCheck = 0
+	else
 WAVESPAWN = 1
 CanCheck = 0
 Wave=6
@@ -827,7 +923,7 @@ end
 
 
 
-print("[The Hunt]:  infinite wave loaded. ")
+	print("[The Hunt]:  infinite wave loaded. ")
 	timer.Simple(20, function()
 	timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
 	timer.Create( "infinitewave", 2, CombineInfiniteWave, infinitewave )
@@ -838,7 +934,7 @@ print("[The Hunt]:  infinite wave loaded. ")
 	SpawnCanisterWave(table.Random(player.GetAll()):GetPos())
 	end	) 
 
-
+end
 end
 function CreateHeliPath(pos)
 creating = ents.Create( "path_track" )
@@ -984,7 +1080,7 @@ function SpawnCanister( pos )
 
 traceRes = util.QuickTrace(pos, Vector(0,0,500), player.GetAll())
 print(traceRes.Entity)
-if traceRes.Entity == NULL then 
+if traceRes.Entity == NULL or traceRes.HitSky then 
 print("[The Hunt]: Place is suitable for canister deployment ")
 
 local canister = ents.Create( "env_headcrabcanister" )
@@ -1294,6 +1390,10 @@ if math.random(1,3) == 1 then
 		or prop:GetModel() == "models/props_junk/wood_crate001a_damagedmax.mdl" 
 		or prop:GetModel() == "models/props_junk/wood_crate001a_damagedmax.mdl" 
 		or prop:GetModel() == "models/props_junk/wood_crate001a.mdl" 
+		or prop:GetModel() == "models/props_junk/cardboard_box003a.mdl"
+		or prop:GetModel() == "models/props_junk/cardboard_box002a.mdl"
+		or prop:GetModel() == "models/props_junk/cardboard_box004a.mdl"
+
 		then
 		SpawnItem(""..table.Random(CRATEITEMS).."", prop:GetPos(), Angle(0,0,0))
 		end
@@ -1586,7 +1686,7 @@ end
 
 
 function GM:InitPostEntity()
-if !CRATEITEMS then print("[The Hunt]: Didn't found a custom CRATEITEMS table. Building one... ") CRATEITEMS = { "weapon_357", "weapon_frag", "weapon_slam", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black", "npc_headcrab_", } end
+if !CRATEITEMS then print("[The Hunt]: Didn't found a custom CRATEITEMS table. Building one... ") CRATEITEMS = { "weapon_357", "weapon_frag", "weapon_slam", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black", "npc_headcrab", } end
 if !GOODCRATEITEMS then print("[The Hunt]: Didn't found a custom GOODCRATEITEMS table. Building one... ") GOODCRATEITEMS = { "item_dynamic_resupply","weapon_frag", "weapon_slam","item_healthkit", "item_ammo_smg1_grenade","item_box_buckshot","item_ammo_smg1_large","item_ammo_crossbow","item_ammo_ar2_large","item_ammo_ar2_altfire"} end
 
 INFINITE_ACHIEVED = 0
@@ -1641,7 +1741,7 @@ nearbycombinecomecasual(ply)
 end
 
 function GM:OnEntityCreated(entity)
-wavefinishedchecker()
+
 	if entity:IsNPC() && entity:GetClass() != "npc_helicopter" && entity:GetClass() != "npc_combinegunship"  && entity:GetClass() != "npc_combine_s" && entity:GetClass() != "npc_metropolice" && entity:GetName() == "" then
 	ManuallySpawnedEntity = ManuallySpawnedEntity + 1
 	entity:SetName("NPC nº"..ManuallySpawnedEntity.."")
@@ -1735,7 +1835,7 @@ if HeliA:IsValid() && HeliA:GetEnemy() == nil then
 				Usada = HeliTrack
 			--	print(Usada)
 				timer.Create( "GoingToUsed", 0, 1, goingtoused ) 
-				timer.Create( "helipath", math.random(3,6), 0, helipath ) 
+				timer.Create( "helipath", math.random(5,8), 0, helipath ) 
 				timer.Create( "usedpaths", 7, 0, usedpaths ) 
 				return false
 			end
@@ -1753,7 +1853,7 @@ elseif  HeliA:IsValid() && HeliA:GetEnemy() != nil then
 				Usada = HeliTrack
 			--	print(Usada)
 				timer.Create( "GoingToUsed", 0, 1, goingtoused ) 
-				timer.Create( "helipath", math.random(4,8), 0, helipath ) 
+				timer.Create( "helipath", math.random(7,9), 0, helipath ) 
 				timer.Create( "usedpaths", 9, 0, usedpaths ) 
 				return false
 			end
@@ -1874,6 +1974,7 @@ killer.spotted = 0
 
 if killer:Alive() then
 	if victim:GetClass() == "npc_metropolice" || victim:GetClass() == "npc_combine_s" then
+	COMBINE_KILLED = COMBINE_KILLED+1
 		local MAX=0
 		local TALK=0
 		for k, see in pairs(ents.FindInSphere(victim:GetPos(),256)) do
