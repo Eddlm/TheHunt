@@ -38,6 +38,7 @@ Vector(-576.679199, -133.586029, 326.312256),
 Vector(-324.615234, -2660.272949, 448.031250),
 }
 
+SPECIALITEMPLACES = {Vector(-26.358618, -2012.917847, 412.450073),}
 
 function GM:PlayerInitialSpawn(ply)
 timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Protection team alert, evidence of anticivil activity in this ship.") end )

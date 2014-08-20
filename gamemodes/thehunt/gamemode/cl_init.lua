@@ -25,25 +25,49 @@ net.Receive( "NotVisible", function( length, client )
 	LIGHTEXT = 'Not Visible'
 	LIGHTCOLOR = Color(0,255,0) 
 end )
+/*
+killicon.AddFont( "prop_physics", "HL2MPTypeDeath", "9", Color(255,0,0)  )
+killicon.AddFont( "weapon_smg1", "HL2MPTypeDeath", "/",Color(255,0,0)  )
+killicon.AddFont( "weapon_357", "HL2MPTypeDeath", ".", Color(255,0,0)  )
+killicon.AddFont( "weapon_ar2", "HL2MPTypeDeath", "2", Color(255,0,0)  )
+killicon.AddFont( "crossbow_bolt", "HL2MPTypeDeath", "1",Color(255,0,0) )
+killicon.AddFont( "weapon_shotgun", "HL2MPTypeDeath", "0", Color(255,0,0)  )
+killicon.AddFont( "rpg_missile", "HL2MPTypeDeath", "3", Color(255,0,0) )
+killicon.AddFont( "npc_grenade_frag", "HL2MPTypeDeath", "4", Color(255,0,0)  )
+killicon.AddFont( "weapon_pistol", "HL2MPTypeDeath", "-",Color(255,0,0)  )
+killicon.AddFont( "prop_combine_ball", "HL2MPTypeDeath", "8", Color(255,0,0)  )
+killicon.AddFont( "grenade_ar2", "HL2MPTypeDeath", "7", Color(255,0,0)  )
+killicon.AddFont( "weapon_stunstick", "HL2MPTypeDeath", "!", Color(255,0,0)  )
+killicon.AddFont( "npc_satchel", "HL2MPTypeDeath", "*", Color(255,0,0)  )
+killicon.AddFont( "npc_tripmine", "HL2MPTypeDeath", "*", Color(255,0,0)  )
+killicon.AddFont( "weapon_crowbar", "HL2MPTypeDeath", "6", Color(255,0,0)  )
+killicon.AddFont( "weapon_physcannon",	"HL2MPTypeDeath",	",", Color(0,255,0)  )
 
-
+*/
 net.Receive( "Visible", function( length, client )
 	LIGHTEXT = 'Visible'
 	LIGHTCOLOR = Color(255,255,0)
 end )
 
+net.Receive( "PlayerKillNotice", function( len, ply )
+GAMEMODE:AddDeathNotice(net.ReadString(), 0, net.ReadString(), net.ReadString(), 1001)
+end)
+
+
 
 net.Receive( "Spotted", function( length, client )
 	HUDTEXT = 'Spotted'
 	HUDCOLOR=Color(255,8,8)
+ 
 end )
 
-		net.Receive( "Hidden", function( length, client )
+	net.Receive( "Hidden", function( length, client )
 	HUDTEXT = 'Safe'
 	HUDCOLOR=Color(0,255,0)
 end )
 
 hook.Add( "HUDPaint", "HuntHud", function()
+if LocalPlayer():Alive() then
 if GetConVarNumber("h_hud_left") == 0 then
 
 	draw.RoundedBox(6 , ScrW()*0.885, ScrH() * 0.90, 140, 67, Color(255,255,255,20))
@@ -58,7 +82,7 @@ if GetConVarNumber("h_hud_left") == 0 then
 	draw.DrawText( LIGHTEXT, "TargetID", ScrW() * 0.03, ScrH() * 0.84, LIGHTCOLOR, TEXT_ALIGN_LEFT )
 	draw.DrawText( HUDTEXT, "TargetID", ScrW() * 0.03, ScrH() * 0.88, HUDCOLOR, TEXT_ALIGN_LEFT )
 	end
-
+end
 end)
 
 

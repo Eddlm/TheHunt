@@ -6,18 +6,19 @@ include( "config.lua" )
 
 
 
-
-
-
 function ISaid( ply, text, public )
-    if text == "!remain" or text == !REMAIN then
-	PrintMessage(HUD_PRINTTALK, "[Ovewatch]: Squad Number "..Wave..", you have "..EnemiesRemainining.." units remaining.")
+local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLED
+
+    if text == "!remain" or text == "!REMAIN" then
+	PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Number "..Wave..", you have "..EnemiesRemainining.." units remaining.")
+	timer.Simple(3, function() PrintMessage(HUD_PRINTTALK, "[Overwatch]: Mission failure if "..GlobalRemaining.." ground units are lost.") end)
 		        return false
 
     end
 
-
 end
+
+
 
 hook.Add( "PlayerSay", "ISaid", ISaid )
 
@@ -107,8 +108,7 @@ local coming=0
 end
 
 function GM:PlayerCanPickupWeapon(ply, wep)
-print(""..ply:GetName().." trying to get " ..wep:GetClass().."")
---print(""..ply:GetName().." has "..(wep:Clip1()).." on clip1, "..(wep:Clip1()).." on clip2, "..GetAmmoCount(ply:GetActiveWeapon():GetPrimaryAmmoType()).." primary ammo, "..GetAmmoCount(ply:GetActiveWeapon():GetSecondaryAmmoType()).." secondary ammo")
+--print(""..ply:GetName().." trying to get " ..wep:GetClass().."")
 
 CANPICKUP = 1
 table.foreach(ONLY_PICKUP_ONCE, function(key,value)
@@ -168,10 +168,7 @@ SpawnItem(table.Random(MISCELANEOUS_ITEMS),value, Angle(0,0,0))
 end
 end)
 end
---  
--- 
--- 
--- 
+
 
 
 for k,v in pairs(ents.FindByClass("item_healthcharger")) do 
@@ -203,7 +200,7 @@ if RPGCANSPAWN == 1 then
 	RPGSPAWN = GetConVarNumber("h_rpgmax") - RPG_IN_MAP
 	while RPGSPAWN > 0 && RPGCANSPAWN == 1 do
 	print("[The Hunt]: RPG's that will spawn: "..RPGSPAWN.."")
-	SpawnItem("weapon_rpg", Vector(-26.358618, -2012.917847, 412.450073), Angle(0.945, 74.805, 79.540) )
+	SpawnItem("weapon_rpg", table.Random(SPECIALITEMPLACES), Angle(90, 90, 0) )
 	RPGSPAWN=RPGSPAWN - 1
 	end
 end
@@ -215,7 +212,6 @@ end
 
 
 MainEnemiesGround = { "npc_combine_s", "npc_metropolice"}
-
 MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
 MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_turret_ceiling"}
 

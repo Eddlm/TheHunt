@@ -35,7 +35,7 @@ Dark weapons do not add luminosity.
 TOO_BRIGHT_WEAPONS = { "weapon_crossbow", "weapon_physcannon", "weapon_rpg", "weapon_medkit" }
 -- Weapons that make you more visible. It's harder to hide while carrying this weapon.
 
-DARK_WEAPONS = { "weapon_frag", "weapon_crowbar" }
+DARK_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_357" }
 -- Weapons that don't have any bright items on them. It's easier to hide while carrying this weapon.
 
 /*--------------Stealth (sounds)----------------------------
@@ -46,6 +46,7 @@ If a weapon doesn't make noise when used (Left Click), add it to SILENT_WEAPONS.
 If a weapon has a loud secondary fire (Right click), add it to the SECONDARY_FIRE_WEAPONS.
 The gamemode doesn't check for USE or RELOAD actions for now. These are always silent.
 --------------------------------------------------------------*/
+
 SILENT_WEAPONS = { "weapon_frag", "weapon_crossbow", "weapon_crowbar", "suppressed_pistol", "suppressed_smg1","weapon_slam" }
 -- Any weapon that's not included on this table will be considered a loud weapon and it's gunshots will attrack combine.
 

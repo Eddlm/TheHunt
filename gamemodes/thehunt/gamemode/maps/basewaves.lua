@@ -51,7 +51,6 @@ end
 
 function fifthwave()
 Wave = 5
-PrintMessage(HUD_PRINTCENTER, "Final Squad!")
 	if math.random (1,6) == 2 then 
 		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	elseif math.random (1,6) == 2 then 

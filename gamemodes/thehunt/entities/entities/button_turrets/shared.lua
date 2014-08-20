@@ -32,7 +32,20 @@ function ENT:Use(activator)
 		end
 	end
 end
+function ENT:OnTakeDamage(activator)
+	if SERVER then
+	self:EmitSound( "buttons/combine_button2.wav", 200, 100 )
 
+			if ARMED==0 then
+				ARMED=1
+				for k, v in pairs(ents.FindByClass("npc_turret_ceiling")) do
+					v:AddRelationship("player D_LI 999")
+				end
+			PrintMessage(HUD_PRINTTALK, "Ceiling Turrets disarmed.")
+			end
+
+	end
+end
 function ENT:Draw()
 self:DrawModel()
 end
