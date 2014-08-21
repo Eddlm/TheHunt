@@ -256,7 +256,7 @@ end )
 
 concommand.Add( "h_version", function(ply)
 ply:PrintMessage(HUD_PRINTTALK, "TheHunt Version: v0.9-beta-ALMOST_THERE edition. Date: 20/08/2014")
-ply:PrintMessage(HUD_PRINTTALK, "Last changes: Improved helicopter behavior.")
+ply:PrintMessage(HUD_PRINTTALK, "Last changes: Improved helicopter behavior. Removed spotlights not being removed.")
 ply:PrintMessage(HUD_PRINTTALK, "Running the GitHub version.")
 end )
 
@@ -971,25 +971,39 @@ HeliA:SetKeyValue( "patrolspeed", "500" )
 HeliA:SetKeyValue("squadname", "heliaforce")
 HeliA:SetPos( pos )
 HeliA.boss = IsBoss
-
+if HeliA.boss == 1 then BossHeliAlive = 1 end
 if type == "npc_combinegunship" then
 RunConsoleCommand( "sk_gunship_health_increments", 8) 
 HeliA:Fire("SetPenetrationDepth ","24",0)
 HeliA:Fire("BlindfireOn","",0)
 end
-
+HeliA:SetCustomCollisionCheck(true)
 HeliA:Spawn()
 HeliA:Activate()
 HeliA:Fire("activate","",0)
 -- HeliA:Fire("missileon","",0)
 HeliA:Fire("gunon","",0)
 
+
+HeliA.spotlight = ents.Create( "point_spotlight" )
+HeliA.spotlight:SetPos(HeliA:GetPos()+(HeliA:GetForward()*150+Vector(0,0,-50)))
+HeliA.spotlight:SetAngles(HeliA.spotlight:GetAngles()+Angle(30,0,0))
+HeliA.spotlight:SetParent(HeliA)
+HeliA.spotlight:SetKeyValue( "spawnflags", "1" )
+HeliA.spotlight:SetKeyValue( "SpotlightWidth", "50" )
+HeliA.spotlight:SetKeyValue( "SpotlightLength", "200" )
+HeliA.spotlight:SetKeyValue("rendercolor", "100 200 200")
+--NPCSpotlight:SetColor(0,0,0,255)
+HeliA.spotlight:Spawn()
+HeliA.spotlight:Activate()
+
 local CanSpotlight = 0
 for k, v in pairs(ents.FindByClass("npc_helicopter")) do
 CanSpotlight = CanSpotlight+1
 end
+
 if CanSpotlight > 1 then HeliCanSpotlight = 0 end
-if HeliCanSpotlight < 2 && type == "npc_helicopter" then
+if HeliCanSpotlight == 1 && type == "npc_helicopter" then
 HeliA.light = ents.Create("env_projectedtexture");
 HeliA.light:SetPos(HeliA:GetPos());
 HeliA.light:SetAngles(HeliA:GetAngles()+Angle(30,0,0) );
@@ -1008,17 +1022,6 @@ HeliA.light:Spawn();
 HeliA.light:Activate();
 
 
-HeliA.spotlight = ents.Create( "point_spotlight" )
-HeliA.spotlight:SetPos(HeliA:GetPos()+(HeliA:GetForward()*150+Vector(0,0,-50)))
-HeliA.spotlight:SetAngles(HeliA.spotlight:GetAngles()+Angle(30,0,0))
-HeliA.spotlight:SetParent(HeliA)
-HeliA.spotlight:SetKeyValue( "spawnflags", "1" )
-HeliA.spotlight:SetKeyValue( "SpotlightWidth", "50" )
-HeliA.spotlight:SetKeyValue( "SpotlightLength", "200" )
-HeliA.spotlight:SetKeyValue("rendercolor", "100 200 200")
---NPCSpotlight:SetColor(0,0,0,255)
-HeliA.spotlight:Spawn()
-HeliA.spotlight:Activate()
 end
 end
 function SpawnScanner ( pos )
@@ -1568,6 +1571,7 @@ if ent1:IsPlayer() then
 if ent2:GetClass() == "npc_combine_s" then
 if ent1:GetPos():Distance(ent2:GetPos()) < 50 then
 ent1:SetNoTarget(false)
+return true
 end
 end
 end
@@ -1577,14 +1581,17 @@ if ent1:GetClass() == "npc_combine_s" then
 if ent2:GetClass():IsPlayer() then
 if ent1:GetPos():Distance(ent2:GetPos()) < 50 then
 ent1:SetNoTarget(false)
-end
-end
-end
-
 return true
-
+end
+end
 end
 
+if ent1:GetClass()== "npc_helicopter" and  ent2:GetClass() =="npc_helicopter" then
+
+return false
+end
+return true
+end
 
 function metropolicewander()
 for k, v in pairs(ents.FindByClass("npc_metropolice")) do
@@ -1777,10 +1784,10 @@ function helibehavior()
 for num, Heli in pairs(ents.FindByClass("npc_helicopter")) do
 		if Heli:GetEnemy() then
 			--print ("heli has enemy: "..HeliA:GetEnemy():GetName().."")
-				if Heli:GetEnemy():IsNPC() && HeliCanSpotlight == 1 then
+				if Heli:GetEnemy():IsNPC() && Heli.light then
 					Heli.light:Fire("Target", ""..Heli:GetEnemy():GetName().."", 0)
 					end
-				if Heli:GetEnemy():IsPlayer() && HeliCanSpotlight == 1 then
+				if Heli:GetEnemy():IsPlayer() && Heli.light  then
 				Heli:GetEnemy():SetName(""..tostring(Heli:GetEnemy():GetName()).."focus")
 				Heli.light:Fire("Target", ""..tostring(Heli:GetEnemy():GetName()).."focus", 0)
 				end
@@ -1790,7 +1797,6 @@ end
 elseif HeliCanSpotlight == 1 then Heli.light:Fire("Target", "", 0)
 end
 end
-timer.Create( "helibehavior", 1, 1, helibehavior ) 
 end
 
 function helipath()
@@ -1853,7 +1859,7 @@ table.foreach(AirEnemies, function(key,enemy)
 end
 
 function usedpaths()
-if HeliA:IsValid() then
+if HeliA then
 	for num, HeliTrack in pairs(ents.FindByClass("path_track")) do
 				if HeliTrack:GetName() == "used" then
 					HeliTrack:SetName("empty")
@@ -2056,9 +2062,7 @@ RunConsoleCommand( "sk_helicopter_burstcount", "10")
 RunConsoleCommand( "sk_helicopter_firingcone", "2") 
 RunConsoleCommand( "sk_helicopter_roundsperburst", "5") 
 damaged:SetKeyValue( "patrolspeed", "5000" )
-if HeliCanSpotlight == 1 then
-damaged.light:SetKeyValue("lightcolor", "255 0 0") 
-damaged.spotlight:Remove()
+damaged.spotlight:Fire("LightOff","",0)
 damaged.spotlight = ents.Create( "point_spotlight" )
 damaged.spotlight:SetPos(HeliA:GetPos()+(HeliA:GetForward()*150+Vector(0,0,-50)))
 damaged.spotlight:SetAngles(damaged:GetAngles()+Angle(30,0,0))
@@ -2069,6 +2073,8 @@ damaged.spotlight:SetKeyValue( "SpotlightLength", "200" )
 damaged.spotlight:SetKeyValue("rendercolor", "255 0 0")
 damaged.spotlight:Spawn()
 damaged.spotlight:Activate()
+if damaged.light then
+damaged.light:SetKeyValue("lightcolor", "255 0 0") 
 end
 HeliAangered = 1
 end
@@ -2087,12 +2093,20 @@ end
 if damaged:Health() < damage:GetDamage() then
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: All units, "..damaged:GetName().." state changed to: inoperative.")
 print("dead")
-if damaged.boss == 1 then BossHeliAlive = 0 end
-damaged.spotlight:Remove()
+damaged.spotlight:Fire("LightOff","",0)
+	
+	if damaged.boss == 1 then
+		timer.Simple(2, function()
+			local morebosses = 0
+			for k, v in pairs(ents.FindByClass("npc_helicopter")) do
+				if v.boss == 1 then morebosses = 1 end
+			end
+			if morebosses == 0 then BossHeliAlive = 0 end
+		end)
+	end
 end
 end
 end
-
 
 if damaged:GetClass() == "npc_sniper" then
 if damage:GetInflictor():GetClass() == "crossbow_bolt" or damage:IsDamageType(64) or damage:IsDamageType(67108864) then

@@ -68,13 +68,24 @@ end
 
 function infinitewave()
 Wave = 6
+
+	if math.random (1,6) == 2 then 
+		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+	elseif math.random (1,6) == 2 then 
+		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+	else
+		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+	end
+
+
 local NumHelis = 0
 for k, v in pairs(ents.FindByClass("npc_helicopter")) do
 NumHelis=NumHelis+1
 end
 
-if NumHelis > 2 then end else
-SpawnHeliA(Vector(967.547241, 722.096069, 465.658081), "npc_helicopter" ,0)
+if NumHelis > 1 then print("too much helis")
+else 
+SpawnHeliA(Vector(967.547241, 722.096069, 465.658081), "npc_helicopter" ,1)
 end
 RPGCANSPAWN = 1
 end
@@ -86,7 +97,7 @@ CombineSecondWave = 7
 CombineThirdWave = 10
 CombineFourthWave = 10
 CombineFifthWave = 10
-CombineInfiniteWave = 1
+CombineInfiniteWave = 15
 DARKNESS = 3
 
 
