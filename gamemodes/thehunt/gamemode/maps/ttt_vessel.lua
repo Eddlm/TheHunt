@@ -70,7 +70,7 @@ v:Remove()
 end
 end
 
-SpawnHeliA( Vector(356.599335, 2395.603760, 672.474854), "npc_helicopter" )
+SpawnHeliA( Vector(356.599335, 2395.603760, 672.474854), "npc_helicopter", 1 )
 HeliA:Fire("gunoff","",0)
 
 if HeliA:Health() != 1500 then print("WARNING: This Helicopter hasn't the adequeate health.") end
@@ -168,12 +168,6 @@ SpawnDynamicAmmoCrate(Vector(-170.943298, -1632.518311, -31.668612), Angle(0.000
 
 SpawnSuitCharger(Vector(52.103043, -1772.168701, 23.371933), Angle(0.000, 90.000, 0.000) )
 SpawnSuitCharger(Vector(25.139523, -1773.168701, 23.235916), Angle(0.000, 90.000, 0.000) )
-/*
-SpawnFriendlyTurret(Vector(-32.045780, -1498.981567, 8.971822),Angle(0.240, -0.520, 0.367))
-SpawnFriendlyTurret(Vector(-143.808929, -1497.576904, 8.930364),Angle(0.338, -0.204, 0.612))
-SpawnFriendlyTurret(Vector(-29.140911, -1451.474487, 8.946697),Angle(0.337, 0.500, 0.438))
-SpawnFriendlyTurret(Vector(-143.900421, -1452.632202, 8.884084),Angle(0.226, -0.116, -0.150))
-*/
 
 SpawnAirboat(Vector(-57.304810, -1479.193115, 11.625523),Angle(0,-90,0))
 

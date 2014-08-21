@@ -25,25 +25,7 @@ net.Receive( "NotVisible", function( length, client )
 	LIGHTEXT = 'Not Visible'
 	LIGHTCOLOR = Color(0,255,0) 
 end )
-/*
-killicon.AddFont( "prop_physics", "HL2MPTypeDeath", "9", Color(255,0,0)  )
-killicon.AddFont( "weapon_smg1", "HL2MPTypeDeath", "/",Color(255,0,0)  )
-killicon.AddFont( "weapon_357", "HL2MPTypeDeath", ".", Color(255,0,0)  )
-killicon.AddFont( "weapon_ar2", "HL2MPTypeDeath", "2", Color(255,0,0)  )
-killicon.AddFont( "crossbow_bolt", "HL2MPTypeDeath", "1",Color(255,0,0) )
-killicon.AddFont( "weapon_shotgun", "HL2MPTypeDeath", "0", Color(255,0,0)  )
-killicon.AddFont( "rpg_missile", "HL2MPTypeDeath", "3", Color(255,0,0) )
-killicon.AddFont( "npc_grenade_frag", "HL2MPTypeDeath", "4", Color(255,0,0)  )
-killicon.AddFont( "weapon_pistol", "HL2MPTypeDeath", "-",Color(255,0,0)  )
-killicon.AddFont( "prop_combine_ball", "HL2MPTypeDeath", "8", Color(255,0,0)  )
-killicon.AddFont( "grenade_ar2", "HL2MPTypeDeath", "7", Color(255,0,0)  )
-killicon.AddFont( "weapon_stunstick", "HL2MPTypeDeath", "!", Color(255,0,0)  )
-killicon.AddFont( "npc_satchel", "HL2MPTypeDeath", "*", Color(255,0,0)  )
-killicon.AddFont( "npc_tripmine", "HL2MPTypeDeath", "*", Color(255,0,0)  )
-killicon.AddFont( "weapon_crowbar", "HL2MPTypeDeath", "6", Color(255,0,0)  )
-killicon.AddFont( "weapon_physcannon",	"HL2MPTypeDeath",	",", Color(0,255,0)  )
 
-*/
 net.Receive( "Visible", function( length, client )
 	LIGHTEXT = 'Visible'
 	LIGHTCOLOR = Color(255,255,0)
@@ -164,7 +146,7 @@ if LocalPlayer():Alive() then
 lightcol = (render.GetLightColor(LocalPlayer():GetPos())*Vector(100,100,100)):Length()
 --lightcol = (render.ComputeDynamicLighting(LocalPlayer():GetPos(),Vector( 0, 0, 0 ))*Vector(100,100,100)):Length()
 
-if LocalPlayer():Health() > 0 then
+if LocalPlayer():Health() > 0 and LocalPlayer():GetActiveWeapon() != nil then
 table.foreach(DARK_WEAPONS, function(key,value)
 if LocalPlayer():GetActiveWeapon():GetClass() != value then lightcol=lightcol+1 end
 end)

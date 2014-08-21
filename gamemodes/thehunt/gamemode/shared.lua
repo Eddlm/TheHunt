@@ -59,8 +59,9 @@ end
 
 function nearbycombinecomecasual(suspect)
 local come=0
-		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
+		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),256)) do
 				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
+			--	if v:Health() > 0 then
 				if come < 1 then
 					if !v:GetEnemy() then
 						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
@@ -71,8 +72,28 @@ local come=0
 							v:SetSchedule(SCHED_FORCED_GO)
 							end
 						end
-					end
+						end
+				--	end
 				end
+end
+if come < 1 then
+		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),512)) do
+				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
+				if v:Health() > 0 then
+				if come < 1 then
+					if !v:GetEnemy() then
+						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
+							come=come+1
+							print(""..v:GetName().." investigates.")
+							PrintMessage(HUD_PRINTTALK, ""..v:GetName()..": "..table.Random(CombineHearBreak).."")
+							v:SetLastPosition(suspect:GetPos())
+							v:SetSchedule(SCHED_FORCED_GO)
+							end
+						end
+						end
+				end
+				end
+end
 end
 end
 
@@ -209,11 +230,11 @@ print("")
 end
 
 
-
+AirEnemies = { "npc_helicopter", "npc_combinegunship"}
 
 MainEnemiesGround = { "npc_combine_s", "npc_metropolice"}
 MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
-MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_turret_ceiling"}
+MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship", "npc_turret_ceiling"}
 
 
 CombineHearBreak = {"I think I heard something.","What was that?","Something broke nearby.","Heard something broke.","...the fuck...","I think I hear dubstep somewhere.","Suspicious sounds near my position.","...going to check that.","Nearby units, the suspect must be in this area.","Here you are."}

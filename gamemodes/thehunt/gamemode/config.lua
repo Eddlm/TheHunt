@@ -35,7 +35,7 @@ Dark weapons do not add luminosity.
 TOO_BRIGHT_WEAPONS = { "weapon_crossbow", "weapon_physcannon", "weapon_rpg", "weapon_medkit" }
 -- Weapons that make you more visible. It's harder to hide while carrying this weapon.
 
-DARK_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_357" }
+DARK_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_357","weapon_slam" }
 -- Weapons that don't have any bright items on them. It's easier to hide while carrying this weapon.
 
 /*--------------Stealth (sounds)----------------------------

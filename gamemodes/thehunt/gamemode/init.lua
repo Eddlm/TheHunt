@@ -34,8 +34,8 @@ end )
 net.Receive( "light_below_limit", function( length, client )
 local hidden=1
 
-for k, v in pairs(ents.FindInSphere(client:GetPos(),500)) do
-if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
+for k, v in pairs(ents.FindInSphere(client:GetPos(),1512)) do
+if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_helicopter" then
 if v:Health() > 0 then
 if v:GetEnemy(client) then
 hidden=0
@@ -140,6 +140,12 @@ print( v.ClassName )
 end 
 print("")
 end )
+concommand.Add( "dropweapons", function(player, command, arguments )
+
+	player:DropWeapon( player:GetActiveWeapon() )
+--end
+end )
+
 
 
 concommand.Add( "h_revealcombinespawnpoints", function(player, command, arguments )
@@ -250,7 +256,7 @@ end )
 
 concommand.Add( "h_version", function(ply)
 ply:PrintMessage(HUD_PRINTTALK, "TheHunt Version: v0.9-beta-ALMOST_THERE edition. Date: 20/08/2014")
-ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added death notifications, improved chase system and entity names.")
+ply:PrintMessage(HUD_PRINTTALK, "Last changes: Improved helicopter behavior.")
 ply:PrintMessage(HUD_PRINTTALK, "Running the GitHub version.")
 end )
 
@@ -786,25 +792,25 @@ end
 table.foreach( ply:GetWeapons(), function(key,value)
 if key > 1 then
 print(value:GetClass())
-SpawnItem(value:GetClass(), ply:GetPos()+Vector(math.random(-30,30),math.random(-30,30),20), Angle(0,0,0))
+--SpawnItem(value:GetClass(), ply:GetPos()+Vector(math.random(-30,30),math.random(-30,30),20), Angle(0,0,0))
+ply:DropWeapon(value)
 end
 end)
 
 
 
-timer.Create( "Delaywhenkilled", 1, 1, function()
+timer.Simple(1, function()
 if attacker:IsNPC() then
 ply:Spectate(5)
 ply:SetMoveType(10)
 ply:SpectateEntity(attacker)
 end
 if PLAYERSINMAP > 1 then
-
 if GetConVarNumber("h_max_player_deaths") == ply:Deaths() or ply:Deaths() > GetConVarNumber("h_max_player_deaths")  then
 ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left. You will respawn in "..GetConVarNumber("h_punish_deaths_timer").." seconds.")
 ply:PrintMessage(HUD_PRINTTALK, "While you wait, think on a better strategy for the next time.")
 
-	timer.Create( "Playernoobspawn", GetConVarNumber("h_punish_deaths_timer"), 1, function()
+	timer.Simple(GetConVarNumber("h_punish_deaths_timer"), function()
 	ply.canspawn = 1
 	ply:SetDeaths(0)
 	ply:SetFrags(0)
@@ -816,10 +822,7 @@ ply:PrintMessage(HUD_PRINTTALK, "You have "..GetConVarNumber("h_max_player_death
 ply.canspawn = 1
 end
 else
-
 ply.canspawn = 1
-
-
 end
 
 end)
@@ -920,25 +923,21 @@ if INFINITE_ACHIEVED == 1 then
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: "..table.Random(OVERWATCH_TAUNTS).."")
 end
 
-
 if INFINITE_ACHIEVED == 0 then
 INFINITE_ACHIEVED = 1
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: Dude you fucked up.")
 end
 
 
-
-	print("[The Hunt]:  infinite wave loaded. ")
+	timer.Create( "launchanisters", 3, 5, function()
+	SpawnCanisterWave(table.Random(player.GetAll()):GetPos())
+	end	) 
 	timer.Simple(20, function()
 	timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
 	timer.Create( "infinitewave", 2, CombineInfiniteWave, infinitewave )
 	timer.Simple(20, function() CanCheck = 1 end)
 	end)
 	
-	timer.Create( "launchanisters", 3, 5, function()
-	SpawnCanisterWave(table.Random(player.GetAll()):GetPos())
-	end	) 
-
 end
 end
 function CreateHeliPath(pos)
@@ -956,17 +955,13 @@ function hidezones()
 	v:Remove()
 	end
 end
-function SpawnHeliA( pos,type )
+function SpawnHeliA( pos,type,IsBoss )
 RunConsoleCommand( "sk_helicopter_health", "1500") 
 RunConsoleCommand( "g_helicopter_chargetime", "2") 
 RunConsoleCommand( "sk_helicopter_burstcount", "12") 
 RunConsoleCommand( "sk_helicopter_firingcone", "20") 
 RunConsoleCommand( "sk_helicopter_roundsperburst", "5") 
-timer.Create( "helibehavior", 1, 1, helibehavior ) 
-timer.Create( "helipath", 1, 1, helipath ) 
-timer.Create( "usedpaths", 1, 1, usedpaths ) 
-HeliIsDead = 0
-
+timer.Simple( 3, helipath ) 
 HeliA = ents.Create( ""..type.."" )
 -- HeliA:SetKeyValue( "target", "2" )
 HeliA:SetKeyValue( "targetname", "Heli" )
@@ -975,6 +970,8 @@ HeliA:SetKeyValue( "spawnflags", "262144" )
 HeliA:SetKeyValue( "patrolspeed", "500" )
 HeliA:SetKeyValue("squadname", "heliaforce")
 HeliA:SetPos( pos )
+HeliA.boss = IsBoss
+
 if type == "npc_combinegunship" then
 RunConsoleCommand( "sk_gunship_health_increments", 8) 
 HeliA:Fire("SetPenetrationDepth ","24",0)
@@ -986,37 +983,42 @@ HeliA:Activate()
 HeliA:Fire("activate","",0)
 -- HeliA:Fire("missileon","",0)
 HeliA:Fire("gunon","",0)
-if HeliCanSpotlight == 1 then
 
-helispotlight = ents.Create("env_projectedtexture");
-helispotlight:SetPos(HeliA:GetPos());
-helispotlight:SetAngles(HeliA:GetAngles()+Angle(30,0,0) );
-helispotlight:SetParent(HeliA);
-helispotlight:SetKeyValue("spawnflags", 2);
-helispotlight:SetKeyValue("enableshadows", 1);
-helispotlight:SetKeyValue("farz", 2000);
-helispotlight:SetKeyValue("target", "");
-helispotlight:SetKeyValue("nearz", 400);
-helispotlight:SetKeyValue("lightfov", 20);
-helispotlight:SetKeyValue("lightcolor", "0 255 255")
-helispotlight:SetKeyValue("shadowquality", 1)
-helispotlight:SetKeyValue("lightstrength", 5)
+local CanSpotlight = 0
+for k, v in pairs(ents.FindByClass("npc_helicopter")) do
+CanSpotlight = CanSpotlight+1
+end
+if CanSpotlight > 1 then HeliCanSpotlight = 0 end
+if HeliCanSpotlight < 2 && type == "npc_helicopter" then
+HeliA.light = ents.Create("env_projectedtexture");
+HeliA.light:SetPos(HeliA:GetPos());
+HeliA.light:SetAngles(HeliA:GetAngles()+Angle(30,0,0) );
+HeliA.light:SetParent(HeliA);
+HeliA.light:SetKeyValue("spawnflags", 2);
+HeliA.light:SetKeyValue("enableshadows", 1);
+HeliA.light:SetKeyValue("farz", 2000);
+HeliA.light:SetKeyValue("target", "");
+HeliA.light:SetKeyValue("nearz", 400);
+HeliA.light:SetKeyValue("lightfov", 20);
+HeliA.light:SetKeyValue("lightcolor", "0 255 255")
+HeliA.light:SetKeyValue("shadowquality", 1)
+HeliA.light:SetKeyValue("lightstrength", 5)
 -- helispotlight:SetKeyValue("style", 6);
-helispotlight:Spawn();
-helispotlight:Activate();
+HeliA.light:Spawn();
+HeliA.light:Activate();
 
 
-HeliAFocus = ents.Create( "point_spotlight" )
-HeliAFocus:SetPos(HeliA:GetPos()+(HeliA:GetForward()*150+Vector(0,0,-50)))
-HeliAFocus:SetAngles(helispotlight:GetAngles())
-HeliAFocus:SetParent(helispotlight)
-HeliAFocus:SetKeyValue( "spawnflags", "1" )
-HeliAFocus:SetKeyValue( "SpotlightWidth", "50" )
-HeliAFocus:SetKeyValue( "SpotlightLength", "200" )
-HeliAFocus:SetKeyValue("rendercolor", "100 200 200")
+HeliA.spotlight = ents.Create( "point_spotlight" )
+HeliA.spotlight:SetPos(HeliA:GetPos()+(HeliA:GetForward()*150+Vector(0,0,-50)))
+HeliA.spotlight:SetAngles(HeliA.spotlight:GetAngles()+Angle(30,0,0))
+HeliA.spotlight:SetParent(HeliA)
+HeliA.spotlight:SetKeyValue( "spawnflags", "1" )
+HeliA.spotlight:SetKeyValue( "SpotlightWidth", "50" )
+HeliA.spotlight:SetKeyValue( "SpotlightLength", "200" )
+HeliA.spotlight:SetKeyValue("rendercolor", "100 200 200")
 --NPCSpotlight:SetColor(0,0,0,255)
-HeliAFocus:Spawn()
-HeliAFocus:Activate()
+HeliA.spotlight:Spawn()
+HeliA.spotlight:Activate()
 end
 end
 function SpawnScanner ( pos )
@@ -1318,6 +1320,13 @@ if v:GetClass() != NPC:GetClass() then
 end
 end
 end
+function SpawnEntranceInfoNode( pos )
+node = ents.Create("info_node_hint")
+node:SetPos(pos)
+node:SetKeyValue("hinttype", 103)
+node:SetKeyValue("nodeFOV", 360)
+node:SetKeyValue("IgnoreFacing", 1)
+end
 function SpawnCombineElite1( pos )
 	NPC = ents.Create( "npc_combine_s" )
 	NPC:SetKeyValue("NumGrenades", "0") 
@@ -1498,26 +1507,20 @@ end
 -- v PRE-PLAY THINGS
 
 function GM:PlayerSpawn(ply)
---	net.Start( "NotVisible" )
---	net.Send(ply)
---	ply:SetNoTarget(true)
--- MapLoadout() Placeholder
---	ply.safe=yes
+
 	ply:SetTeam(1)
     ply:SetCustomCollisionCheck(true)
 	ply:StripAmmo()
 	ply:StripWeapons()
 	ply:Give("weapon_crowbar")
---	ply:Give("weapon_physcannon")
---	ply:Give(table.Random(MEDIUMWEAPONS))
+
 	ply:SetupHands()
 	ply:SetWalkSpeed(150)
 	ply:SetRunSpeed(250)
 	ply:SetCrouchedWalkSpeed(0.3)
 	ply:AllowFlashlight(true)
 	ply:SetNoCollideWithTeammates(1)
---	ply:SetCollisionGroup(11)
-	timer.Simple(0.1, npcforget)
+	timer.Simple(0.5, npcforget)
 if math.random(1,2) == 1 then
 ply:SetModel(table.Random(playermodelsmale) )
 ply.sex="male"
@@ -1536,8 +1539,6 @@ timer.Create( "coverzones", 20, 0, coverzones )
 print("[The Hunt]: Patrol Areas updated:")
 
 table.foreach(MainEnemiesGround, function(key,value)
-
-
 for k, v in pairs(ents.FindByClass(value)) do
 	if WAVESPAWN == 1 then v:SetCollisionGroup(1) else v:SetCollisionGroup(9) end
 
@@ -1557,45 +1558,6 @@ for k, v in pairs(ents.FindByClass(value)) do
 end
 
 end)
-/*
-for k, v in pairs(ents.FindByClass("npc_combine_s")) do
-	if WAVESPAWN == 1 then v:SetCollisionGroup(1) else v:SetCollisionGroup(9) end
-
-	if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then	
-		if v:GetEnemy() then 
-			print(""..v:GetName().." is busy, cannot change patrol area")
-		else
-			v:SetLastPosition(table.Random(zonescovered) + Vector(math.random(-20,20), math.random(-20,20), -30))
-			if WAVESPAWN == 1 then
-				v:SetSchedule(SCHED_FORCED_GO_RUN)
-			else
-				v:SetSchedule(SCHED_FORCED_GO)
-			end
-		print(""..v:GetName().." changed patrol area")
-		end
-	end
-end
-
-
-
-
-for k, v in pairs(ents.FindByClass("npc_metropolice")) do
-	if WAVESPAWN == 1 then v:SetCollisionGroup(1) else v:SetCollisionGroup(9) end
-		if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
-		if v:GetEnemy() then 
-			print(""..v:GetName().." is busy, cannot change patrol area")
-		else
-			v:SetLastPosition(table.Random(zonescovered) + Vector(math.random(-20,20), math.random(-20,20), -30))
-			if WAVESPAWN == 1 then
-				v:SetSchedule(SCHED_FORCED_GO_RUN)
-			else
-				v:SetSchedule(SCHED_FORCED_GO)
-			end
-		print(""..v:GetName().." changed patrol area")
-		end
-end
-end
-*/
 end
 
 
@@ -1682,9 +1644,9 @@ for k, v in pairs(ents.FindByClass(enemy)) do
 v:SetKeyValue("squadname", "")
 if v:GetEnemy() then if v:GetEnemy():IsPlayer() then
 --v:GetEnemy():PrintMessage(HUD_PRINTTALK, ""..v:GetName().." lost "..v:GetEnemy():GetName().."")
-v:ClearEnemyMemory() 
+v:ClearEnemyMemory()
 v:SetEnemy(nil)
-v:SetSchedule(SCHED_FORCED_GO_RUN)
+v:SetSchedule(SCHED_MOVE_AWAY)
 end
 end
 end
@@ -1772,7 +1734,7 @@ npc:SetKeyValue("squadname", "CombineSquad")
 if npc:GetEnemy().spotted != 1 then
 if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
 npc:EmitSound(table.Random(ContactConfirmed), 100, 100) end
-
+table.insert(zonescovered, npc:GetEnemy():GetPos())
 net.Start("Spotted")
 net.Send(npc:GetEnemy())
 npc:GetEnemy().spotted = 1
@@ -1812,83 +1774,93 @@ timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo )
 end
 
 function helibehavior()
-if HeliA then
-if HeliIsDead != 1 then
-		if HeliA:GetEnemy() then
+for num, Heli in pairs(ents.FindByClass("npc_helicopter")) do
+		if Heli:GetEnemy() then
 			--print ("heli has enemy: "..HeliA:GetEnemy():GetName().."")
-				if HeliA:GetEnemy():IsNPC() && HeliCanSpotlight == 1 then
-					helispotlight:Fire("Target", ""..HeliA:GetEnemy():GetName().."", 0)
+				if Heli:GetEnemy():IsNPC() && HeliCanSpotlight == 1 then
+					Heli.light:Fire("Target", ""..Heli:GetEnemy():GetName().."", 0)
 					end
-				if HeliA:GetEnemy():IsPlayer() && HeliCanSpotlight == 1 then
-				HeliA:GetEnemy():SetName(""..tostring(HeliA:GetEnemy():GetName()).."focus")
-				helispotlight:Fire("Target", ""..tostring(HeliA:GetEnemy():GetName()).."focus", 0)
+				if Heli:GetEnemy():IsPlayer() && HeliCanSpotlight == 1 then
+				Heli:GetEnemy():SetName(""..tostring(Heli:GetEnemy():GetName()).."focus")
+				Heli.light:Fire("Target", ""..tostring(Heli:GetEnemy():GetName()).."focus", 0)
 				end
-if HeliA:HasCondition(10) then
-nearbycombinecomeheli(HeliA,HeliA:GetEnemy())
+if Heli:HasCondition(10) then
+nearbycombinecomeheli(Heli,Heli:GetEnemy())
 end
-		end
+elseif HeliCanSpotlight == 1 then Heli.light:Fire("Target", "", 0)
 end
 end
 timer.Create( "helibehavior", 1, 1, helibehavior ) 
-
 end
+
 function helipath()
-if HeliA:IsValid() && HeliA:GetEnemy() == nil then
-	for num, HeliTrack in pairs(ents.FindInSphere(HeliA:GetPos(), 1700)) do
-		if HeliCanSpotlight == 1 then helispotlight:Fire("Target", "", 0)	end
-			if HeliTrack:IsValid() && HeliTrack:GetClass() == "path_track" && HeliTrack:GetName() != "used" then
-			if HeliA:Visible(HeliTrack) then
-			--	print("[The Hunt]: found "..HeliTrack:GetName().."")
-				HeliTrack:SetName("going")
-				HeliA:Fire("SetTrack","going",0)
-				Usada = HeliTrack
-			--	print(Usada)
-				timer.Create( "GoingToUsed", 0, 1, goingtoused ) 
-				timer.Create( "helipath", math.random(5,8), 0, helipath ) 
-				timer.Create( "usedpaths", 7, 0, usedpaths ) 
-				return false
+	helibehavior()
+timer.Simple( 5, helipath )
+print("Helipath")
+local found = 0
+table.foreach(AirEnemies, function(key,enemy)
+
+	for num, Heli in pairs(ents.FindByClass(enemy)) do
+
+	if Heli:GetVelocity():Length() < 240 then
+	print("")
+	print("Heli "..Heli:EntIndex().." searching")
+	 if Heli:GetEnemy() then
+	 nearbycombinecome(Heli:GetEnemy())
+	 		for num, HeliTrack in pairs(ents.FindInSphere(Heli:GetEnemy():GetPos(), 2000)) do
+			if found == 0 or  found == 1 then
+			if HeliTrack:GetClass() == "path_track" then
+			print("Found one,"..HeliTrack:EntIndex().."")
+			if HeliTrack:GetName() == "used" then  found = 1 print("Is NOT Empty") end
+			if HeliTrack:GetName() != "used" then
+			print("Is Empty")
+			if Heli:Visible(HeliTrack) and HeliTrack:Visible(Heli:GetEnemy()) then
+			print("Going to "..HeliTrack:EntIndex().."")
+			HeliTrack:SetName("going")
+			Heli:Fire("SetTrack",tostring(HeliTrack:GetName()))
+			timer.Simple (0.5, function() HeliTrack:SetName("used") end)
+			found = 2
 			end
+			end
+			end 
+			end
+			end
+	 else
+			for num, HeliTrack in pairs(ents.FindInSphere(Heli:GetPos(), 2000)) do
+			if found == 0 or  found == 1 then
+			if HeliTrack:GetClass() == "path_track" then
+			print("Found one,"..HeliTrack:EntIndex().."")
+			if HeliTrack:GetName() == "used" then  found = 1 print("Is NOT Empty") end
+			if HeliTrack:GetName() != "used" then
+			print("Is Empty")
+			if Heli:Visible(HeliTrack) then
+			print("Going to "..HeliTrack:EntIndex().."")
+			HeliTrack:SetName("going")
+			Heli:Fire("SetTrack",tostring(HeliTrack:GetName()))
+			timer.Simple (0.5, function() HeliTrack:SetName("used") end)
+			found = 2
+			end
+			end
+			end 
+			end
+			end
+			end
+			print("Heli "..Heli:EntIndex().." status: "..found.."")
+			if found == 0 or found == 1 then usedpaths() end
 			end
 	end
-		
-elseif  HeliA:IsValid() && HeliA:GetEnemy() != nil then
-	for num, HeliTrack in pairs(ents.FindInSphere(HeliA:GetEnemy():GetPos(), 2000)) do
-		if HeliTrack:IsValid() && HeliTrack:GetClass() == "path_track" && HeliTrack:GetName() != "used" then	
-			if HeliA:Visible(HeliTrack) && HeliTrack:Visible(HeliA:GetEnemy()) then
-			--	print("[The Hunt]: found "..HeliTrack:GetName().."")
-				HeliTrack:SetName("going")
-				HeliA:Fire("SetTrack","going",0)
-				HeliA:SetVelocity(Vector(2,2,2))
-				Usada = HeliTrack
-			--	print(Usada)
-				timer.Create( "GoingToUsed", 0, 1, goingtoused ) 
-				timer.Create( "helipath", math.random(7,9), 0, helipath ) 
-				timer.Create( "usedpaths", 9, 0, usedpaths ) 
-				return false
-			end
-		end
-	end
-end
--- timer.Create( "helipath", math.random(3,6), 0, helipath ) 
-end
-
-
-function goingtoused()
-		Usada:SetName("used")
-	--	print("[The Hunt]: Changed to Used")
+	end)
 end
 
 function usedpaths()
 if HeliA:IsValid() then
-	for num, HeliTrack in pairs(ents.FindInSphere(HeliA:GetPos(), 200560)) do
+	for num, HeliTrack in pairs(ents.FindByClass("path_track")) do
 				if HeliTrack:GetName() == "used" then
 					HeliTrack:SetName("empty")
-					--print("[The Hunt]: found used and emptied")
-					Usada:SetName("used")
+					print("[The Hunt]: found used and emptied")
 				end
 	end
 	end
--- timer.Create( "usedpaths", 40, 0, usedpaths ) 
 end
 
 
@@ -1928,25 +1900,26 @@ print("[The Hunt]: assploded")
 ent:Fire("Explode",0,0)
 */
 
-
-
 if victim:GetClass() == "npc_turret_floor" then
 print("[The Hunt]: turret killed")
 nearbycombinecome(victim)
 end
-
 if victim:GetClass() == "npc_turret_ceiling" then
 nearbycombinecome(killer)
 end
 
-if victim:GetClass() == "npc_helicopter" then
-timer.Stop( "helipath")
-timer.Stop( "usedpaths")
-timer.Stop( "helibehavior")
+if killer:IsNPC() then
+	if killer:GetClass() == "npc_citizen" then
+	nearbycombinecome(killer)
+	end
+	if killer:Health() > 0 then
+		if killer:GetClass() == "npc_combine_s" then
+		killer:EmitSound(table.Random(CombineKillSounds), 100, 100)
+		end
+	end
 end
 
-table.foreach(MainEnemiesGround, function(key,value)
-if victim:GetClass() == value then
+if victim:GetClass() == "npc_metropolice" or victim:GetClass() == "npc_combine_s" then
 		COMBINE_KILLED = COMBINE_KILLED+1
 		net.Start( "Hidden" )
 		net.Send(killer)
@@ -1960,43 +1933,28 @@ if victim:GetClass() == value then
 			end
 		net.WriteString( ""..victim:GetName().."" )
 		net.Broadcast()
-			end
-end)
-
-if killer:IsNPC() then
-	if killer:GetClass() == "npc_citizen" then
-	nearbycombinecome(killer)
-	end
-
-	if killer:Health() > 0 then
-		if killer:GetClass() == "npc_combine_s" then
-		killer:EmitSound(table.Random(CombineKillSounds), 100, 100)
-		end
-	--PrintMessage(HUD_PRINTTALK, ""..killer:GetName().." killed "..victim:GetName().."")
-	end
-end
-
-if killer:IsPlayer() then
-nearbycombinecomecasual(victim)
-
-	if killer:Alive() then
-		if victim:GetClass() == "npc_metropolice" or victim:GetClass() == "npc_combine_s" then
-
+		
 			local MAX=0
 			local TALK=0
+			local MAXCOME=0
 			for k, see in pairs(ents.FindInSphere(victim:GetPos(),256)) do
-				if see:GetClass() == "npc_combine_s" && see:EntIndex() != victim:EntIndex() then
-					if TALK<1 then
-					see:EmitSound(table.Random(CombineKilledSounds), 360, 100)
-					TALK=TALK+1
-					end
-					if see:GetEnemy() == nil then
-						if see:Visible(victim) then 
+				if see:GetClass() == "npc_combine_s" then
+					if !see:GetEnemy() then
+						if see:Visible(victim) and see:EntIndex() != victim:EntIndex() then 
+							if TALK<1  then
+							see:EmitSound(table.Random(CombineKilledSounds), 360, 100)
+							TALK=TALK+1
+							end
 							if MAX < 1 then
 								see:Fire("ThrowGrenadeAtTarget",""..tostring(victim:GetName()) .."",0)
 								see:SetEnemy(killer)
 								MAX=MAX+1
 							end
+							elseif MAXCOME<2 then
+							PrintMessage(HUD_PRINTTALK, ""..see:GetName()..": "..table.Random(CombineHearBreak).."")
+							see:SetLastPosition(victim:GetPos())
+							see:SetSchedule(SCHED_FORCED_GO_RUN)	
+							MAXCOME=MAXCOME+1							
 						end
 					elseif math.random (1,8) == 1 then
 							killer:SetName("player")
@@ -2006,49 +1964,48 @@ nearbycombinecomecasual(victim)
 			end
 			if victim:GetEnemy() then
 				CombineAssisting = 0	
-				nearbycombinecome(killer)
-				if killer.sex == "male"  then
-					killer:EmitSound(table.Random(malecomments), 360, 100)
-				else
-					killer:EmitSound(table.Random(femalecomments), 360, 100)
-				end
-			end
-			if !victim:GetEnemy() then
-				if weapon:GetClass() == "npc_tripmine" || weapon:GetClass() == "npc_satchel" then
-				killstyle = 2
-				elseif killer:GetActiveWeapon():GetClass() != "weapon_crowbar" && killer:GetActiveWeapon():GetClass() != "weapon_crossbow"  then
-				killstyle = 2
-				elseif killer:GetActiveWeapon():GetClass() == "weapon_crowbar"  || killer:GetActiveWeapon():GetClass() == "weapon_crossbow" then
-				killstyle = 3
-				end
-				if killstyle == 3 then
-					if killer:Frags() < 1 then
-					timer.Simple(2 , function()	killer:EmitSound("music/hl1_song11.mp3", 40, 100)end)
+				if killer:IsPlayer() and killer:Alive() then
+					if killer.sex == "male"  then
+						killer:EmitSound(table.Random(malecomments), 360, 100)
+					else
+						killer:EmitSound(table.Random(femalecomments), 360, 100)
 					end
-				end
-				if killstyle == 2 then
-					CombineAssisting = 0
-					nearbycombinecome(victim)
 				end
 			end
 		end
-	end
-killer:AddFrags(1)
-end
+if killer:IsPlayer() then killer:AddFrags(1) end
 end
 
-function helideath()
+function GM:PlayerSelectSpawn( pl )
+    local spawns = ents.FindByClass( "info_player_start" )
+	local random_entry = math.random( #spawns )
+local spawn = false
+table.foreach(spawns, function(key,value)
+	local can = 1
+	for k, v in pairs(ents.FindInSphere(value:GetPos(),1000)) do
+	if v:IsNPC() then
+	if v:Visible(value) then
+	can = 0
+	end
+	end
+	end
+	print(can)
+	if can == 1 then spawn = value end
+end)
+   return spawn
+
+end
+
+function helideath(HeliKilled)
 BossHeliAlive = 0
-if HeliA:IsValid() && HeliIsDead != 1 then
+if HeliKilled:IsValid() && HeliIsDead != 1 then
 HeliIsDead = 1
-helispotlight:Remove()
-HeliAFocus:Remove()
+--helispotlight:Remove()
+--HeliAFocus:Remove()
 timer.Create( "SpawnRollermine", 2, 2, function()
 SpawnRollermine(HeliA:GetPos() + Vector(0, 0, -100))
 end)
-HeliA:Fire("SelfDestruct","",5)
-timer.Stop( "helipath")
-timer.Stop( "usedpaths")
+HeliKilled:Fire("SelfDestruct","",5)
 end
 end
 
@@ -2076,8 +2033,8 @@ function ScaleNPCDamage( damaged, hitgroup, damage )
 		damaged:SetEnemy(damage:GetAttacker())
 		end
 	end
-	 end)
-
+	end)
+	 
 	-- friendly fire between same class NPCs
 	if damaged:GetClass() == damage:GetAttacker():GetClass() then
 		damage:ScaleDamage(0)
@@ -2087,45 +2044,52 @@ function ScaleNPCDamage( damaged, hitgroup, damage )
 	
 
 if damaged:GetClass() == "npc_helicopter" then
-
 if damaged:Health() < 800 && HeliIsDead != 1 then
 if HeliAangered == 0 then
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: Air enforcement unit, you are now free to employ aggresive containment tactics.")
 
 RunConsoleCommand( "g_helicopter_chargetime", "1") 
-HeliA:Fire("BlindfireOn","",0)
-HeliA:Fire("SetPenetrationDepth","200",0)
+--daaged:Fire("BlindfireOn","",0)
+--damaged:Fire("SetPenetrationDepth","200",0)
 RunConsoleCommand( "g_helicopter_chargetime", "1") 
 RunConsoleCommand( "sk_helicopter_burstcount", "10") 
 RunConsoleCommand( "sk_helicopter_firingcone", "2") 
 RunConsoleCommand( "sk_helicopter_roundsperburst", "5") 
-HeliA:SetKeyValue( "patrolspeed", "5000" )
+damaged:SetKeyValue( "patrolspeed", "5000" )
 if HeliCanSpotlight == 1 then
-helispotlight:SetKeyValue("lightcolor", "255 0 0") 
-HeliAFocus:Remove()
-HeliAFocus = ents.Create( "point_spotlight" )
-HeliAFocus:SetPos(HeliA:GetPos()+(HeliA:GetForward()*150+Vector(0,0,-50)))
-HeliAFocus:SetAngles(helispotlight:GetAngles())
-HeliAFocus:SetParent(helispotlight)
-HeliAFocus:SetKeyValue( "spawnflags", "1" )
-HeliAFocus:SetKeyValue( "SpotlightWidth", "50" )
-HeliAFocus:SetKeyValue( "SpotlightLength", "200" )
-HeliAFocus:SetKeyValue("rendercolor", "255 0 0")
-HeliAFocus:Spawn()
-HeliAFocus:Activate()
+damaged.light:SetKeyValue("lightcolor", "255 0 0") 
+damaged.spotlight:Remove()
+damaged.spotlight = ents.Create( "point_spotlight" )
+damaged.spotlight:SetPos(HeliA:GetPos()+(HeliA:GetForward()*150+Vector(0,0,-50)))
+damaged.spotlight:SetAngles(damaged:GetAngles()+Angle(30,0,0))
+damaged.spotlight:SetParent(damaged)
+damaged.spotlight:SetKeyValue( "spawnflags", "1" )
+damaged.spotlight:SetKeyValue( "SpotlightWidth", "50" )
+damaged.spotlight:SetKeyValue( "SpotlightLength", "200" )
+damaged.spotlight:SetKeyValue("rendercolor", "255 0 0")
+damaged.spotlight:Spawn()
+damaged.spotlight:Activate()
 end
 HeliAangered = 1
 end
 
+/* -- Original "Heli tries to crash on you" code. Doesn't work for now.
 if damaged:Health() < 151 then
 timer.Simple(3, function() PrintMessage(HUD_PRINTTALK, "[Overwatch]: All units, "..damaged:GetName().." state changed to: inoperative.") end)
-timer.Simple(1 , helideath)
+timer.Simple(1 , helideath(damaged))
 creating = ents.Create( "info_target_helicopter_crash" )
 creating:SetPos(damage:GetAttacker():GetPos() + Vector(0, 0, 500))
 creating:Spawn()
 creating:SetParent(damage:GetAttacker())
 end
+*/
 
+if damaged:Health() < damage:GetDamage() then
+PrintMessage(HUD_PRINTTALK, "[Overwatch]: All units, "..damaged:GetName().." state changed to: inoperative.")
+print("dead")
+if damaged.boss == 1 then BossHeliAlive = 0 end
+damaged.spotlight:Remove()
+end
 end
 end
 
@@ -2180,6 +2144,15 @@ end
 function GM:KeyPress(player,key)
 if player:Alive() then
 if key == IN_ATTACK then
+if player:GetActiveWeapon():GetClass() == "weapon_crowbar" then
+if CAN_HEAR_BREAK == 1
+then CAN_HEAR_BREAK = 0
+timer.Simple(5, function() CAN_HEAR_BREAK = 1 end)
+local traceRes = util.QuickTrace(player:GetPos(), player:GetForward()*75, player)
+print(traceRes.Entity)
+if traceRes.HitWorld then  nearbycombinecomecasual(player) end
+end
+end
 if player:GetActiveWeapon():Clip1() > 0 then
 				local silent=0
 				table.foreach(SILENT_WEAPONS, function(key,value)
