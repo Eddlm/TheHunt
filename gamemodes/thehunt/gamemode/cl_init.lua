@@ -10,8 +10,7 @@ light_above_limit = 3
 LIGHTEXT = 'Visible'
 LIGHTCOLOR = Color(255,0,0)
 lightcol = 0
-CLDARKNESS = 0
-MenuOpen = 0
+CLDARKNESS = 3
 
 if !ConVarExists("h_outline_radius") then
 CreateClientConVar( "h_outline_radius", "1000", true, false )

@@ -4,6 +4,7 @@ CombineThirdWave = 15
 CombineFourthWave = 20
 CombineFifthWave = 1
 CombineInfiniteWave = 20
+DARKNESS = 2
 
 HeliCanSpotlight = 1
 
@@ -53,14 +54,7 @@ timer.Simple(10, function()ply:PrintMessage(HUD_PRINTTALK, "Type !help to see th
 end
 
 function MapSetup()
-RunConsoleCommand( "r_shadowdist", "200") 
-RunConsoleCommand( "r_shadowcolor", ('20 20 20')) 
-RunConsoleCommand( "sk_helicopter_health", "1500") 
-RunConsoleCommand( "g_helicopter_chargetime", "2") 
-RunConsoleCommand( "sk_helicopter_burstcount", "12") 
-RunConsoleCommand( "sk_helicopter_firingcone", "20") 
-RunConsoleCommand( "sk_helicopter_roundsperburst", "5") 
-RunConsoleCommand( "air_density", "0")
+
 
 
 for k,v in pairs(ents.FindByClass("func_door_rotating")) do 
@@ -70,7 +64,7 @@ v:Remove()
 end
 end
 
-SpawnHeliA( Vector(356.599335, 2395.603760, 672.474854), "npc_helicopter", 1 )
+SpawnHeliA( Vector(356.599335, 2395.603760, 672.474854), "npc_helicopter", 0 )
 HeliA:Fire("gunoff","",0)
 
 if HeliA:Health() != 1500 then print("WARNING: This Helicopter hasn't the adequeate health.") end
@@ -336,7 +330,7 @@ Wave = 5
 RPGCANSPAWN = 1
 HeliA:Fire("gunon","",0)
 BossHeliAlive = 1
-
+HeliA.boss = 1
 end
 
 

@@ -5,7 +5,7 @@ CombineThirdWave = 10
 CombineFourthWave = 10
 CombineFifthWave = 10
 CombineInfiniteWave = 20
-
+DARKNESS = 3
 zonescovered ={
 Vector(-715.801270, -1541.449219, -175.968750),
 Vector(323.394135, -214.058197, -95.968750),

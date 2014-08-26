@@ -85,7 +85,7 @@ end
 
 if NumHelis > 1 then print("too much helis")
 else 
-SpawnHeliA(Vector(967.547241, 722.096069, 465.658081), "npc_helicopter" ,1)
+SpawnHeliA(Vector(967.547241, 722.096069, 465.658081), "npc_helicopter" ,1,1)
 end
 RPGCANSPAWN = 1
 end

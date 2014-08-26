@@ -17,9 +17,6 @@ local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLE
     end
 
 end
-
-
-
 hook.Add( "PlayerSay", "ISaid", ISaid )
 
 function GM:Initialize()
@@ -59,7 +56,8 @@ end
 
 function nearbycombinecomecasual(suspect)
 local come=0
-		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),256)) do
+if suspect:GetPos() then
+		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),512)) do
 				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
 			--	if v:Health() > 0 then
 				if come < 1 then
@@ -93,6 +91,7 @@ if come < 1 then
 						end
 				end
 				end
+end
 end
 end
 end
@@ -156,7 +155,7 @@ PLAYERS = PLAYERS + 1
 end
 local OFFSET = PLAYERS + GetConVarNumber("h_weaponoffset")
 print("")
-
+if PLAYERS > 5 then PLAYERS = 5 end
 table.foreach(MEDIUMWEAPONS, function(key,value)
 for k,weapon in pairs(ents.FindByClass(value)) do 
 NUMBER=NUMBER+1
@@ -170,7 +169,7 @@ end
 NUMBER=0
 end)
 
-
+/*
 if MISCELANEOUS_ITEMS_PLACES then
 table.foreach(MISCELANEOUS_ITEMS_PLACES, function(key,value)
 local canspawnitem=1
@@ -189,7 +188,7 @@ SpawnItem(table.Random(MISCELANEOUS_ITEMS),value, Angle(0,0,0))
 end
 end)
 end
-
+*/
 
 
 for k,v in pairs(ents.FindByClass("item_healthcharger")) do 

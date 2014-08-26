@@ -70,9 +70,6 @@ end
 
 
 function MapSetup()
-RunConsoleCommand( "r_shadowdist", "500") 
-RunConsoleCommand( "r_shadowcolor", ('20 20 20')) 
-
 
 SpawnItem("item_healthcharger", Vector(126.031250, -1090.029663, 330.202118), Angle(0,0,0))
 SpawnItem("item_healthcharger", Vector(126.031250, -756.941406, 328.275513), Angle(0,0,0))
@@ -87,15 +84,13 @@ SpawnItem("item_healthcharger", Vector(-495.031250, 178.636093, 327.759247), Ang
 for k,v in pairs(ents.FindByClass("func_door_rotating")) do print (v:GetClass()) v:Remove() end
 
 
-for k, v in pairs(ents.FindByClass("info_player_deathmatch")) do
+table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value)
+for k, v in pairs(ents.FindByClass(value)) do
 print(v:GetClass())
 v:Remove()
 end
+end)
 
-for k, v in pairs(ents.FindByClass("info_player_start")) do
-print(v:GetClass())
-v:Remove()
-end
 SpawnItem("info_player_start", Vector(255.010361, -256.592407, 270.041107), Angle(0,0,0) )
 SpawnItem("info_player_start", Vector(-649.375671, 106.820007, 270.948212), Angle(0,0,0) )
 SpawnItem("info_player_start", Vector(-452.823029, -2179.458008, 270.535217), Angle(0,90,0) )

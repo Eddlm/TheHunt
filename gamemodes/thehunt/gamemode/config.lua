@@ -15,7 +15,7 @@ RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade
 -- Don't add anything to this. Is what kind of ammo the NPC rebels will give you. You can prevent them for giving X type of ammo if you delete it from this table, but you can't add new values here. It will explode.
 
 
-MEDIUMWEAPONS = { "weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1","weapon_ar2" }
+MEDIUMWEAPONS = { "weapon_shotgun", "weapon_pistol", "weapon_frag", "weapon_slam", "weapon_crossbow", "weapon_physcannon", "weapon_smg1","weapon_ar2","item_healthvial" }
 -- Weapons the gamemode will spawn around. 
 
 
