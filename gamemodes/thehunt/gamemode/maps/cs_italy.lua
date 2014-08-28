@@ -5,7 +5,9 @@ CombineThirdWave = 10
 CombineFourthWave = 10
 CombineFifthWave = 10
 CombineInfiniteWave = 20
-DARKNESS = 3
+
+MAP_PROPS = {"models/props_c17/furnituredrawer001a.mdl","models/props_c17/furnituretable002a.mdl","models/props_c17/furnituretable001a.mdl",}
+
 zonescovered ={
 Vector(-715.801270, -1541.449219, -175.968750),
 Vector(323.394135, -214.058197, -95.968750),
@@ -14,8 +16,6 @@ Vector(-1100.641968, 987.607788, -95.968750),
 Vector(234.752258, 2087.459229, 64.031250),
 Vector(712.359741, 2196.531006, 192.031250),
 }
-
-SPECIALITEMPLACES = {}
 
 ITEMPLACES ={
 Vector(-1261.686646, 1220.821899, -99.216232),
@@ -27,18 +27,6 @@ Vector(663.113403, -457.634277, -118.530411),
 Vector(460.007019, -383.301483, -117.090652),
 Vector(-471.744293, 472.556305, 72.031250),
 }
-
-
-MISCELANEOUS_ITEMS = { "item_healthkit" }
-
-
-MISCELANEOUS_ITEMS_PLACES = {
-Vector(-596.337158, 2053.319092, -115.211304),
-Vector(613.793701, -729.269226, -104.564911),
-Vector(948.682373, 1925.878662, 51.591042),
-Vector(-775.073425, 1114.353516, -102.172470),
-}
-
 
 
 combinespawnzones = {
@@ -56,32 +44,43 @@ end
 
 
 function MapSetup()
---SpawnItem("item_healthcharger", Vector(-456.275421, 479.784363, -414.434113), Angle(-90.000, 90.000, 45.000) )
-
-for k, v in pairs(ents.FindByClass("info_player_start")) do
+table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value)
+for k, v in pairs(ents.FindByClass(value)) do
 print(v:GetClass())
 v:Remove()
 end
-
-for k, v in pairs(ents.FindByClass("info_player_counterterrorist")) do
-print(v:GetClass())
-v:Remove()
-end
-
-for k, v in pairs(ents.FindByClass("info_player_terrorist")) do
-print(v:GetClass())
-v:Remove()
-end
+end)
 
 SpawnItem("info_player_start", Vector(-410.501892, -89.787407, -87.968750)+Vector(0,0,-45), Angle(0,0,0))
 SpawnItem("info_player_start", Vector(177.478897, 95.992462, -87.968750)+Vector(0,0,-45), Angle(0,0,0))
 SpawnItem("info_player_start", Vector(-159.968750, 1913.448975, -95.968750)+Vector(0,0,-45), Angle(0,0,0))
 
 SpawnTurret(Vector(-491.003052, -1442.955566, -239.262634),Angle(0.397, 167.418, 0.522))
+SpawnTurret(Vector(556.156494, 2330.056641, 128.705292),Angle(0.331, 22.378, 0.497))
+SpawnTurret(Vector(-709.125061, 169.305756, 8.702634),Angle(0.201, 51.508, 0.738))
+SpawnProp(Vector(490.964935, 2385.634766, 0.909191),Angle(0,0,0),"models/props_junk/sawblade001a.mdl")
+SpawnProp(Vector(490.964935, 2385.634766, 2.909191),Angle(0,0,0),"models/props_junk/sawblade001a.mdl")
+SpawnProp(Vector(490.964935, 2385.634766, 4.909191),Angle(0,0,0),"models/props_junk/sawblade001a.mdl")
 
 
---if math.random(1,2) == 1 then
---SpawnTurret(Vector(-86.159615, -1113.844360, -223.263809),Angle(0.257, 92.666, 0.642))
---end
+SpawnProp(Vector(941.523132, 184.121384, -131.631363),Angle(0,0,0),"models/props_junk/wood_crate001a.mdl")
+SpawnProp(Vector(941.523132, 184.121384, -101.631363),Angle(0,0,0),"models/props_junk/wood_crate001a.mdl")
+SpawnProp(Vector(941.523132, 184.121384, 21.631363),Angle(0,0,0),"models/props_junk/wood_crate001a.mdl")
+SpawnProp(Vector(941.523132, 184.121384, 51.631363),Angle(0,0,0),"models/props_junk/wood_crate001a.mdl")
+
+SpawnProp(Vector(941.523132, 184.121384, 51.631363),Angle(0,0,0),"models/props_junk/wood_crate001a.mdl")
+SpawnProp(Vector(941.523132, 184.121384, 51.631363),Angle(0,0,0),"models/props_junk/wood_crate001a.mdl")
+SpawnProp(Vector(941.523132, 184.121384, 51.631363),Angle(0,0,0),"models/props_junk/wood_crate001a.mdl")
+SpawnProp(Vector(941.523132, 184.121384, 51.631363),Angle(0,0,0),"models/props_junk/wood_crate001a.mdl")
+
+
+SpawnProp(Vector(983.913452, -794.092651, -151.607880),Angle(0,0,0),"models/props_c17/oildrum001_explosive.mdl")
+SpawnProp(Vector(1008.994324, -780.184509, -151.532333),Angle(0,0,0),"models/props_c17/oildrum001_explosive.mdl")
+SpawnProp(Vector(1062.439209, -714.620239, -151.612885),Angle(0,0,0),"models/props_c17/oildrum001_explosive.mdl")
+SpawnProp(Vector(1042.702026, -686.063293, -151.616333),Angle(0,0,0),"models/props_c17/oildrum001_explosive.mdl")
+SpawnProp(Vector(1057.852783, -654.657043, -151.643707),Angle(0,0,0),"models/props_c17/oildrum001_explosive.mdl")
+
 end
+
+
 

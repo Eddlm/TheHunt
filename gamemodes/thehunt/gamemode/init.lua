@@ -11,19 +11,23 @@ util.AddNetworkString( "Visible" )
 util.AddNetworkString( "NotVisible" )
 util.AddNetworkString( "PlayerKillNotice" )
 
-CAN_HEAR_BREAK= 1
-COMBINE_KILLED = 0
 util.PrecacheModel("models/Combine_Soldier.mdl")
 util.PrecacheModel("models/Combine_Super_Soldier.mdl")
 util.PrecacheModel("models/Police.mdl")
 
-SPAWNPOINTS_TO_DELETE = {"info_player_terrorist", "info_player_counterterrorist", "info_player_start", "info_player_deathmatch",
-}
+CAN_HEAR_BREAK= 1
+COMBINE_KILLED = 0
+/*             notes
 
-ChatEnemySpotted = {"All units, hostile spotted.","All units, hostiles near my position.","Suspect found, all units provide support.","All units: hostiles found, I repeat, hostiles found."}
 
-OVERWATCH_TAUNTS = { "I'd get ready if I were you.", "Hope you like bloodbaths.", "Let's get this farce over with.", "I've calculated who will win to a 99.93% certainty, if you're interested. ", "So at least your teammates know what they're doing. ", "Your teammates are doing a really great job. ", "This is probably the most heroic thing anyone's ever done while sitting motionless in their parents' rec room. ", "You were almost helpful this time. ", " It's a good feeling, isn't it? I wouldn't get used to it. ", "That's funny, I didn't even see you cheat. ", "That should delay the inevitable slightly. ", "Great teamwork, you vicious thugs. ", "Your entire life has been a mathematical error. A mathematical error I'm about to correct.", "Someone is going to get badly hurt.", "I hate you so much.", "Did anything happen while I was out?", "Just stop it already.", "Are you testing me?" , "You really aren't getting tired of that, are you?" , "I'm done." , "Do you need real encouragement? Let's see if this helps." , "Now, you are just wasting my time." , "If you are wondering what that smell is, that is the smell of human fear." }
+NPC:SetKeyValue( "model", "models/elite_synth/elite_synth.mdl" )
+NPC:SetSkin(1)
 
+Get info from an entity typing this on the console while facing at it
+lua_run print("Entity: ") print(player.GetByID(1):GetEyeTrace().Entity) print("Position: ") print(player.GetByID(1):GetEyeTrace().Entity:GetPos()) print("Angles: ") print(player.GetByID(1):GetEyeTrace().Entity:GetAngles())
+
+lua_run print("Model: ") print(player.GetByID(1):GetEyeTrace().Entity:GetModel())
+*/
 
 
 net.Receive( "light_above_limit", function( length, client )
@@ -35,7 +39,7 @@ end )
 net.Receive( "light_below_limit", function( length, client )
 local hidden=1
 
-for k, v in pairs(ents.FindInSphere(client:GetPos(),1512)) do
+for k, v in pairs(ents.FindInSphere(client:GetPos(),256)) do
 if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_helicopter" then
 if v:Health() > 0 then
 if v:GetEnemy(client) then
@@ -67,17 +71,6 @@ function util.QuickTrace( origin, dir, filter )
 end
 
 
-/*             notes
-
-
-NPC:SetKeyValue( "model", "models/elite_synth/elite_synth.mdl" )
-NPC:SetSkin(1)
-
-Get info from an entity typing this on the console while facing at it
-lua_run print("Entity: ") print(player.GetByID(1):GetEyeTrace().Entity) print("Position: ") print(player.GetByID(1):GetEyeTrace().Entity:GetPos()) print("Angles: ") print(player.GetByID(1):GetEyeTrace().Entity:GetAngles())
-
-lua_run print("Model: ") print(player.GetByID(1):GetEyeTrace().Entity:GetModel())
-*/
 
 function GM:Initialize()
 RunConsoleCommand( "g_ragdoll_maxcount", "6")
@@ -89,6 +82,7 @@ RunConsoleCommand( "sk_helicopter_burstcount", "12")
 RunConsoleCommand( "sk_helicopter_firingcone", "20") 
 RunConsoleCommand( "sk_helicopter_roundsperburst", "5") 
 RunConsoleCommand( "air_density", "0")
+RunConsoleCommand( "ai_norebuildgraph", "1")   
 
 end
 
@@ -234,14 +228,13 @@ end
 end )
 
 concommand.Add( "h_version", function(ply)
-ply:PrintMessage(HUD_PRINTTALK, "TheHunt Version: v0.9-beta-ALMOST_THERE edition. Date: 26/08/2014")
+ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.0. Date: 28/08/2014")
 ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added various maps. Tweaked various map-things.")
 ply:PrintMessage(HUD_PRINTTALK, "Running the GitHub version.")
 end )
 
 
 concommand.Add( "LaunchCanister", function(ply)
---print("[The Hunt]: Will go to you.")
 if ply:IsAdmin() then
 SpawnCanister(ply:GetPos())
 end
@@ -249,14 +242,14 @@ end
 end)
 
 concommand.Add( "LaunchMortar", function(ply)
-
 if ply:IsAdmin() then
 LaunchMortarRound(ply)
 end
-
 end)
 
 function LaunchMortarRound(ply)	// Find where the player is aiming.
+print("[The Hunt]: Experimental shit I didn't implemented yet. If it explodes, is your fault.")
+
 	local targetTrace = util.QuickTrace( ply:GetShootPos(), ply:GetUp(), ply )
 	
 	// If we hit the sky/walls/ceilings, don't bother.
@@ -479,17 +472,13 @@ print("[The Hunt]: h_npcscaledamage: "..GetConVarNumber("h_npcscaledamage").."")
 print("[The Hunt]: h_playerscaledamage: "..GetConVarNumber("h_playerscaledamage").."")
 print("[The Hunt]: h_lostplayertimeout: "..GetConVarNumber("h_lostplayertimeout").."")
 print("[The Hunt]: h_weaponoffset: "..GetConVarNumber("h_weaponoffset").."")
-print("[The Hunt]: h_autorepeat: "..GetConVarNumber("h_autorepeat").."")
 print("[The Hunt]: h_rpgmax: "..GetConVarNumber("h_rpgmax").."")
 print("[The Hunt]: h_maxgunshotinvestigate: "..GetConVarNumber("h_maxgunshotinvestigate").."")
 print("[The Hunt]: h_max_player_deaths: "..GetConVarNumber("h_max_player_deaths").."")
 print("[The Hunt]: h_punish_deaths_timer: "..GetConVarNumber("h_punish_deaths_timer").."")
-print("[The Hunt]: h_infinite_waves: "..GetConVarNumber("h_infinite_waves").."")
 print("[The Hunt]: h_time_between_waves: "..GetConVarNumber("h_time_between_waves").."")
-print("[The Hunt]: Friendly fire: "..GetConVarNumber("h_friendlyfire").."")
 print("[The Hunt]: Weapons that The Hunt spawns: ")
 PrintTable(MEDIUMWEAPONS)
-
 end)
 
 concommand.Add( "helpme", function(ply)
@@ -498,7 +487,6 @@ print("[The Hunt]: firstwave: starts the firstwave")
 print("[The Hunt]: h_fixtimers: use it if any feature stops working")
 print("[The Hunt]: infinitewave: starts the infinite wave system")
 print("[The Hunt]: h_version: Info about the current The Hunt version.")
-
 
 print("")
 print("[The Hunt]: Facepunch thread: http://facepunch.com/showthread.php?t=1394695")
@@ -749,7 +737,7 @@ end
 end
 
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
---timer.Simple(1, npcforget)
+timer.Simple(1, npcforget)
 ply:CreateRagdoll()
 ply:AddDeaths(1)
 NUMPLAYERS()
@@ -771,7 +759,7 @@ end
 
 table.foreach( ply:GetWeapons(), function(key,value)
 if key > 1 then
-print(value:GetClass())
+--print(value:GetClass())
 --SpawnItem(value:GetClass(), ply:GetPos()+Vector(math.random(-30,30),math.random(-30,30),20), Angle(0,0,0))
 ply:DropWeapon(value)
 end
@@ -820,9 +808,13 @@ end
 function KillCombine()
 for k, v in pairs(ents.FindByClass("npc_combine_s")) do
 v:Remove()
+COMBINE_KILLED = COMBINE_KILLED+1
+
 end
  for k, v in pairs(ents.FindByClass("npc_metropolice")) do
 v:Remove()
+COMBINE_KILLED = COMBINE_KILLED+1
+
 end
 end
 
@@ -888,18 +880,13 @@ OverwatchAmbientOne()
 		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
 	end)
 		if Wave == 5 or Wave == 6 then 
-				if GetConVarNumber("h_infinite_waves") == 1 then
 				infinitewavehandler()
-				end
 
 		end
 		end
 		
 function infinitewavehandler()
-	if COMBINE_KILLED > GetConVarNumber("h_combine_killed_to_win") then
-	PrintMessage(HUD_PRINTTALK, "You win!")
-	CanCheck = 0
-	else
+
 WAVESPAWN = 1
 CanCheck = 0
 Wave=6
@@ -925,7 +912,6 @@ end
 	end)
 	
 end
-end
 
 
 function CreateHeliPath(pos)
@@ -933,18 +919,14 @@ creating = ents.Create( "path_track" )
 creating:SetPos( pos )
 creating:Spawn()
 end
-function restorecombineassistance ()
-		if CombineAssisting > 0 then
-			CombineAssisting = 0
-		end
-end
+
 function hidezones()
 	for k, v in pairs(ents.FindByName("ZoneReveal") ) do
 	v:Remove()
 	end
 end
 function SpawnHeliA( pos,type,IsBoss,GunOnAtSpawn )
-RunConsoleCommand( "sk_helicopter_health", "1500") 
+RunConsoleCommand( "sk_helicopter_health", "1500")
 RunConsoleCommand( "g_helicopter_chargetime", "2") 
 RunConsoleCommand( "sk_helicopter_burstcount", "12") 
 RunConsoleCommand( "sk_helicopter_firingcone", "20") 
@@ -1014,6 +996,24 @@ end
 end
 end
 
+function SpawnDynamicResuply( pos )
+NPC = ents.Create( "item_dynamic_resupply" )
+NPC:SetPos( pos )
+NPC:SetKeyValue("DesiredHealth", 0.3)
+NPC:SetKeyValue("DesiredArmor", 0.25)
+NPC:SetKeyValue("DesiredAmmoPistol", 0)
+NPC:SetKeyValue("DesiredAmmoSMG1", 0.1)
+NPC:SetKeyValue("DesiredAmmoSMG1_Grenade", 0.1)
+NPC:SetKeyValue("DesiredAmmoAR2", 00)
+NPC:SetKeyValue("DesiredAmmoBuckshot", 0.1)
+NPC:SetKeyValue("DesiredAmmoRPG_Round", 0)
+NPC:SetKeyValue("DesiredAmmoGrenade",0.1)
+NPC:SetKeyValue("DesiredAmmo357", 0.3)
+NPC:SetKeyValue("DesiredAmmoCrossbow", 0.5)
+NPC:Spawn()
+
+end
+
 function SpawnScanner ( pos )
 NPC = ents.Create( "npc_cscanner" )
 NPC:SetPos( pos )
@@ -1025,7 +1025,6 @@ NPC:Fire("SetFollowTarget","Combine",0)
 NPC:Fire("EquipMine","",0)
 NPC:Fire("DeployMine","",0)
 NPC:Activate()
-timer.Create( "Scanner Wander", 1, 1, scannerwander ) 
 end
 function SpawnCombineSFlashlight ( pos )
 NPC = ents.Create( "npc_combine_s" )
@@ -1209,6 +1208,8 @@ combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
 NPC:Fire("StartPatrolling","",0)
+ 
+
 end
 
 function SpawnCombineShotgunner ( pos )
@@ -1225,6 +1226,8 @@ combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
 NPC:Fire("StartPatrolling","",0)
+ 
+
 end
 function SpawnCombineShotgunnerElite ( pos )
 NPC = ents.Create( "npc_combine_s" )
@@ -1240,6 +1243,8 @@ combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )	
 NPC:Fire("StartPatrolling","",0)
+ 
+
 end
 function SpawnMetropoliceStunstick( pos )
 NPC = ents.Create( "npc_metropolice" )
@@ -1257,6 +1262,8 @@ NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
 NPC:Fire("StartPatrolling","",0)
 NPC:Fire("ActivateBaton","",0)
+ 
+
 end
 function SpawnMetropolice( pos )
 NPC = ents.Create( "npc_metropolice" )
@@ -1273,6 +1280,8 @@ combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
 NPC:Fire("StartPatrolling","",0)
+ 
+
 end
 function SpawnMetropoliceHard( pos )
 NPC = ents.Create( "npc_metropolice" )
@@ -1289,6 +1298,8 @@ combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
 NPC:Fire("StartPatrolling","",0)
+ 
+
 end
 function SpawnRollermine( pos )
 NPC = ents.Create( "npc_rollermine" )
@@ -1333,6 +1344,7 @@ function SpawnCombineElite1( pos )
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )
 	NPC:Fire("StartPatrolling","",0)
+ 
 
 end
 function SpawnCombineElite2( pos )
@@ -1349,6 +1361,8 @@ function SpawnCombineElite2( pos )
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )
 	NPC:Fire("StartPatrolling","",0)
+	 
+
 end
 
 
@@ -1475,7 +1489,7 @@ end
 -- v PRE-PLAY THINGS
 
 function GM:PlayerSpawn(ply)
-	timer.Simple (1.3, npcforget)
+	--timer.Simple (1.3, npcforget)
 	ply:SetTeam(1)
     ply:SetCustomCollisionCheck(true)
 	ply:StripAmmo()
@@ -1503,7 +1517,7 @@ end
 -- CYCLES v
 function coverzones()
 timer.Create( "coverzones", 20, 0, coverzones ) 	
-print("[The Hunt]: Patrol Areas updated:")
+--print("[The Hunt]: Patrol Areas updated:")
 
 table.foreach(MainEnemiesGround, function(key,value)
 for k, v in pairs(ents.FindByClass(value)) do
@@ -1511,7 +1525,7 @@ for k, v in pairs(ents.FindByClass(value)) do
 
 	if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then	
 		if v:GetEnemy() then 
-			print(""..v:GetName().." is busy, cannot change patrol area")
+			--print(""..v:GetName().." is busy, cannot change patrol area")
 		else
 			v:SetLastPosition(table.Random(zonescovered) + Vector(math.random(-20,20), math.random(-20,20), -30))
 			if WAVESPAWN == 1 then
@@ -1519,7 +1533,7 @@ for k, v in pairs(ents.FindByClass(value)) do
 			else
 				v:SetSchedule(SCHED_FORCED_GO)
 			end
-		print(""..v:GetName().." changed patrol area")
+		--print(""..v:GetName().." changed patrol area")
 		end
 	end
 end
@@ -1610,22 +1624,17 @@ end
 
 function npcforget()
 print("[The Hunt]: npcforget APPLIED")
+table.foreach(MainEnemiesGround, function(key,enemy)
+for k, v in pairs(ents.FindByClass(enemy)) do 
+v:SetKeyValue("squadname", "")
+v:ClearEnemyMemory()
+v:SetSchedule(SCHED_MOVE_AWAY)
+end
+end)
 table.foreach(player.GetAll(), function(key,value)
 net.Start( "Hidden" )
 net.Send(value)
 value.spotted = 0
-end)
-table.foreach(MainEnemies, function(key,enemy)
-for k, v in pairs(ents.FindByClass(enemy)) do 
-v:SetKeyValue("squadname", "")
---if v:GetEnemy() then if v:GetEnemy():IsPlayer() then
---v:GetEnemy():PrintMessage(HUD_PRINTTALK, ""..v:GetName().." lost "..v:GetEnemy():GetName().."")
-v:ClearEnemyMemory()
-v:SetEnemy(nil)
-v:SetSchedule(SCHED_MOVE_AWAY)
---end
---end
-end
 end)
 end
 
@@ -1673,7 +1682,7 @@ print("[The Hunt]: Finished map setup function")
 if MAP_PROPS then
 print("[The Hunt]: found a props table, will add dynamic weapon spawnpoints. ")
 table.foreach(MAP_PROPS, function(key,propclass)
-for k, v in pairs(ents.FindByClass("prop_physics")) do
+for k, v in pairs(ents.GetAll()) do
 	if v:GetModel() == propclass then
 	table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,v:BoundingRadius()+20))
 	v:SetKeyValue("minhealthdmg", "9001")
@@ -1714,22 +1723,21 @@ if npc:GetEnemy() then
 	if npc:IsCurrentSchedule(SCHED_FORCED_GO) or npc:IsCurrentSchedule(SCHED_IDLE_WANDER) or npc:IsCurrentSchedule(SCHED_FORCED_GO_RUN)	then npc:ClearSchedule() end
 
 if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
-if npc:GetEnemy().spotted != 1 then
-if npc:GetEnemy():IsPlayer() then
-npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
-PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."")
-if table.Count(zonescovered) > 10 then table.remove(zonescovered, 1 ) print("patrol zone added") else print("zonescovered has less than 7 zones") end
-table.insert(zonescovered, npc:GetEnemy():GetPos()+Vector(0,0,30))
-net.Start("Spotted")
-net.Send(npc:GetEnemy())
-npc:GetEnemy().spotted = 1
-end
-end
 	if npc:HasCondition(10) then
+			if npc:GetEnemy().spotted != 1 then
+				if npc:GetEnemy():IsPlayer() then
+					npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
+					PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."")
+					if table.Count(zonescovered) > 10 then table.remove(zonescovered, 1 ) print("patrol zone added") else print("zonescovered has less than 7 zones") end
+					table.insert(zonescovered, npc:GetEnemy():GetPos()+Vector(0,0,30))
+					net.Start("Spotted")
+					net.Send(npc:GetEnemy())
+					npc:GetEnemy().spotted = 1
+				end
+			end
 		npc:SetKeyValue("squadname", "CombineSquad")
 		if timer.Exists("npcforgettimer") then
 		timer.Destroy( "npcforgettimer")
-		--print("[The Hunt]: npcforget STOPPED")
 		end
 		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),2000)) do 
 		if ThisEnt:GetClass() == "npc_combine_s" or ThisEnt:GetClass() == "npc_metropolice" then
@@ -1739,7 +1747,7 @@ end
 					ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
 					ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
 					CombineAssisting = CombineAssisting+1
-					-- print("[The Hunt]: Combines helping: "..CombineAssisting.." of "..GetConVarNumber("h_maxhelp").."")
+					--print("[The Hunt]: Combines helping: "..CombineAssisting.." of "..GetConVarNumber("h_maxhelp").."")
 					end
 				end
 		end
@@ -1755,7 +1763,6 @@ end
 end
 end
 end)
-
 timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo ) 
 end
 
@@ -1773,7 +1780,7 @@ for num, Heli in pairs(ents.FindByClass("npc_helicopter")) do
 if Heli:HasCondition(10) then
 nearbycombinecomeheli(Heli,Heli:GetEnemy())
 end
-elseif HeliCanSpotlight == 1 then Heli.light:Fire("Target", "", 0)
+else Heli.light:Fire("Target", "", 0)
 end
 end
 end
@@ -1853,32 +1860,12 @@ if HeliA then
 end
 
 
-function scannerwander()
-	for numA, scanner in pairs(ents.GetAll()) do
-		if scanner:GetName() == "Scanner" then
-			for numB, scannertarget in pairs(ents.FindInSphere(scanner:GetPos(), 25600)) do
-				if scannertarget:IsNPC() then
-					if scanner:GetEnemy() == nil && scannertarget:GetClass() == "npc_metropolice" || scannertarget:GetClass() == "npc_combine_s" then
-					scanner:Fire("SetFollowTarget",""..scannertarget:GetClass().."",0)
-					if mines != 1 then
-					scanner:Fire("EquipMine","",0)
-					scanner:Fire("DeployMine","",2)
-					local mines = 1
-					end
-					end
-				end
-			end
-		end
-	end
-timer.Create( "Scanner Wander", 30, 1, scannerwander )
-mines = 0
-end
 -- CYCLES ^
 
 -- GM HOOKS v
 function GM:OnNPCKilled(victim, killer, weapon)
 wavefinishedchecker()
-
+local victimpos = victim:GetPos()
 -- Uncomment to for-the-lulz explosion kills
 /*
 ent = ents.Create( "env_explosion" )
@@ -1890,7 +1877,6 @@ ent:Fire("Explode",0,0)
 */
 
 if victim:GetClass() == "npc_turret_floor" then
---print("[The Hunt]: turret killed")
 nearbycombinecome(victim)
 end
 if victim:GetClass() == "npc_turret_ceiling" then
@@ -1907,13 +1893,11 @@ if killer:IsNPC() then
 		end
 	end
 end
+
 if victim:GetClass() == "npc_metropolice" or victim:GetClass() == "npc_combine_s" then
+CombineAssisting = CombineAssisting/2
 COMBINE_KILLED = COMBINE_KILLED+1
 if killer:IsPlayer() then
-
-		--net.Start( "Hidden" )
-		--net.Send(killer)
-		--killer.spotted = 0
 		net.Start( "PlayerKillNotice" )
 		net.WriteString( ""..killer:GetName().."" )
 			if weapon:IsPlayer() then
@@ -1923,44 +1907,21 @@ if killer:IsPlayer() then
 			end
 		net.WriteString( ""..victim:GetName().."" )
 		net.Broadcast()
-		
-			local MAX=0
-			local TALK=0
-			local MAXCOME=0
-			for k, see in pairs(ents.FindInSphere(victim:GetPos(),256)) do
-				if see:GetClass() == "npc_combine_s" then
-					if !see:GetEnemy() then
-						if see:Visible(victim) and see:EntIndex() != victim:EntIndex() then 
-							if TALK<1  then
-							see:EmitSound(table.Random(CombineKilledSounds), 360, 100)
-							TALK=TALK+1
-							end
-							if MAX < 1 then
-								see:Fire("ThrowGrenadeAtTarget",""..tostring(victim:GetName()) .."",0)
-								see:SetEnemy(killer)
-								MAX=MAX+1
-							end
-							elseif MAXCOME<2 then
-							PrintMessage(HUD_PRINTTALK, ""..see:GetName()..": "..table.Random(CombineHearBreak).."")
-							see:SetLastPosition(victim:GetPos())
-							see:SetSchedule(SCHED_FORCED_GO_RUN)	
-							MAXCOME=MAXCOME+1							
-						end
-					elseif math.random (1,8) == 1 then
-							killer:SetName("player")
-							see:Fire("ThrowGrenadeAtTarget","player",0)
+
+			if !victim:GetEnemy() then
+			for k, v in pairs(ents.FindInSphere(victim:GetPos(),512)) do
+					if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then
+					if v:Visible(victim) then
+					v:SetLastPosition(victim:GetPos())
+					v:SetSchedule(SCHED_FORCED_GO_RUN)
 					end
-				end
+					end
 			end
-			if victim:GetEnemy() then
-				CombineAssisting = 0	
-				if killer:IsPlayer() and killer:Alive() then
-					if killer.sex == "male"  then
-						killer:EmitSound(table.Random(malecomments), 360, 100)
-					else
-						killer:EmitSound(table.Random(femalecomments), 360, 100)
+				nearbycombinecomecasual(victim) 
+					if math.random(1,2) == 1 then 
+						SpawnDynamicResuply(victim:GetPos()) 
 					end
-				end
+				else nearbycombinecome(victim)
 			end
 		end
 end
@@ -2001,7 +1962,7 @@ hook.Add("ScalePlayerDamage","ScalePlayerDamage", ScalePlayerDamage)
 
 function ScaleNPCDamage( damaged, hitgroup, damage )
 
-	table.foreach(MainEnemiesGround, function(key,value)
+	table.foreach(MainEnemiesDamage, function(key,value)
 	if damaged:GetClass() == value  then
 	if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) end -- flee from fire and friendly fire
 		if damaged:GetEnemy() == nil then
@@ -2101,7 +2062,7 @@ end
 if !damaged:IsNPC() and !damaged:IsPlayer() then
 if CAN_HEAR_BREAK == 1 then
 CAN_HEAR_BREAK = 0
-print("player hit "..damaged:GetClass().."")
+--print("player hit "..damaged:GetClass().."")
 nearbycombinecomecasual(damaged)
 timer.Simple(5, function() CAN_HEAR_BREAK = 1 end)
 end
@@ -2156,7 +2117,7 @@ if player:GetActiveWeapon():GetClass() == "weapon_crowbar" then
 if CAN_HEAR_BREAK == 1 then 
 local traceRes = util.QuickTrace(player:GetPos(), player:GetForward()*75, player)
 if traceRes.HitWorld then
-print(""..player:GetName().. " hit "..traceRes.Entity:GetClass().."")
+--print(""..player:GetName().. " hit "..traceRes.Entity:GetClass().."")
 CAN_HEAR_BREAK = 0
 timer.Simple(5, function() CAN_HEAR_BREAK = 1 end)
 nearbycombinecomecasual(player)

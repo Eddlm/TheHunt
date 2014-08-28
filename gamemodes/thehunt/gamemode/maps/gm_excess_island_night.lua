@@ -13,10 +13,7 @@ CombineFourthWave = 20
 CombineFifthWave = 1
 CombineInfiniteWave = 50
 
-HeliCanSpotlight = 1
-
 CUSTOMWAVESPAWN = 70
-DARKNESS = 2
 ITEMPLACES ={
 Vector(5598.376953, 845.021606, 169.564438),
 Vector(4811.672852, 2020.771118, -242.142380),
@@ -105,19 +102,6 @@ Vector(3292.492676, -2960.350830, 64.031250),
 Vector( 2775.436523, -3403.709473, 64.031250),
 }
 
-function GM:PlayerInitialSpawn(ply)
-ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Rebel forces located.")
-ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: CODE: Shoot to kill.")
-ply:PrintMessage(HUD_PRINTTALK, "HINT: RPG spawns on one of the islands.")
-end
-
-function MapSetup()
-table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value)
-for k, v in pairs(ents.FindByClass(value)) do
-print(v:GetClass())
-v:Remove()
-end
-end)
 
 SPECIALITEMPLACES = {Vector(2323.769531, -2851.547852, -255.968750),}
 MAP_PROPS = {"models/props_combine/breendesk.mdl","models/props_junk/wood_crate001a.mdl","models/props_c17/FurnitureDrawer001a.mdl",
@@ -129,10 +113,23 @@ MAP_PROPS = {"models/props_combine/breendesk.mdl","models/props_junk/wood_crate0
 "models/props_c17/furniturestove001a.mdl","models/props_junk/wood_crate002a.mdl","models/props_wasteland/kitchen_stove002a.mdl",
 "models/props_wasteland/laundry_dryer002.mdl","models/props_vehicles/wagon001a.mdl"}
 
-GOODCRATEITEMS = { "item_dynamic_resupply","weapon_frag", "weapon_slam","item_healthkit","weapon_357","item_ammo_smg1_grenade","item_box_buckshot","item_ammo_smg1_large","item_ammo_crossbow","item_ammo_ar2_large","item_ammo_ar2_altfire"}
 
-CRATEITEMS = { "weapon_357", "weapon_frag", "weapon_slam", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black", "npc_headcrab_", }
+function GM:PlayerInitialSpawn(ply)
+timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Protection team alert, evidence of anticivil activity in this island.") end )
+timer.Simple(4, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Code: assemble, plan, contain.") end )
+timer.Simple(8, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: A maximun of "..GetConVarNumber("h_combine_killed_to_win").." ground units are available for this mission.") end )
+timer.Simple(15, function()ply:PrintMessage(HUD_PRINTTALK, "Type !help to see the game mechanics. ") end )
+timer.Simple(30, function()ply:PrintMessage(HUD_PRINTTALK, "HINT: RPG spawns on one of the islands.") end )
 
+end
+
+function MapSetup()
+table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value)
+for k, v in pairs(ents.FindByClass(value)) do
+print(v:GetClass())
+v:Remove()
+end
+end)
 
 if math.random (1,2) == 1 then 
 		SpawnTurret(Vector(1296.726685, -3441.329834, 64.772011),Angle(0.292, 41.580, 0.428))
@@ -488,7 +485,7 @@ CreateHeliPath(Vector(-3027.587402, -1193.849854, 468.443207))
 CreateHeliPath(Vector(-6590.920410, -1198.241943, 1257.568970))
 CreateHeliPath(Vector(-6124.779297, -7889.253418, 1348.724365))
 
-SpawnHeliA( Vector(564.066650, 4525.123047, 1127.825195), "npc_combinegunship", 0,0 )
+SpawnHeliA( Vector(564.066650, 4525.123047, 1127.825195), "npc_helicopter", 0,0 )
 SpawnHeliA( Vector(1091.125977, -6795.336914, 1430.005615), "npc_helicopter", 0,0 )
 
 end
@@ -567,5 +564,18 @@ Wave = 6
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
 
+local NumHelis = 0
+for k, v in pairs(ents.FindByClass("npc_helicopter")) do
+NumHelis=NumHelis+1
+end
+
+for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
+NumHelis=NumHelis+1
+end
+
+if NumHelis > 0 then print("too much helis")
+else 
+SpawnHeliA(Vector(-3741.778320, 4829.747559, 2343.333008), ""..table.Random(AirEnemies).."" ,0,1)
+end
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end

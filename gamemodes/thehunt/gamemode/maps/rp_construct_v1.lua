@@ -1,23 +1,22 @@
-/*-------------------------------------------------------------------------------------
-To get the position and angles of a prop/npc/whatever:
-lua_run print("Entity: ") print(player.GetByID(1):GetEyeTrace().Entity) print("Position: ") print(player.GetByID(1):GetEyeTrace().Entity:GetPos()) print("Angles: ") print(player.GetByID(1):GetEyeTrace().Entity:GetAngles())
-
-To get a entity model:  
-lua_run print("Model: ") print(player.GetByID(1):GetEyeTrace().Entity:GetModel())
-
----------------------------------------------------------------------------------*/
---include( "basewaves.lua" )
-
 CombineFirstWave = 20
 CombineSecondWave = 25
 CombineThirdWave = 30
 CombineFourthWave = 40
 CombineFifthWave = 1
 CombineInfiniteWave = 50
+CUSTOMWAVESPAWN = 40
 
-HeliCanSpotlight = 1
 
-CUSTOMWAVESPAWN = 70
+
+SPECIALITEMPLACES = {}
+
+MAP_PROPS = {"models/props_combine/breendesk.mdl","models/props_junk/wood_crate001a.mdl","models/props_c17/FurnitureDrawer001a.mdl",
+"models/props_wasteland/prison_bedframe001b.mdl","models/props_c17/oildrum001.mdl","models/props_c17/FurnitureTable002a.mdl",
+"models/props_c17/furniturecouch001a.mdl","models/props_c17/furniturecouch002a.mdl","models/props_junk/trashdumpster01a.mdl",
+"models/props_vehicles/car005a.mdl","models/props_wasteland/kitchen_counter001d.mdl","models/props_vehicles/car005b_physics.mdl",
+"models/props_combine/combine_interface003.mdl","models/props_interiors/furniture_couch01a.mdl","models/props_c17/furniturewashingmachine001a.mdl",
+"models/props_interiors/furniture_couch02a.mdl","models/props_c17/furniturestove001a.mdl"}
+
 
 ITEMPLACES ={
 Vector(578.430237, -311.099823, -239.609344),
@@ -159,21 +158,19 @@ Vector(1781.668701, -2515.957275, 96.031250),
 Vector(1629.789063, -2267.988525, 96.031250)
 }
 
+
+
+
 function GM:PlayerInitialSpawn(ply)
-ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Suspects located.")
-ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: All squads, move in and exterminate.")
+timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Protection team alert, evidence of anticivil activity in this block.") end )
+timer.Simple(4, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Code: assemble, plan, contain.") end )
+timer.Simple(8, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: A maximun of "..GetConVarNumber("h_combine_killed_to_win").." ground units are available for this mission.") end )
+timer.Simple(15, function()ply:PrintMessage(HUD_PRINTTALK, "Type !help to see the game mechanics. ") end )
 end
 
-function MapSetup()
-RunConsoleCommand( "r_shadowdist", "200") 
-RunConsoleCommand( "r_shadowcolor", ('20 20 20')) 
-RunConsoleCommand( "sk_helicopter_health", "1500") 
-RunConsoleCommand( "g_helicopter_chargetime", "1.5") 
-RunConsoleCommand( "sk_helicopter_burstcount", "16") 
-RunConsoleCommand( "sk_helicopter_firingcone", "25") 
-RunConsoleCommand( "sk_helicopter_roundsperburst", "15") 
-RunConsoleCommand( "air_density", "0")
 
+
+function MapSetup()
 table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value)
 for k, v in pairs(ents.FindByClass(value)) do
 print(v:GetClass())
@@ -181,23 +178,7 @@ v:Remove()
 end
 end)
 
-SpawnHeliA( Vector(539.342224, -2375.450195, 1012.996094), "npc_helicopter" )
-HeliA:Fire("gunoff","",0)
 
-if HeliA:Health() != 1500 then print("WARNING: This Helicopter hasn't the adequeate health.") end
-
-SPECIALITEMPLACES = {}
-
-MAP_PROPS = {"models/props_combine/breendesk.mdl","models/props_junk/wood_crate001a.mdl","models/props_c17/FurnitureDrawer001a.mdl",
-"models/props_wasteland/prison_bedframe001b.mdl","models/props_c17/oildrum001.mdl","models/props_c17/FurnitureTable002a.mdl",
-"models/props_c17/furniturecouch001a.mdl","models/props_c17/furniturecouch002a.mdl","models/props_junk/trashdumpster01a.mdl",
-"models/props_vehicles/car005a.mdl","models/props_wasteland/kitchen_counter001d.mdl","models/props_vehicles/car005b_physics.mdl",
-"models/props_combine/combine_interface003.mdl","models/props_interiors/furniture_couch01a.mdl","models/props_c17/furniturewashingmachine001a.mdl",
-"models/props_interiors/furniture_couch02a.mdl","models/props_c17/furniturestove001a.mdl"}
-
-GOODCRATEITEMS = { "item_dynamic_resupply","weapon_frag", "weapon_slam","item_healthkit", "item_ammo_smg1_grenade","item_box_buckshot","item_ammo_smg1_large","item_ammo_crossbow","item_ammo_ar2_large","item_ammo_ar2_altfire"}
-
-CRATEITEMS = { "weapon_357", "weapon_frag", "weapon_slam", "item_ammo_smg1_grenade", "item_healthvial","npc_headcrab_black", "npc_headcrab_", }
 
 if math.random(1,2) == 1 then
 SpawnTurret(Vector(1496.894287, 1319.823853, -227.220932),Angle(0.269, -117.222, 0.266))
@@ -254,8 +235,8 @@ if math.random (1,2) == 1 then
 end
 SpawnItem("item_healthcharger", Vector(1442.846802, 1343.605225, -178.970917), Angle(0.034, -90.016, -0.241) )
 
-SpawnItem("button_turrets", Vector(469.687195, -1159.781738, 238.728470), Angle(-0.007, 90.082, -0.015))
 
+SpawnItem("button_turrets", Vector(469.687195, -1159.781738, 238.728470), Angle(-0.007, 90.082, -0.015))
 SpawnItem("item_rpg_round", Vector(1289.540405, -1148.637939, 442.318237), Angle(0.209, 144.091, 112.641) )
 SpawnItem("item_rpg_round", Vector(1297.625732, -1135.700928, 442.447449), Angle(0.388, -67.948, -90.403) )
 SpawnItem("item_rpg_round", Vector(1283.433960, -1132.527710, 443.898865), Angle(12.545, -150.060, 134.871) )
@@ -561,58 +542,32 @@ SpawnProp(Vector(667.403198, 464.681641, -111.304115),Angle(-0.311, 179.996, 0.0
 SpawnProp(Vector(873.661499, -2443.603271, 460.372314),Angle(-0.022, -179.870, -0.013),"models/props_c17/FurnitureDrawer001a.mdl")
 SpawnProp(Vector(1392.075439, -203.021103, 950.530823),Angle(-0.049, 91.267, 0.027),"models/props_c17/FurnitureTable002a.mdl")
 
-SpawnItem("info_player_start", Vector(1557.913452, 83.190407, 996.031250)+Vector(0,0,-45), Angle(3.110897, -178.019669, 0.027321
-))
-SpawnItem("info_player_start", Vector(595.753418, -2686.457764, 232.031250)+Vector(0,0,-45), Angle(2.721906, 90.817535, -0.065469
-))
-SpawnItem("info_player_start", Vector(-638.500000, 1556.130127, -45.968750)+Vector(0,0,-45), Angle(8.372471, 179.514114, 0.000000
-))
-SpawnItem("info_player_start", Vector(20.438599, -1762.399414, 232.031250)+Vector(0,0,-45), Angle(1.181992, -87.547379, 0.019990
-))
-SpawnItem("info_player_start", Vector(-464.221466, 2900.100342, 96.031250)+Vector(0,0,-45), Angle(3.373836, 91.291832, 0.027009
-))
-SpawnItem("info_player_start", Vector(1010.403992, 2090.431152, -163.968750)+Vector(0,0,-45), Angle(1.324578, -86.836121, 0.011959
-))
-SpawnItem("info_player_start", Vector(1175.774536, 2071.391602, -163.968750)+Vector(0,0,-45), Angle(0.029172, 4.443381, -0.037492
-))
-SpawnItem("info_player_start", Vector(526.708313, 32.512253, -207.968750)+Vector(0,0,-45), Angle(4.694943, -2.706146, 0.000000
-))
-SpawnItem("info_player_start", Vector(882.578613, -813.705566, -207.968750)+Vector(0,0,-45), Angle(-1.034407, 179.778625, 0.000000
-))
-SpawnItem("info_player_start", Vector(552.533936, -611.267334, -207.968750)+Vector(0,0,-45), Angle(2.225348, -0.692580, 0.000000
-))
-SpawnItem("info_player_start", Vector(1116.384521, -1182.843506, 232.031250)+Vector(0,0,-45), Angle(4.694696, 0.036617, 0.000000
-))
-SpawnItem("info_player_start", Vector(1961.392578, -521.523865, -45.968750)+Vector(0,0,-45), Angle(1.482541, 90.565125, 0.000000
-))
-SpawnItem("info_player_start", Vector(-881.830078, -522.277344, -45.968750)+Vector(0,0,-45), Angle(-1.085752, 89.972656, 0.000000
-))
-SpawnItem("info_player_start", Vector(-207.473755, -167.377960, -47.968750)+Vector(0,0,-45), Angle(9.730598, -174.950851, 0.000000
-))
-SpawnItem("info_player_start", Vector(-194.647171, -342.326965, 368.031250)+Vector(0,0,-45), Angle(5.140980, -0.050244, 0.000000
-))
-SpawnItem("info_player_start", Vector(1110.679443, -70.811409, 96.031250)+Vector(0,0,-45), Angle(-0.094357, 100.310219, 0.000000
-))
-SpawnItem("info_player_start", Vector(-229.891495, 662.801575, 96.031250)+Vector(0,0,-45), Angle(5.140990, -171.980484, 0.000000
-))
-SpawnItem("info_player_start", Vector(678.700378, 1599.695313, -45.968750)+Vector(0,0,-45), Angle(3.856872, -148.326385, 0.000000
-))
-SpawnItem("info_player_start", Vector(1939.606567, 1563.674561, -45.968750)+Vector(0,0,-45), Angle(2.869072, 0.633889, 0.000000
-))
-SpawnItem("info_player_start", Vector(1524.667358, 2603.045654, 96.031250)+Vector(0,0,-45), Angle(7.808131, 174.676956, 0.000000
-))
-SpawnItem("info_player_start", Vector(804.364563, 2531.447510, 96.031250)+Vector(0,0,-45), Angle(6.419950, -158.002594, 0.000000
-))
-SpawnItem("info_player_start", Vector(-309.213196, 2484.779297, 96.031250)+Vector(0,0,-45), Angle(3.955720, 50.214745, 0.000000
-))
-SpawnItem("info_player_start", Vector(-166.617783, 2135.998291, 232.031250)+Vector(0,0,-45), Angle(3.066700, -153.811676, 0.000000
-))
-SpawnItem("info_player_start", Vector(1455.071899, -87.888351, -3.968750)+Vector(0,0,-45), Angle(5.190490, 81.976158, 0.000000
-))
-SpawnItem("info_player_start", Vector(1262.431519, -141.011642, 564.031250)+Vector(0,0,-45), Angle(8.499659, -104.224197, 0.000000
-))
-SpawnItem("info_player_start", Vector(1127.729004, -1023.876160, 368.031250)+Vector(0,0,-45), Angle(5.042368, -58.488991, 0.000000
-))
+SpawnItem("info_player_start", Vector(1557.913452, 83.190407, 996.031250)+Vector(0,0,-45), Angle(3.110897, -178.019669, 0.027321))
+SpawnItem("info_player_start", Vector(595.753418, -2686.457764, 232.031250)+Vector(0,0,-45), Angle(2.721906, 90.817535, -0.065469))
+SpawnItem("info_player_start", Vector(-638.500000, 1556.130127, -45.968750)+Vector(0,0,-45), Angle(8.372471, 179.514114, 0.000000))
+SpawnItem("info_player_start", Vector(20.438599, -1762.399414, 232.031250)+Vector(0,0,-45), Angle(1.181992, -87.547379, 0.019990))
+SpawnItem("info_player_start", Vector(-464.221466, 2900.100342, 96.031250)+Vector(0,0,-45), Angle(3.373836, 91.291832, 0.027009))
+SpawnItem("info_player_start", Vector(1010.403992, 2090.431152, -163.968750)+Vector(0,0,-45), Angle(1.324578, -86.836121, 0.011959))
+SpawnItem("info_player_start", Vector(1175.774536, 2071.391602, -163.968750)+Vector(0,0,-45), Angle(0.029172, 4.443381, -0.037492))
+SpawnItem("info_player_start", Vector(526.708313, 32.512253, -207.968750)+Vector(0,0,-45), Angle(4.694943, -2.706146, 0.000000))
+SpawnItem("info_player_start", Vector(882.578613, -813.705566, -207.968750)+Vector(0,0,-45), Angle(-1.034407, 179.778625, 0.000000))
+SpawnItem("info_player_start", Vector(552.533936, -611.267334, -207.968750)+Vector(0,0,-45), Angle(2.225348, -0.692580, 0.000000))
+SpawnItem("info_player_start", Vector(1116.384521, -1182.843506, 232.031250)+Vector(0,0,-45), Angle(4.694696, 0.036617, 0.000000))
+SpawnItem("info_player_start", Vector(1961.392578, -521.523865, -45.968750)+Vector(0,0,-45), Angle(1.482541, 90.565125, 0.000000))
+SpawnItem("info_player_start", Vector(-881.830078, -522.277344, -45.968750)+Vector(0,0,-45), Angle(-1.085752, 89.972656, 0.000000))
+SpawnItem("info_player_start", Vector(-207.473755, -167.377960, -47.968750)+Vector(0,0,-45), Angle(9.730598, -174.950851, 0.000000))
+SpawnItem("info_player_start", Vector(-194.647171, -342.326965, 368.031250)+Vector(0,0,-45), Angle(5.140980, -0.050244, 0.000000))
+SpawnItem("info_player_start", Vector(1110.679443, -70.811409, 96.031250)+Vector(0,0,-45), Angle(-0.094357, 100.310219, 0.000000))
+SpawnItem("info_player_start", Vector(-229.891495, 662.801575, 96.031250)+Vector(0,0,-45), Angle(5.140990, -171.980484, 0.000000))
+SpawnItem("info_player_start", Vector(678.700378, 1599.695313, -45.968750)+Vector(0,0,-45), Angle(3.856872, -148.326385, 0.000000))
+SpawnItem("info_player_start", Vector(1939.606567, 1563.674561, -45.968750)+Vector(0,0,-45), Angle(2.869072, 0.633889, 0.000000))
+SpawnItem("info_player_start", Vector(1524.667358, 2603.045654, 96.031250)+Vector(0,0,-45), Angle(7.808131, 174.676956, 0.000000))
+SpawnItem("info_player_start", Vector(804.364563, 2531.447510, 96.031250)+Vector(0,0,-45), Angle(6.419950, -158.002594, 0.000000))
+SpawnItem("info_player_start", Vector(-309.213196, 2484.779297, 96.031250)+Vector(0,0,-45), Angle(3.955720, 50.214745, 0.000000))
+SpawnItem("info_player_start", Vector(-166.617783, 2135.998291, 232.031250)+Vector(0,0,-45), Angle(3.066700, -153.811676, 0.000000))
+SpawnItem("info_player_start", Vector(1455.071899, -87.888351, -3.968750)+Vector(0,0,-45), Angle(5.190490, 81.976158, 0.000000))
+SpawnItem("info_player_start", Vector(1262.431519, -141.011642, 564.031250)+Vector(0,0,-45), Angle(8.499659, -104.224197, 0.000000))
+SpawnItem("info_player_start", Vector(1127.729004, -1023.876160, 368.031250)+Vector(0,0,-45), Angle(5.042368, -58.488991, 0.000000))
 
 
 CreateHeliPath(Vector(1970.932129, 471.931458, 941.516479))
@@ -641,18 +596,15 @@ CreateHeliPath(Vector(1191.612549, 3307.030273, 554.492554))
 
 CreateHeliPath(Vector(421.747131, 2805.322021, 541.500732))
 CreateHeliPath(Vector(364.688873, 1667.821167, 687.147339))
+SpawnHeliA( Vector(539.342224, -2375.450195, 1012.996094), "npc_helicopter",0,0 )
 
-/*
-*/
 end
 
 function firstwave()
 Wave = 1
 SpawnMetropolice(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 
-WAVESPAWN = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
-
 end
 
 function secondwave()
@@ -664,7 +616,6 @@ Wave = 2
 	else
 		SpawnCombineS1(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
-WAVESPAWN = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
 
@@ -678,7 +629,6 @@ Wave = 3
 		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
 
-WAVESPAWN = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
 
@@ -691,28 +641,65 @@ Wave = 4
 	else
 		SpawnCombineElite1(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
-WAVESPAWN = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
 
 function fifthwave()
 Wave = 5
 RPGCANSPAWN = 1
-HeliA:Fire("gunon","",0)
-BossHeliAlive = 1
+
+for k, v in pairs(ents.FindByClass("npc_helicopter")) do v:Fire("gunon","",0) v.boss = 1 end
+for k, v in pairs(ents.FindByClass("npc_combinegunship")) do v:Fire("gunon","",0) v.boss = 1 end
+
+
+	if math.random (1,6) == 2 then 
+		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+	elseif math.random (1,6) == 2 then 
+		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+	else
+		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+	end
+
+
+local NumHelis = 0
+for k, v in pairs(ents.FindByClass("npc_helicopter")) do
+NumHelis=NumHelis+1
+end
+
+for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
+NumHelis=NumHelis+1
+end
+
+if NumHelis > 0 then print("too much helis")
+else 
+SpawnHeliA(Vector(-3741.778320, 4829.747559, 2343.333008), "npc_helicopter" ,0,1)
+end
 
 end
 
 function infinitewave()
 Wave = 6
+
 	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
+		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 	elseif math.random (1,6) == 2 then 
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
+		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 	else
-		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
+		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 	end
 
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
+
+local NumHelis = 0
+for k, v in pairs(ents.FindByClass("npc_helicopter")) do
+NumHelis=NumHelis+1
+end
+
+for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
+NumHelis=NumHelis+1
+end
+
+if NumHelis > 0 then print("too much helis")
+else 
+SpawnHeliA(Vector(-3741.778320, 4829.747559, 2343.333008), ""..table.Random(AirEnemies).."" ,0,1)
+end
 end
