@@ -16,7 +16,7 @@
 			"type"		"CheckBox"
 			"default"	"1"
 		}
-		3
+		2
 		{
 			"name"		"h_minenemies"
 			"text"		"Min. Enemies to win"
@@ -25,7 +25,7 @@
 			"default"	"3"
 		}
 		
-		4
+		3
 		{
 			"name"		"h_maxhelp"
 			"text"		"Max. Combine help"
@@ -34,7 +34,7 @@
 			"default"	"4"
 		}
 		
-		5
+		4
 		{
 			"name"		"h_npcscaledamage"
 			"text"		"NPC damage multiplier"
@@ -42,7 +42,7 @@
 			"type"		"Numeric"
 			"default"	"3"
 		}
-		6
+		5
 		{
 			"name"		"h_playerscaledamage"
 			"text"		"Player damage multiplier"
@@ -50,7 +50,7 @@
 			"type"		"Numeric"
 			"default"	"3"
 		}
-		7
+		6
 		{
 			"name"		"h_lostplayertimeout"
 			"text"		"Combine give up time "
@@ -58,7 +58,7 @@
 			"type"		"Numeric"
 			"default"	"10"
 		}		
-		8
+		7
 		{
 			"name"		"h_weaponoffset"
 			"text"		"Player - Weapons balance"
@@ -66,7 +66,7 @@
 			"type"		"Numeric"
 			"default"	"0"
 		}			
-		9
+		8
 		{
 			"name"		"h_rpgmax"
 			"text"		"Max RPG to spawn"
@@ -74,7 +74,7 @@
 			"type"		"Numeric"
 			"default"	"1"
 		}		
-		10
+		9
 		{
 			"name"		"h_maxgunshotinvestigate"
 			"text"		"Gunshot alerts NºCombine"
@@ -82,7 +82,7 @@
 			"type"		"Numeric"
 			"default"	"4"
 		}
-		11
+		10
 		{
 			"name"		"h_max_player_deaths"
 			"text"		"Max player deaths"
@@ -90,7 +90,7 @@
 			"type"		"Numeric"
 			"default"	"4"
 		}	
-		12
+		11
 		{
 			"name"		"h_punish_deaths_timer"
 			"text"		"Player dead punish time"
@@ -98,21 +98,21 @@
 			"type"		"Numeric"
 			"default"	"30"
 		}	
-		13
+		12
 		{
 			"name"		"h_time_between_waves"
 			"text"		"Time between waves"
 			"help"		"Enables the light based stealth system."
 			"type"		"Numeric"
-			"default"	"10"
+			"default"	"15"
 		}
-		14
+		13
 		{
 			"name"		"h_combine_killed_to_win"
 			"text"		"Combine limit:"
 			"help"		"When you reach this limit, you automatically win."
 			"type"		"Numeric"
-			"default"	"200"
+			"default"	"120"
 		}
 
 	}
