@@ -30,6 +30,8 @@ net.Receive( "Visible", function( length, client )
 	LIGHTCOLOR = Color(255,255,0)
 end )
 
+
+
 net.Receive( "PlayerKillNotice", function( len, ply )
 GAMEMODE:AddDeathNotice(net.ReadString(), 0, net.ReadString(), net.ReadString(), 1001)
 end)

@@ -10,13 +10,13 @@ util.AddNetworkString( "light_above_limit" )
 util.AddNetworkString( "Visible" )
 util.AddNetworkString( "NotVisible" )
 util.AddNetworkString( "PlayerKillNotice" )
+util.AddNetworkString( "Scoreboard" )
 
 util.PrecacheModel("models/Combine_Soldier.mdl")
 util.PrecacheModel("models/Combine_Super_Soldier.mdl")
 util.PrecacheModel("models/Police.mdl")
 
-CAN_HEAR_BREAK= 1
-COMBINE_KILLED = 0
+
 /*             notes
 
 
@@ -84,6 +84,18 @@ RunConsoleCommand( "sk_helicopter_roundsperburst", "5")
 RunConsoleCommand( "air_density", "0")
 RunConsoleCommand( "ai_norebuildgraph", "1")   
 
+EnemiesRemainining = 0
+combinen = 0
+CombineAssisting = 0
+ManuallySpawnedEntity = 0
+HeliAangered = 0
+CAN_HEAR_BREAK = 1
+team_silent_kills=0
+team_deaths =0
+team_kills =0
+COMBINE_KILLED = 0
+CAN_HEAR_BREAK = 1
+
 end
 
 -- WHAT-MAP-ARE-THEY-PLAYING CHECK v
@@ -102,12 +114,7 @@ end
 -- VARIABLES USED BY THE GAME v
 -- Don't touch them. They are edited in-game.
 VariedPos = Vector(math.random(-100,100),math.random(-100,100),0)
-EnemiesRemainining = 0
-combinen = 0
-CombineAssisting = 0
-ManuallySpawnedEntity = 0
-HeliAangered = 0
-CAN_HEAR_BREAK = 1
+
 -- VARIABLES USED BY THE GAME ^
 
 -- UTILITY COMMANDS v
@@ -117,9 +124,10 @@ for k,v in pairs( weapons.GetList() ) do
 print( v.ClassName )
 end 
 print("")
-end )
-concommand.Add( "dropweapons", function(player, command, arguments )
-player:DropWeapon( player:GetActiveWeapon() )
+end)
+
+concommand.Add( "h_dropweapon", function(ply, command, arguments )
+ManualWeaponDrop(ply)
 end )
 
 
@@ -185,7 +193,9 @@ end)
 print("")
 print("[The Hunt]: Plz report the bug to the Facepunch Thread, the autor itself or the workshop page.")
 end)
-
+concommand.Add( "h_restartgame", function(ply)
+autofirstwave()
+end)
 concommand.Add( "Spotted", function(ply)
 if ply:IsAdmin() then
 net.Start( "Spotted" )
@@ -474,7 +484,7 @@ print("[The Hunt]: h_lostplayertimeout: "..GetConVarNumber("h_lostplayertimeout"
 print("[The Hunt]: h_weaponoffset: "..GetConVarNumber("h_weaponoffset").."")
 print("[The Hunt]: h_rpgmax: "..GetConVarNumber("h_rpgmax").."")
 print("[The Hunt]: h_maxgunshotinvestigate: "..GetConVarNumber("h_maxgunshotinvestigate").."")
-print("[The Hunt]: h_max_player_deaths: "..GetConVarNumber("h_max_player_deaths").."")
+print("[The Hunt]: h_max_team_deaths: "..GetConVarNumber("h_max_team_deaths").."")
 print("[The Hunt]: h_punish_deaths_timer: "..GetConVarNumber("h_punish_deaths_timer").."")
 print("[The Hunt]: h_time_between_waves: "..GetConVarNumber("h_time_between_waves").."")
 print("[The Hunt]: Weapons that The Hunt spawns: ")
@@ -742,7 +752,9 @@ ply:CreateRagdoll()
 ply:AddDeaths(1)
 NUMPLAYERS()
 ply.canspawn = 0
-
+ply.lifes=ply.lifes-1
+ply.deaths=ply.deaths+1
+team_deaths=team_deaths+1
 
 if attacker:IsNPC() then
 attacker:EmitSound(table.Random(CombineKillSounds), 100, 100)
@@ -758,11 +770,15 @@ end
 
 
 table.foreach( ply:GetWeapons(), function(key,value)
-if key > 1 then
---print(value:GetClass())
---SpawnItem(value:GetClass(), ply:GetPos()+Vector(math.random(-30,30),math.random(-30,30),20), Angle(0,0,0))
-ply:DropWeapon(value)
-end
+	if key > 1 then
+		if value:Clip1() then
+			if value:Clip1() == 0 then
+				value:Remove()
+				else
+				ply:DropWeapon(value)
+			end
+		end
+	end
 end)
 
 
@@ -774,19 +790,18 @@ ply:SetMoveType(10)
 ply:SpectateEntity(attacker)
 end
 if PLAYERSINMAP > 1 then
-if GetConVarNumber("h_max_player_deaths") == ply:Deaths() or ply:Deaths() > GetConVarNumber("h_max_player_deaths")  then
-ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left. You will respawn in "..GetConVarNumber("h_punish_deaths_timer").." seconds.")
+if ply.lifes == 0  then
+ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left, so you have to wait until the round ends.")
 ply:PrintMessage(HUD_PRINTTALK, "While you wait, think on a better strategy for the next time.")
-
+/*
 	timer.Simple(GetConVarNumber("h_punish_deaths_timer"), function()
 	ply.canspawn = 1
-	ply:SetDeaths(0)
-	ply:SetFrags(0)
+	ply.lifes = GetConVarNumber("h_player_lifes")
 	ply:PrintMessage(HUD_PRINTTALK, "You can spawn now.")
 	end)
- 
+*/
 else
-ply:PrintMessage(HUD_PRINTTALK, "You have "..GetConVarNumber("h_max_player_deaths") - ply:Deaths().." lifes left.")
+ply:PrintMessage(HUD_PRINTTALK, "You have "..ply.lifes.." lifes left.")
 ply.canspawn = 1
 end
 else
@@ -821,11 +836,34 @@ end
 function autofirstwave()
 timer.Create( "firstwave", 1, CombineFirstWave, firstwave )
 WAVESPAWN = 1
+Wave = 1
+combinen = 0
+CAN_HEAR_BREAK = 1
+team_silent_kills=0
+team_deaths =0
+team_kills =0
+COMBINE_KILLED = 0
+cansilentkillreward = 1
 timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
 timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
 end
-
+function PlayerDefeat()
+PrintMessage(HUD_PRINTTALK, "All players are dead!")
+timer.Simple( 20, autofirstwave)
+game.CleanUpMap()
+timer.Simple( 2, MapSetup)
+end
 function wavefinishedchecker()
+if PLAYERSINMAP > 1 then
+	local players_defeated = 1
+	table.foreach(player.GetAll(), function(key,value)
+	if value:Alive() then players_defeated = 0 end
+	end)
+	if players_defeated == 1  then 
+	PlayerDefeat()
+	CanCheck = 0
+	end
+end
 timer.Create( "wavefinishedchecker", 10, 1, wavefinishedchecker)
 EnemiesRemainining=0
 local BossHeliAlive=0
@@ -844,12 +882,26 @@ end)
 			end
 if BossHeliAlive == 0 or BossHeliAlive == nil then
 if CanCheck == 1 then 
-	if EnemiesRemainining < GetConVarNumber("h_minenemies") then 
+	if EnemiesRemainining < GetConVarNumber("h_minenemies") then
+	if GetConVarNumber("h_hardcore") == 0 then
+	table.foreach(player.GetAll(), function(key,value)
+	value.canspawn = 1
+	value.lifes=GetConVarNumber("h_player_lifes")
+	if !value:Alive() then value:PrintMessage(HUD_PRINTTALK, "You can spawn now.") end end)
+	end
 	if COMBINE_KILLED > GetConVarNumber("h_combine_killed_to_win") then
+	
+	local yeah = table.Random(player.GetAll())
+	if table.Random(player.GetAll()).sex == "male" then table.Random(player.GetAll()):EmitSound(table.Random(malewin), 100, 100) else
+	table.Random(player.GetAll()):EmitSound(table.Random(femalewin), 100, 100)
+	end
+	
 	PrintMessage(HUD_PRINTTALK, "[Overwatch]: Attention: Mission failure. More than "..GetConVarNumber("h_combine_killed_to_win").." ground units have been lost.")
 	PrintMessage(HUD_PRINTTALK, "[Overwatch]: Remaining units, cease aggression and return.")
-	timer.Simple(10, function() PrintMessage(HUD_PRINTTALK, "[Eddlm]: You won! You killed "..COMBINE_KILLED.." combine! Thanks for playing. In next versions, a scoreboard will appear here.") end)
-	timer.Simple(25, function() PrintMessage(HUD_PRINTTALK, "[Eddlm]: Now that you played, you can submit your suggestions to Facepunch, The Hunt Workshop page, or contact myself. I'm always willing to improve this gamemode.") end)
+	timer.Simple(13, function() PrintMessage(HUD_PRINTTALK, "[Eddlm]: Congratulations, you won! You prevented the combine raid. Here's the statistics:") end)
+	timer.Simple(16, function()	TeamStats() end)
+--	timer.Simple(20+(PLAYERSINMAP*10), EndgameStatistics)
+-- timer.Simple(33+(PLAYERSINMAP*10), function() PrintMessage(HUD_PRINTTALK, "[Eddlm]: Now that you played, you can submit your suggestions to Facepunch, The Hunt Workshop page, or contact myself. I'm always willing to improve this gamemode.") end)
 	CanCheck = 0
 	else
 	waveend()
@@ -860,8 +912,173 @@ end
 end
 end
 
+
+function TestStats()
+local total_silent_kills = 20
+local total_player_killed = 10
+local total_combine_killed = 100
+
+local numplayers = 10
+local playerfrags = 100
+local playersilentfrags = 20
+local playerdeaths = 1
+local killpercent = ((playerfrags+playersilentfrags)/total_combine_killed)*100
+local deathpercent = (playerdeaths/total_player_killed)*100
+
+local teamscore = (total_combine_killed+(total_silent_kills*3))-(total_player_killed*(2*numplayers))
+local player_points = ((playerfrags+(playersilentfrags*3)-playerdeaths*2))
+
+PrintMessage(HUD_PRINTTALK, "With "..numplayers.." members, this team killed "..total_combine_killed.." combine and died "..total_player_killed.." times.")
+PrintMessage(HUD_PRINTTALK, "Team score: "..teamscore.."")
+
+for k,player in pairs( player.GetAll() ) do
+if playerdeaths == 0 then bonus = 50 end
+
+PrintMessage(HUD_PRINTTALK, "Edd stats:")
+PrintMessage(HUD_PRINTTALK, "Edd killed "..playerfrags+playersilentfrags.." Combine. ("..killpercent.."% of the team kills).")
+if playerdeaths == 0 then
+PrintMessage(HUD_PRINTTALK, "Edd survived the entire game!")
+else
+PrintMessage(HUD_PRINTTALK, "Edd was killed "..playerdeaths.." times ("..deathpercent.."% of the team deaths).")
+end
+PrintMessage(HUD_PRINTTALK, "Edd score: "..player_points.." points.")
+if (playersilentfrags/playerfrags)*100 > 50 then
+PrintMessage(HUD_PRINTTALK, "Special mention: Silent kills ("..math.Round(((playersilentfrags/playerfrags)*100)) .."%)")
+end
+ --PrintMessage(HUD_PRINTTALK, "Eficiency "..(((playerfrags/(total_combine_killed/numplayers)*100) + (100 - (((playerdeaths/total_player_killed) * 100)))) /2).."")
+ --(((playerfrags/(total_combine_killed/numplayers)*100) + (100 - (((playerdeaths/total_player_killed) * 100)))) /2)
+
+end
+
+end
+
+
+function TeamStats()
+teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
+
+PrintMessage(HUD_PRINTTALK, "With "..PLAYERSINMAP.." members, this team killed "..team_kills+team_silent_kills.." combine and died "..team_deaths.." times.")
+PrintMessage(HUD_PRINTTALK, "Team score: "..teamscore.."")
+
+local MostKills = 0 
+local BestPlayer
+local MostDeaths = 0
+local WorstPlayer
+local MostSilentKills = 0
+local MostSilentPlayer
+for k,v in pairs( player.GetAll() ) do  
+	local Frags = v:Frags()       // Getting a player's frags
+	if Frags > MostKills then     // If it's higher then the current MostKills then
+		MostKills = Frags     // Make it the new MostKills
+		BestPlayer = v:Name() // And make the player the new BestPlayer
+	end
+end
+for k,v in pairs( player.GetAll() ) do  
+	local Deaths = v.deaths      // Getting a player's frags
+	if Deaths > MostDeaths then     // If it's higher then the current MostKills then
+		MostDeaths = Deaths     // Make it the new MostKills
+		WorstPlayer = v:Name() // And make the player the new BestPlayer
+	end
+end
+for k,v in pairs( player.GetAll() ) do
+	local SilentKills = v.SilentKills     // Getting a player's frags
+	if SilentKills > MostSilentKills then     // If it's higher then the current MostKills then
+		MostSilentKills = SilentKills     // Make it the new MostKills
+		MostSilentPlayer = v:Name() // And make the player the new BestPlayer
+	end
+end
+
+
+if MostKills != 0 then
+	PrintMessage(HUD_PRINTTALK, "" .. BestPlayer .. " has the most kills with " .. tostring(MostKills) .. " combine defeated!") 
+else PrintMessage(HUD_PRINTTALK, "Noone killed anything for now.") 
+end
+if MostSilentKills != 0 then 
+	PrintMessage(HUD_PRINTTALK, ""..MostSilentPlayer.." has the most silent kills, "..tostring(MostSilentKills)..".")
+else PrintMessage(HUD_PRINTTALK, "Not a single silent kill for now.") 
+end
+
+if MostDeaths != 0 then
+	PrintMessage(HUD_PRINTTALK, "" .. WorstPlayer .. " has died the most,  " .. tostring(MostDeaths) .. " times.") 
+else PrintMessage(HUD_PRINTTALK, "None of the rebels has been killed in this game! Congratulations!") 
+end
+
+timer.Simple(6, function() PrintMessage(HUD_PRINTTALK, "You can check the scoreboard by typing !score.") end)
+end
+
+
+function PlayerStats(ply)
+for k,ply in pairs( player.GetAll() ) do  
+
+local killpercent = ((ply.Kills+ply.SilentKills)/(team_kills+team_silent_kills))*100
+local deathpercent = (ply.deaths/team_deaths)*100
+local ply_points = ((ply.Kills+(ply.SilentKills*3)-ply.deaths*2))
+
+ply:PrintMessage(HUD_PRINTTALK, "You killed "..ply.Kills+ply.SilentKills.." Combine. ("..math.Round(killpercent).."% of the team kills).")
+if ply.deaths == 0 then
+ply:PrintMessage(HUD_PRINTTALK, "You survived the entire game!")
+else
+ply:PrintMessage(HUD_PRINTTALK, "You were killed "..ply.deaths.." times ("..math.Round(deathpercent).."% of the team deaths).")
+end
+ply:PrintMessage(HUD_PRINTTALK, "Your score: "..ply_points.." points.")
+if (ply.SilentKills/(ply.Kills+ply.SilentKills))*100 > 50 and(ply.SilentKills > 0 and ply.Kills > 0) then
+ply:PrintMessage(HUD_PRINTTALK, "Special mention: Silent kills ("..math.Round(((ply.SilentKills/(ply.Kills+ply.SilentKills))*100)) .."%)")
+end
+end
+end
+
+function EndgameStatistics()
+local MostKills = 0 
+local BestPlayer
+local MostDeaths = 0
+local WorstPlayer
+local MostSilentKills = 0
+local MostSilentPlayer
+for k,v in pairs( player.GetAll() ) do  
+	local Frags = v:Frags()       // Getting a player's frags
+	if Frags > MostKills then     // If it's higher then the current MostKills then
+		MostKills = Frags     // Make it the new MostKills
+		BestPlayer = v:Name() // And make the player the new BestPlayer
+	end
+end
+for k,v in pairs( player.GetAll() ) do  
+	local Deaths = v.deaths      // Getting a player's frags
+	if Deaths > MostDeaths then     // If it's higher then the current MostKills then
+		MostDeaths = Deaths     // Make it the new MostKills
+		WorstPlayer = v:Name() // And make the player the new BestPlayer
+	end
+end
+for k,v in pairs( player.GetAll() ) do
+	local SilentKills = v.SilentKills     // Getting a player's frags
+	if  SilentKills > MostSilentKills then     // If it's higher then the current MostKills then
+		MostSilentKills = SilentKills     // Make it the new MostKills
+		MostSilentPlayer = v:Name() // And make the player the new BestPlayer
+	end
+end
+
+
+if MostKills != 0 then
+	PrintMessage(HUD_PRINTTALK, "" .. BestPlayer .. " has the most kills with " .. tostring(MostKills) .. " combine defeated!") 
+else PrintMessage(HUD_PRINTTALK, "Noone killed anything for now.") 
+end
+if MostSilentKills != 0 then 
+	PrintMessage(HUD_PRINTTALK, ""..MostSilentPlayer.." has the most silent kills, "..tostring(MostSilentKills)..".")
+else PrintMessage(HUD_PRINTTALK, "Not a single silent kill for now.") 
+end
+
+if MostDeaths != 0 then
+	PrintMessage(HUD_PRINTTALK, "" .. WorstPlayer .. " has died the most,  " .. tostring(MostDeaths) .. " times.") 
+else PrintMessage(HUD_PRINTTALK, "None of the rebels has been killed in this game! Congratulations!") 
+end
+
+end
+ 
+ /*
+  ((((Team kills/Player kills) /Players)*100) + 100 - (((Player deaths/Team deaths) * 100)) /2 = Eficiency%)
+ (((((COMBINE_KILLED/player:Frags)/PLAYERSINMAP)*100) + 100 - (((team_deaths/player:Deaths) * 100)) /2 = Eficiency%))
+ */
 function waveend()
 WAVESPAWN = 1
+
 OverwatchAmbientOne()
 		if Wave < 5 then
 			PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..Wave.." proven unable to contain hostiles.")
@@ -890,8 +1107,6 @@ function infinitewavehandler()
 WAVESPAWN = 1
 CanCheck = 0
 Wave=6
-
-
 if INFINITE_ACHIEVED == 1 then
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: "..table.Random(OVERWATCH_TAUNTS).."")
 end
@@ -1009,7 +1224,7 @@ NPC:SetKeyValue("DesiredAmmoBuckshot", 0.1)
 NPC:SetKeyValue("DesiredAmmoRPG_Round", 0)
 NPC:SetKeyValue("DesiredAmmoGrenade",0.1)
 NPC:SetKeyValue("DesiredAmmo357", 0.3)
-NPC:SetKeyValue("DesiredAmmoCrossbow", 0.5)
+NPC:SetKeyValue("DesiredAmmoCrossbow", 0.2)
 NPC:Spawn()
 
 end
@@ -1206,7 +1421,7 @@ NPC:Spawn()
 NPC:Give("ai_weapon_ar2")
 combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
-NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
+NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_AVERAGE )	
 NPC:Fire("StartPatrolling","",0)
  
 
@@ -1502,6 +1717,7 @@ function GM:PlayerSpawn(ply)
 	ply:SetCrouchedWalkSpeed(0.3)
 	ply:AllowFlashlight(true)
 	ply:SetNoCollideWithTeammates(1)
+	
 if math.random(1,2) == 1 then
 ply:SetModel(table.Random(playermodelsmale) )
 ply.sex="male"
@@ -1695,6 +1911,8 @@ end)
 else 
 print("[The Hunt]: MAP_PROPS not found, will not add dynamic weapon spawnpoints.")
 end
+
+ORIGINAL_ZONES_NUMBER = table.Count(zonescovered)
 print("---------------THE HUNT LOADED-------------")
 
 end
@@ -1728,8 +1946,15 @@ if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
 				if npc:GetEnemy():IsPlayer() then
 					npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
 					PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."")
-					if table.Count(zonescovered) > 10 then table.remove(zonescovered, 1 ) print("patrol zone added") else print("zonescovered has less than 7 zones") end
-					table.insert(zonescovered, npc:GetEnemy():GetPos()+Vector(0,0,30))
+					if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+5 then
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					print("Patrol zones restarted")
+					end					
+					table.insert(zonescovered, npc:GetEnemy():GetPos()+Vector(0,0,30)) print("Patrol zone added")
 					net.Start("Spotted")
 					net.Send(npc:GetEnemy())
 					npc:GetEnemy().spotted = 1
@@ -1780,7 +2005,7 @@ for num, Heli in pairs(ents.FindByClass("npc_helicopter")) do
 if Heli:HasCondition(10) then
 nearbycombinecomeheli(Heli,Heli:GetEnemy())
 end
-else Heli.light:Fire("Target", "", 0)
+elseif Heli.light then Heli.light:Fire("Target", "", 0)
 end
 end
 end
@@ -1909,9 +2134,17 @@ if killer:IsPlayer() then
 		net.Broadcast()
 
 			if !victim:GetEnemy() then
+			killer.SilentKills=killer.SilentKills+1 team_silent_kills=team_silent_kills+1
+			if killer.sex == "male" then killer:EmitSound(table.Random(malecomments), 100, 100) else
+			killer:EmitSound(table.Random(femalecomments), 100, 100)
+			end
+
 			for k, v in pairs(ents.FindInSphere(victim:GetPos(),512)) do
 					if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then
 					if v:Visible(victim) then
+					v:SetLastPosition(killer:GetPos())
+					v:SetSchedule(SCHED_FORCED_GO_RUN)
+					else
 					v:SetLastPosition(victim:GetPos())
 					v:SetSchedule(SCHED_FORCED_GO_RUN)
 					end
@@ -1919,13 +2152,19 @@ if killer:IsPlayer() then
 			end
 				nearbycombinecomecasual(victim) 
 					if math.random(1,2) == 1 then 
-						SpawnDynamicResuply(victim:GetPos()) 
+						SpawnDynamicResuply(victim:GetPos())
+						elseif cansilentkillreward != 0 then
+						cansilentkillreward = 0
+						timer.Simple(10, function() cansilentkillreward = 1 end)
+						SpawnItem(table.Random(SILENTKILLREWARD), victim:GetPos(), Angle(0,0,0))
 					end
-				else nearbycombinecome(victim)
+				else
+					nearbycombinecome(victim) killer.Kills=killer.Kills+1
+					team_kills=team_kills+1
 			end
 		end
+		killer:AddFrags(1)
 end
-if killer:IsPlayer() then killer:AddFrags(1) end
 end
 
 function GM:PlayerSelectSpawn( pl )
@@ -1990,26 +2229,14 @@ if damaged:Health() < 800 and damaged:Health() > 650 then
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: Air enforcement unit, you are now free to employ aggresive containment tactics.")
 
 RunConsoleCommand( "g_helicopter_chargetime", "1") 
---daaged:Fire("BlindfireOn","",0)
---damaged:Fire("SetPenetrationDepth","200",0)
 RunConsoleCommand( "g_helicopter_chargetime", "1") 
 RunConsoleCommand( "sk_helicopter_burstcount", "10") 
 RunConsoleCommand( "sk_helicopter_firingcone", "2") 
 RunConsoleCommand( "sk_helicopter_roundsperburst", "5") 
 damaged:SetKeyValue( "patrolspeed", "5000" )
 damaged.spotlight:Fire("LightOff","",0)
-damaged.spotlight = ents.Create( "point_spotlight" )
-damaged.spotlight:SetPos(damaged:GetPos()+(damaged:GetForward()*150+Vector(0,0,-50)))
-damaged.spotlight:SetAngles(damaged:GetAngles()+Angle(30,0,0))
-damaged.spotlight:SetParent(damaged)
-damaged.spotlight:SetKeyValue( "spawnflags", "1" )
-damaged.spotlight:SetKeyValue( "SpotlightWidth", "50" )
-damaged.spotlight:SetKeyValue( "SpotlightLength", "200" )
-damaged.spotlight:SetKeyValue("rendercolor", "255 0 0")
-damaged.spotlight:Spawn()
-damaged.spotlight:Activate()
 if damaged.light then
-damaged.light:SetKeyValue("lightcolor", "255 0 0") 
+damaged.light:SetKeyValue("lightcolor", "0 0 0") 
 end
 
 /* -- Original "Heli tries to crash on you" code. Doesn't work for now.
@@ -2058,6 +2285,10 @@ function GM:EntityTakeDamage(damaged,damage)
 if damage:GetAttacker():GetClass() == "monster_apc" then
 damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
 end
+
+	if damaged:IsNPC() and (damage:GetDamage() < damaged:Health()) then
+	damaged:SetEnemy(damage:GetAttacker())
+	end
 
 if !damaged:IsNPC() and !damaged:IsPlayer() then
 if CAN_HEAR_BREAK == 1 then
@@ -2111,8 +2342,12 @@ end
 
 
 function GM:KeyPress(player,key)
+
 if player:Alive() then
+local clip = player:GetActiveWeapon():Clip1()
+local loud = 1
 if key == IN_ATTACK then
+if player:Alive() then
 if player:GetActiveWeapon():GetClass() == "weapon_crowbar" then
 if CAN_HEAR_BREAK == 1 then 
 local traceRes = util.QuickTrace(player:GetPos(), player:GetForward()*75, player)
@@ -2124,21 +2359,74 @@ nearbycombinecomecasual(player)
 end
 end
 end
-if player:GetActiveWeapon():Clip1() > 0 then
-				local silent=0
-				table.foreach(SILENT_WEAPONS, function(key,value)
-				if player:GetActiveWeapon():GetClass() == value then
-				silent=1
-				--print("[The Hunt]: combine not come")
-				end
-				end)
-				if silent==0 then
-				--print("[The Hunt]: combine come (not silent)")
-				allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate"))
-				end
-end
-end
 
+table.foreach(SILENT_WEAPONS, function(key,value)
+if player:GetActiveWeapon():GetClass() == value then
+loud = 0
+end
+end)
+if loud > 0 then
+timer.Simple(0.1, function()
+if player:GetActiveWeapon():Clip1() then
+if player:GetActiveWeapon():Clip1() < clip then
+if player:GetActiveWeapon():Clip1() > -1 then
+local silenced = 0
+	if player:GetActiveWeapon().Silenced == true then print("Silenced 1") silenced = 1 end
+	if player:GetActiveWeapon():GetClass() == "pspak_mp9" then print("Silenced 2") silenced = 1 end
+	if player:GetActiveWeapon().Primary then 
+		if player:GetActiveWeapon().Primary.Sound == "Weapon_USP.SilencedShot" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" then print("Silenced 3") silenced = 1 end 
+	end
+	if player:GetActiveWeapon().dt then
+			if player:GetActiveWeapon().dt.Suppressed == true then print("Silenced 4") silenced = 1 end
+	end
+	if silenced == 0 then
+	print("NOT Silenced")
+	allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate")) 
+	end
+	if silenced == 1 then
+	nearbycombinecomecasual(player)
+	end
+end	
+end
+end
+end)
+end
+--
+/*
+if player:GetActiveWeapon():Clip1() > 0 then
+local silenced = 0
+	if player:GetActiveWeapon().Silenced == true then print("yes") silenced = 1 end
+	if player:GetActiveWeapon():GetClass() == "pspak_mp9" then silenced = 1 end
+	if player:GetActiveWeapon().Primary then 
+		if player:GetActiveWeapon().Primary.Sound == "Weapon_USP.SilencedShot" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" then silenced = 1 end 
+	end
+	if player:GetActiveWeapon().dt then
+			if player:GetActiveWeapon().dt.Suppressed == true then silenced = 1 end
+	end
+			
+				if silenced == 0 then
+				--print("[The Hunt]: combine come (not silent)")
+				local clip = player:GetActiveWeapon():Clip1()
+				timer.Simple(0.2, function() if player:GetActiveWeapon():Clip1() < clip then 				allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate")) end end)
+				elseif silenced == 1 then
+				nearbycombinecomecasual(player)
+				end
+end
+*/
+--
+/*
+if player:GetActiveWeapon():Clip1() == 0 then
+local showhelp = 1
+table.foreach(VanillaWeapons, function(key,value)
+if player:GetActiveWeapon():GetClass() == value then
+showhelp = 0
+end
+end)
+if showhelp == 1 then PrintMessage(HUD_PRINTTALK, "[Eddlm]: This weapon does not have ammo. Say !drop to remove it from your inventary and let the game spawn it again.") end
+end
+*/
+end
+end
 		if key == IN_ATTACK2 then
 			if player:GetAmmoCount(player:GetActiveWeapon():GetSecondaryAmmoType()) > 0 or (player:GetActiveWeapon():GetClass() == "weapon_shotgun") then
 					table.foreach(SECONDARY_FIRE_WEAPONS, function(key,value)
@@ -2158,6 +2446,7 @@ end
 		end
 		end
 		end
+
 end
 end
 
@@ -2175,6 +2464,11 @@ end
 -- GM HOOKS ^
 
 function FirstSpawn(ply)
+ply.deaths=0
+ply.Kills=0
+ply.SilentKills=0
+ply.lifes=GetConVarNumber("h_player_lifes")
+NUMPLAYERS()
 if DARKNESS then
 ply:SendLua("CLDARKNESS="..DARKNESS.."" )
 end

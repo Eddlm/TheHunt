@@ -64,7 +64,7 @@ v:Remove()
 end
 end
 
-SpawnHeliA( Vector(356.599335, 2395.603760, 672.474854), "npc_helicopter", 0 )
+SpawnHeliA( Vector(356.599335, 2395.603760, 672.474854), "npc_helicopter", 0 ,0)
 HeliA:Fire("gunoff","",0)
 
 if HeliA:Health() != 1500 then print("WARNING: This Helicopter hasn't the adequeate health.") end
@@ -329,8 +329,8 @@ function fifthwave()
 Wave = 5
 RPGCANSPAWN = 1
 HeliA:Fire("gunon","",0)
-BossHeliAlive = 1
-HeliA.boss = 1
+for k, v in pairs(ents.FindByClass("npc_helicopter")) do v:Fire("gunon","",0) v.boss = 1 end
+
 end
 
 

@@ -84,21 +84,13 @@
 		}
 		10
 		{
-			"name"		"h_max_player_deaths"
-			"text"		"Max player deaths"
-			"help"		"Maximun player deaths. When reached, players will have to wait for spawn."
+			"name"		"h_player_lifes"
+			"text"		"Player lifes"
+			"help"		"When player wastes all his lifes, he won't be able to spawn until the round ends."
 			"type"		"Numeric"
 			"default"	"4"
 		}	
 		11
-		{
-			"name"		"h_punish_deaths_timer"
-			"text"		"Player dead punish time"
-			"help"		"How much time to wait for spawn while punished."
-			"type"		"Numeric"
-			"default"	"30"
-		}	
-		12
 		{
 			"name"		"h_time_between_waves"
 			"text"		"Time between waves"
@@ -106,7 +98,7 @@
 			"type"		"Numeric"
 			"default"	"15"
 		}
-		13
+		12
 		{
 			"name"		"h_combine_killed_to_win"
 			"text"		"Combine limit:"

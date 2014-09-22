@@ -4,7 +4,39 @@ GM.Email = "eddmalaga@gmail.com"
 GM.Website = "http://facepunch.com/showthread.php?t=1391522"
 include( "config.lua" )
 
+net.Receive( "Scoreboard", function( length, client )
+local DermaPanel = vgui.Create( "DFrame" )
+DermaPanel:SetPos( ScrW() * 0.1, ScrH() * 0.1 )
+DermaPanel:SetSize( ScrW() * 0.7, ScrH() * 0.5 )
+DermaPanel:SetTitle( "Scoreboard" )
+DermaPanel:SetVisible( true )
+DermaPanel:SetDraggable( true )
+DermaPanel:ShowCloseButton( true )
+DermaPanel:SetMouseInputEnabled(false)
+DermaPanel:SetKeyboardInputEnabled(false)
+DermaPanel:MakePopup()
 
+local DermaListView = vgui.Create("DListView")
+DermaListView:SetParent(DermaPanel)
+DermaListView:SetPos(25, 50)
+DermaListView:SetSize(ScrW() * 0.65, ScrH() * 0.4)
+DermaListView:SetMultiSelect(false)
+DermaListView:AddColumn("Player")
+DermaListView:AddColumn("Total Kills")
+DermaListView:AddColumn("Silent Kills")
+DermaListView:AddColumn("% of Team Kills")
+DermaListView:AddColumn("Deaths")
+DermaListView:AddColumn("% of Team Deaths")
+DermaListView:AddColumn("Score")
+
+for k,v in pairs(player.GetAll()) do
+
+DermaListView:AddLine(v:Nick(),v:Frags(),v:GetNetworkedString("SilentKills"),""..v:GetNetworkedString("Killpercent").."%",v:Deaths(),""..v:GetNetworkedString("Deathpercent").."%",v:GetNetworkedString("Score"))
+end
+DermaListView:AddLine("Team",team_kills+team_silent_kills,team_silent_kills,"-",team_deaths,"-",teamscore)
+
+
+end )
 
 function ISaid( ply, text, public )
 local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLED
@@ -16,13 +48,77 @@ local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLE
 
     end
 
+	if text == "!remove" or text == "!REMOVE" then
+	ply:PrintMessage(HUD_PRINTTALK, ""..ply:GetActiveWeapon():GetClass().." removed from your inventary.")
+
+	ply:StripWeapon(ply:GetActiveWeapon():GetClass())
+	return false end
+	
+if text == "!drop" or text == "!DROP" then
+ManualWeaponDrop(ply)
+timer.Simple(1, function() AdjustWeight(ply) end)
+		        return false
 end
+
+
+
+	if text == "!myscore" or text == "!MYSCORE" then
+	PlayerStats(ply)
+	return false
+    end
+
+	if text == "!teamscore" or text == "!TEAMSCORE" then
+	local teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
+
+	for k,player in pairs(player.GetAll()) do
+	local killpercent = ((player.Kills+player.SilentKills)/(team_kills+team_silent_kills))*100
+	local deathpercent = (player.deaths/team_deaths)*100
+	local player_points = ((player.Kills+(player.SilentKills*3)-player.deaths*2))
+
+	player:SetNetworkedString("Killpercent", ""..math.Round(killpercent).."")
+	player:SetNetworkedString("SilentKills", ""..player.SilentKills.."")
+	player:SetNetworkedString("Deathpercent", ""..math.Round(deathpercent).."")
+	player:SetNetworkedString("Score", ""..player_points.."")
+	ply:SendLua("team_kills="..team_kills.."" )
+	ply:SendLua("team_silent_kills="..team_silent_kills.."" )
+	ply:SendLua("team_deaths="..team_deaths.."" )
+	ply:SendLua("teamscore="..teamscore.."" )
+	end
+	timer.Simple(1, function() 
+	net.Start( "Scoreboard" )
+	net.Send(ply)
+	end)
+		return false
+    end
+	
+	end
+	
 hook.Add( "PlayerSay", "ISaid", ISaid )
 
 function GM:Initialize()
 	self.BaseClass.Initialize( self )
 end
 
+function ManualWeaponDrop(ply)
+
+local wep = ply:GetActiveWeapon():GetClass()
+local candrop = 1
+if ply:GetActiveWeapon():GetClass() == "weapon_physcannon" then
+candrop = 0 end
+
+if ply:GetActiveWeapon():Clip1() < 0 or ply:GetActiveWeapon():GetClass() == "weapon_slam" then
+candrop = 0
+end
+
+if candrop == 1 then
+ply:PrintMessage(HUD_PRINTTALK, "Dropped "..ply:GetActiveWeapon():GetClass()..".")
+ply:DropWeapon(ply:GetActiveWeapon())
+else
+ply:PrintMessage(HUD_PRINTTALK, "You can't drop "..ply:GetActiveWeapon():GetClass()..". Sorry.")
+end
+
+
+end
 
 function nearbycombinecome(suspect)
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
@@ -110,7 +206,6 @@ end
 
 function GM:PlayerCanPickupWeapon(ply, wep)
 --print(""..ply:GetName().." trying to get " ..wep:GetClass().."")
-
 CANPICKUP = 1
 table.foreach(ONLY_PICKUP_ONCE, function(key,value)
 if wep:GetClass() == value then
@@ -122,13 +217,26 @@ if wep:GetClass() == value then
 	end
 end
 end)
-
 if CANPICKUP == 0 then return false end
+timer.Simple(1, function() AdjustWeight(ply) end)
 CANPICKUP = nil
 return true end
-
+function AdjustWeight(ply)
+local weight = 1
+table.foreach(ply:GetWeapons(), function(key,value)
+if value:GetClass() != "weapon_frag" and value:GetClass() != "weapon_crowbar" then
+weight=weight*0.95
+end
+end)
+ply:SetWalkSpeed(150*weight)
+ply:SetRunSpeed(250*weight)
+if ply:GetWalkSpeed() < 150 then
+--ply:PrintMessage(HUD_PRINTTALK, "Te pesa el culo")
+end
+end
 function ItemRespawnSystem()
 
+local CAN = 1
 local PLAYERS = 0
 local NUMBER = 0
 for k,weapon in pairs(ents.FindByClass("player")) do 
@@ -136,10 +244,10 @@ PLAYERS = PLAYERS + 1
 end
 local OFFSET = PLAYERS + GetConVarNumber("h_weaponoffset")
 --print("")
-if PLAYERS > 5 then PLAYERS = 5 end
+if PLAYERS > 3 then PLAYERS = PLAYERS/2 end
 table.foreach(MEDIUMWEAPONS, function(key,value)
 for k,weapon in pairs(ents.FindByClass(value)) do 
-NUMBER=NUMBER+1
+ NUMBER=NUMBER+1
 end
 --print("[The Hunt]: There are "..NUMBER.." "..value.."")
 while NUMBER < OFFSET do
@@ -212,6 +320,8 @@ end
 SPAWNPOINTS_TO_DELETE = {"info_player_terrorist", "info_player_counterterrorist", "info_player_start", "info_player_deathmatch",
 }
 
+
+VanillaWeapons = { "weapon_shotgun", "weapon_ar2","weapon_pistol", "weapon_crossbow", "weapon_physcannon","weapon_smg1","weapon_357"}
 AirEnemies = { "npc_helicopter", "npc_combinegunship"}
 MainEnemiesGround = { "npc_combine_s", "npc_metropolice"}
 MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
@@ -320,6 +430,15 @@ malecomments={
 femalecomments={
 "vo/npc/female01/gotone01.wav",
 "vo/npc/female01/gotone02.wav",
+"vo/npc/female01/likethat.wav",
+"vo/npc/female01/yeah02.wav",
+}
+
+malewin={
+"vo/npc/male01/yeah02.wav",
+"vo/npc/male01/likethat.wav",
+}
+femalewin={
 "vo/npc/female01/likethat.wav",
 "vo/npc/female01/yeah02.wav",
 }
