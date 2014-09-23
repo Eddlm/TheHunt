@@ -51,6 +51,8 @@ v:Remove()
 end
 end)
 
+SpawnItem("monster_apc", Vector(-512.362732, -1917.421143, -175.968750)+Vector(0,0,0), Angle(0,0,0))
+
 SpawnItem("info_player_start", Vector(-410.501892, -89.787407, -87.968750)+Vector(0,0,-45), Angle(0,0,0))
 SpawnItem("info_player_start", Vector(177.478897, 95.992462, -87.968750)+Vector(0,0,-45), Angle(0,0,0))
 SpawnItem("info_player_start", Vector(-159.968750, 1913.448975, -95.968750)+Vector(0,0,-45), Angle(0,0,0))

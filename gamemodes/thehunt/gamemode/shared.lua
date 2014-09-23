@@ -56,7 +56,7 @@ local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLE
 	
 if text == "!drop" or text == "!DROP" then
 ManualWeaponDrop(ply)
-timer.Simple(1, function() AdjustWeight(ply) end)
+if GetConVarString("h_weight_system") == "1" or GetConVarString("h_hardcore_mode") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
 		        return false
 end
 
@@ -88,6 +88,20 @@ end
 	net.Start( "Scoreboard" )
 	net.Send(ply)
 	end)
+		return false
+    end
+	if text == "!restart" or text == "!RESTART" then
+	if PLAYERSINMAP>0 then
+	PrintMessage(HUD_PRINTTALK, ""..ply:GetName().." voted for a map restart by typing !restart. ")
+	VOTES_FOR_RESTART=VOTES_FOR_RESTART+1
+		if VOTES_FOR_RESTART > 0 then
+		PrintMessage(HUD_PRINTTALK, "Game restart applied.")
+		RestartGame()
+		VOTES_FOR_RESTART=0
+		end
+	else
+	RestartGame()
+	end
 		return false
     end
 	
@@ -218,7 +232,7 @@ if wep:GetClass() == value then
 end
 end)
 if CANPICKUP == 0 then return false end
-timer.Simple(1, function() AdjustWeight(ply) end)
+if GetConVarString("h_weight_system") == "1" or GetConVarString("h_hardcore_mode") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
 CANPICKUP = nil
 return true end
 function AdjustWeight(ply)
@@ -233,9 +247,10 @@ ply:SetRunSpeed(250*weight)
 if ply:GetWalkSpeed() < 150 then
 --ply:PrintMessage(HUD_PRINTTALK, "Te pesa el culo")
 end
-end
+end  
 function ItemRespawnSystem()
 
+if GetConVarString("h_item_respawn_system") == "1" then
 local CAN = 1
 local PLAYERS = 0
 local NUMBER = 0
@@ -258,28 +273,6 @@ end
 NUMBER=0
 end)
 
-/*
-if MISCELANEOUS_ITEMS_PLACES then
-table.foreach(MISCELANEOUS_ITEMS_PLACES, function(key,value)
-local canspawnitem=1
-for k,item in pairs(ents.FindInSphere(value,100)) do 
-table.foreach(MISCELANEOUS_ITEMS, function(key,itemstable)
---print("[The Hunt]:  found item")
-if item:GetClass() == itemstable then
---print("[The Hunt]: item class matched")
-
-canspawnitem=0
-end
-end)
-end
-if canspawnitem==1 then
-SpawnItem(table.Random(MISCELANEOUS_ITEMS),value, Angle(0,0,0))
-end
-end)
-end
-*/
-
-
 for k,v in pairs(ents.FindByClass("item_healthcharger")) do 
 	canrespawn = 1
 	local chargerpos = v:GetPos()
@@ -296,9 +289,7 @@ for k,v in pairs(ents.FindByClass("item_healthcharger")) do
 	SpawnItem("item_healthcharger", chargerpos, chargerangles )
 	end
 end
-
-
-
+end
 
 if RPGCANSPAWN == 1 then
 	RPG_IN_MAP = 0

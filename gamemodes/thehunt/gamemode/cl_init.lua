@@ -252,7 +252,7 @@ timer.Simple ( 5, CombineBoots)
 function ChatToWebsite(pl, text)
 	if string.sub(text, 1, 6) == "!help" then
 		if pl != LocalPlayer() then return true end
-	gui.OpenURL("http://gdriv.es/thehunt/TheHuntSurvivalGuide.html")
+	gui.OpenURL("http://facepunch.com/showthread.php?t=1394695")
 	return true	end
 end
 

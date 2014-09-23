@@ -106,6 +106,30 @@
 			"type"		"Numeric"
 			"default"	"120"
 		}
+		13
+		{
+			"name"		"h_custom_loadout"
+			"text"		"Custom Loadouts"
+			"help"		"If enabled, you will spawn with weapons defined in the STARTING_LOADOUT table (config.lua)."
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		14
+		{
+			"name"		"h_weight_system"
+			"text"		"Weight system"
+			"help"		"If enabled, every weapon you carry will slow you down a little. Prevents people from running to get all the weapons."
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		15
+		{
+			"name"		"h_item_respawn_system"
+			"text"		"Spawn items and weapons"
+			"help"		"If enabled, functions normally. When disabled, items won't spawn naturally. You can still get items from the fallen enemies."
+			"type"		"CheckBox"
+			"default"	"1"
+		}
 
 	}
 
