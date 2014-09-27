@@ -130,6 +130,14 @@
 			"type"		"CheckBox"
 			"default"	"1"
 		}
+		16
+		{
+			"name"		"h_avoid_stuck_combine"
+			"text"		"Avoid Stuck Combine"
+			"help"		"If enabled, the combine will nocollide with everything for a few seconds when they spawn."
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 
 	}
 

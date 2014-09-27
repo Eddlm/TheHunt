@@ -14,8 +14,10 @@ Here you must configure your custom weapons so the game reacts apropiately.
 RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade", "XBowBolt"}
 -- Don't add anything to this. Is what kind of ammo the NPC rebels will give you. You can prevent them for giving X type of ammo if you delete it from this table, but you can't add new values here. It will explode.
 
-STARTING_LOADOUT ={"m9k_m4a1","weapon_mad_m4","weapon_mad_m4","pspak_m4a1"}
-MEDIUMWEAPONS = { "weapon_bo2_peacekeeper","fas2_m4a1","fas2_m67","pspak_hk_usp_match","weapon_ss_cannon","weapon_slam","item_healthvial","fas2_ifak","fas2_att_suppressor"}
+STARTING_LOADOUT ={"weapon_slam","weapon_crossbow","weapon_frag","weapon_physcannon","weapon_shotgun"}
+-- If the custom loadout is enabled, you will spawn with this weapons.
+
+MEDIUMWEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
 -- Weapons the gamemode will spawn around. 
 
 SILENTKILLREWARD = { "item_healthvial","weapon_slam"}
@@ -49,10 +51,10 @@ If a weapon doesn't make noise when used (Left Click), add it to SILENT_WEAPONS.
 If a weapon has a loud secondary fire (Right click), add it to the SECONDARY_FIRE_WEAPONS.
 The gamemode doesn't check for USE or RELOAD actions for now. These are always silent.
 --------------------------------------------------------------*/
-SILENCED_WEAPONS = { "pspak_mp9", "stalker_vintorez", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu",}
--- Using them will attract nearby combine.
+SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu"}
+-- Using them will attract nearby combine. Don't add multimode weapons there, only the ones who are "silenced" all the time.
 
-SILENT_WEAPONS = { "weapon_frag", "weapon_crossbow", "weapon_crowbar","weapon_slam",
+SILENT_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_slam",
 -- DOOM SWEPS support
 "weapon_doom3_fists","weapon_doom3_fists",
 -- M90 Suppport

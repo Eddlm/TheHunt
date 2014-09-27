@@ -14,8 +14,10 @@ Here you must configure your custom weapons so the game reacts apropiately.
 RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade", "XBowBolt"}
 -- Don't add anything to this. Is what kind of ammo the NPC rebels will give you. You can prevent them for giving X type of ammo if you delete it from this table, but you can't add new values here. It will explode.
 
-STARTING_LOADOUT ={"",""}
-MEDIUMWEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial"}
+STARTING_LOADOUT ={"weapon_slam","weapon_crossbow","weapon_frag","weapon_physcannon","weapon_shotgun"}
+-- If the custom loadout is enabled, you will spawn with this weapons.
+
+MEDIUMWEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
 -- Weapons the gamemode will spawn around. 
 
 SILENTKILLREWARD = { "item_healthvial","weapon_slam"}
@@ -50,7 +52,7 @@ If a weapon has a loud secondary fire (Right click), add it to the SECONDARY_FIR
 The gamemode doesn't check for USE or RELOAD actions for now. These are always silent.
 --------------------------------------------------------------*/
 SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu"}
--- Using them will attract nearby combine.
+-- Using them will attract nearby combine. Don't add multimode weapons there, only the ones who are "silenced" all the time.
 
 SILENT_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_slam",
 -- DOOM SWEPS support

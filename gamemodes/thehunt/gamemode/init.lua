@@ -73,6 +73,8 @@ end
 
 
 function GM:Initialize()
+
+RunConsoleCommand( "mp_falldamage", "1") 
 RunConsoleCommand( "g_ragdoll_maxcount", "6")
 RunConsoleCommand( "r_shadowdist", "200") 
 RunConsoleCommand( "r_shadowcolor", ('20 20 20')) 
@@ -225,7 +227,7 @@ else print("[The Hunt]: This map has a custom GOODCRATEITEMS table.") end
 INFINITE_ACHIEVED = 0
 
 if !CUSTOMWAVESPAWN then 
-print("[The Hunt]: CUSTOMWAVESPAWN not set on the map config file. CUSTOMWAVESPAWN will be 30 by default.")
+print("[The Hunt]: CUSTOMWAVESPAWN not set on the map config file. CUSTOMWAVESPAWN will be 20 by default.")
 CUSTOMWAVESPAWN=30
 else
 print("[The Hunt]: CUSTOMWAVESPAWN set to "..CUSTOMWAVESPAWN.." by the map's config file.")
@@ -319,8 +321,8 @@ end
 end )
 
 concommand.Add( "h_version", function(ply)
-ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.0. Date: 28/08/2014")
-ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added various maps. Tweaked various map-things.")
+ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.0. Date: 27/09/2014")
+ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added various maps. Tweaked various map-things again.")
 ply:PrintMessage(HUD_PRINTTALK, "Running the GitHub version.")
 end )
 
@@ -899,6 +901,20 @@ if PLAYERSINMAP > 1 then
 	end
 end
 
+if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+print("Patrol zones restarted")
+end		
+table.insert(zonescovered, ply:GetPos()+Vector(0,0,30)) print("Patrol zone added")
 end
 
 function NearbyEntities()
@@ -967,12 +983,18 @@ end)
 if BossHeliAlive == 0 or BossHeliAlive == nil then
 if CanCheck == 1 then 
 	if EnemiesRemainining < GetConVarNumber("h_minenemies") then
-	if GetConVarNumber("h_hardcore") == 0 then
+	
+	for k,v in pairs( player.GetAll() ) do  
+	if v.sex == "male" then v:EmitSound(table.Random(malewin), 100, 100) else
+	v:EmitSound(table.Random(femalewin), 100, 100)
+	end
+	end
+	
 	table.foreach(player.GetAll(), function(key,value)
 	value.canspawn = 1
 	value.lifes=GetConVarNumber("h_player_lifes")
 	if !value:Alive() then value:PrintMessage(HUD_PRINTTALK, "You can spawn now.") end end)
-	end
+	
 	if COMBINE_KILLED > GetConVarNumber("h_combine_killed_to_win") then
 	
 	local yeah = table.Random(player.GetAll())
@@ -1331,7 +1353,7 @@ end
 
 function SpawnCanister( pos )
 
-traceRes = util.QuickTrace(pos, Vector(0,0,500), player.GetAll())
+traceRes = util.QuickTrace(pos, Vector(0,0,2000), player.GetAll())
 print(traceRes.Entity)
 if traceRes.Entity == NULL or traceRes.HitSky then 
 print("[The Hunt]: Place is suitable for canister deployment ")
@@ -1783,7 +1805,7 @@ timer.Create( "coverzones", 20, 0, coverzones )
 
 table.foreach(MainEnemiesGround, function(key,value)
 for k, v in pairs(ents.FindByClass(value)) do
-	if WAVESPAWN == 1 then v:SetCollisionGroup(1) else v:SetCollisionGroup(9) end
+	if WAVESPAWN == 1 and GetConVarString("h_avoid_stuck_combine") == 1 then v:SetCollisionGroup(3) else v:SetCollisionGroup(9) end
 
 	if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then	
 		if v:GetEnemy() then 
@@ -1917,7 +1939,7 @@ INFINITE_ACHIEVED = 0
 
 if !CUSTOMWAVESPAWN then 
 print("[The Hunt]: CUSTOMWAVESPAWN not set on the map config file. CUSTOMWAVESPAWN will be 30 by default.")
-CUSTOMWAVESPAWN=30 
+CUSTOMWAVESPAWN=30
 else
 print("[The Hunt]: CUSTOMWAVESPAWN set to "..CUSTOMWAVESPAWN.." by the map's config file.")
 end
@@ -1936,11 +1958,12 @@ timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo )
 timer.Create( "coverzones", 10, 1, coverzones )
 timer.Create( "wavefinishedchecker", 5, 1, wavefinishedchecker)
 CanCheck = 0
-print("[The Hunt]: Calling map setup function")
 
+print("[The Hunt]: Calling map setup function")
 MapSetup()
 print("[The Hunt]: Finished map setup function")
 
+timer.Simple(1, function() 
 if MAP_PROPS then
 print("[The Hunt]: found a props table, will add dynamic weapon spawnpoints. ")
 table.foreach(MAP_PROPS, function(key,propclass)
@@ -1960,14 +1983,14 @@ end
 
 ORIGINAL_ZONES_NUMBER = table.Count(zonescovered)
 print("---------------THE HUNT LOADED-------------")
-
+end)
 end
 
 
 function GM:GetFallDamage( ply, speed )
 nearbycombinecomecasual(ply)
-
-	return ( speed / 60 )
+print("lel")
+	return ( speed / 8 )
 end
 
 function GM:OnEntityCreated(entity)
@@ -1976,6 +1999,9 @@ function GM:OnEntityCreated(entity)
 	entity:SetName(""..entity:GetClass().." ("..entity:EntIndex()..")")
 	print(""..entity:GetName().." created")
 	end
+if entity:IsNPC() then 
+entity:SetCollisionGroup(3)
+end
 end
 
 function CicloUnSegundo()
@@ -1993,6 +2019,11 @@ if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
 					npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
 					PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."")
 					if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
 					table.remove(zonescovered)
 					table.remove(zonescovered)
 					table.remove(zonescovered)
@@ -2178,15 +2209,10 @@ if killer:IsPlayer() then
 			end
 		net.WriteString( ""..victim:GetName().."" )
 		net.Broadcast()
-
-			if !victim:GetEnemy() then
 			table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added")
 
+			if !victim:GetEnemy() then
 			killer.SilentKills=killer.SilentKills+1 team_silent_kills=team_silent_kills+1
-			if killer.sex == "male" then killer:EmitSound(table.Random(malecomments), 100, 100) else
-			killer:EmitSound(table.Random(femalecomments), 100, 100)
-			end
-
 			for k, v in pairs(ents.FindInSphere(victim:GetPos(),512)) do
 					if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then
 					if v:Visible(victim) then
@@ -2207,11 +2233,15 @@ if killer:IsPlayer() then
 						SpawnItem(table.Random(SILENTKILLREWARD), victim:GetPos(), Angle(0,0,0))
 					end
 				else
+					if killer.sex == "male" then killer:EmitSound(table.Random(malecomments), 100, 100) else
+					killer:EmitSound(table.Random(femalecomments), 100, 100)
+					end
 					nearbycombinecome(victim) killer.Kills=killer.Kills+1
 					team_kills=team_kills+1
 			end
+					killer:AddFrags(1)
+
 		end
-		killer:AddFrags(1)
 end
 end
 
@@ -2241,6 +2271,7 @@ function ScalePlayerDamage(ply, hitgroup, dmginfo)
 if dmginfo:GetAttacker():IsPlayer() and !dmginfo:IsFallDamage() and !dmginfo:IsDamageType(64) then
 dmginfo:ScaleDamage(GetConVarNumber("h_playerscaledamage")*0.1)
 end
+print(dmginfo:GetAttacker():GetClass())
 if !dmginfo:GetAttacker():IsPlayer() then
 dmginfo:ScaleDamage(GetConVarNumber("h_playerscaledamage"))
 end
@@ -2327,7 +2358,7 @@ hook.Add("ScaleNPCDamage","ScaleNPCDamage",ScaleNPCDamage)
 
 
 function GM:EntityTakeDamage(damaged,damage)
---print(""..damaged:GetClass().." taken damage")
+print(""..damaged:GetClass().." taken damage")
 
 if damage:GetAttacker():GetClass() == "monster_apc" then
 damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))

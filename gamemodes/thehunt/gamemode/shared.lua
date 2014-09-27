@@ -105,10 +105,28 @@ end
 		return false
     end
 	
+		if text == "!patrolzones" or text == "!PATROLZONES" then
+		if ply:IsAdmin() then revealzonestemp() end
+		return false
+		end
 	end
 	
 hook.Add( "PlayerSay", "ISaid", ISaid )
-
+function revealzonestemp()
+table.foreach(zonescovered, function(key,value)
+local sprite = ents.Create( "env_sprite" )
+sprite:SetPos(value)
+sprite:SetColor( Color( 255, 0, 0 ) )
+sprite:SetKeyValue( "model", "sprites/light_glow01.vmt" )
+sprite:SetKeyValue( "scale", 0.50 )
+sprite:SetKeyValue( "rendermode", 5 )
+sprite:SetKeyValue( "renderfx", 7 )
+sprite:Spawn()
+sprite:Activate()
+sprite:SetName("ZoneReveal")
+end)
+timer.Simple(4, hidezones)
+end
 function GM:Initialize()
 	self.BaseClass.Initialize( self )
 end
@@ -235,10 +253,12 @@ if CANPICKUP == 0 then return false end
 if GetConVarString("h_weight_system") == "1" or GetConVarString("h_hardcore_mode") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
 CANPICKUP = nil
 return true end
+
 function AdjustWeight(ply)
 local weight = 1
 table.foreach(ply:GetWeapons(), function(key,value)
-if value:GetClass() != "weapon_frag" and value:GetClass() != "weapon_crowbar" then
+
+if value:GetClass() != "weapon_frag" and value:GetClass() != "weapon_crowbar"  and value:GetClass() != "weapon_slam" and value:GetClass() != "weapon_pistol" and value:GetClass() != "weapon_smg" then
 weight=weight*0.95
 end
 end)
@@ -274,7 +294,26 @@ NUMBER=0
 end)
 
 for k,v in pairs(ents.FindByClass("item_healthcharger")) do 
-	canrespawn = 1
+	local canrespawn = 1
+	local chargerpos = v:GetPos()
+	local chargerangles = v:GetAngles()
+		for k, player in pairs(ents.FindInSphere(v:GetPos(),100)) do
+			if player:IsPlayer() then
+			canrespawn = 0
+			--print("[The Hunt]: player found, wont respawn charger")
+			end
+		end
+	if canrespawn == 1 then
+	--print("[The Hunt]: player not found, will respawn charger")
+	v:Remove()
+	SpawnItem("item_healthcharger", chargerpos, chargerangles )
+	end
+end
+
+
+
+for k,v in pairs(ents.FindByClass("item_suitcharger")) do 
+	local canrespawn = 1
 	local chargerpos = v:GetPos()
 	local chargerangles = v:GetAngles()
 		for k, player in pairs(ents.FindInSphere(v:GetPos(),100)) do
@@ -428,10 +467,18 @@ femalecomments={
 malewin={
 "vo/npc/male01/yeah02.wav",
 "vo/npc/male01/likethat.wav",
+"vo/npc/male01/fantastic01.wav",
+"vo/npc/male01/ohno.wav",
+"vo/npc/male01/oneforme.wav",
+"vo/npc/male01/whoops01.wav",
 }
 femalewin={
 "vo/npc/female01/likethat.wav",
 "vo/npc/female01/yeah02.wav",
+"vo/npc/female01/fantastic01.wav",
+"vo/npc/female01/ohno.wav",
+"vo/npc/female01/oneforme.wav",
+"vo/npc/female01/whoops01.wav",
 }
 
 playermodelsmale = {
