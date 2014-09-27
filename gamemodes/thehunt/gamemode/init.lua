@@ -1805,7 +1805,6 @@ timer.Create( "coverzones", 20, 0, coverzones )
 
 table.foreach(MainEnemiesGround, function(key,value)
 for k, v in pairs(ents.FindByClass(value)) do
-	if WAVESPAWN == 1 and GetConVarString("h_avoid_stuck_combine") == 1 then v:SetCollisionGroup(3) else v:SetCollisionGroup(9) end
 
 	if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then	
 		if v:GetEnemy() then 
