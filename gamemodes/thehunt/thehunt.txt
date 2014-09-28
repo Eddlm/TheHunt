@@ -88,7 +88,7 @@
 			"text"		"Player lifes"
 			"help"		"When player wastes all his lifes, he won't be able to spawn until the round ends."
 			"type"		"Numeric"
-			"default"	"4"
+			"default"	"20"
 		}	
 		11
 		{

@@ -1067,7 +1067,7 @@ if MostDeaths != 0 then
 else PrintMessage(HUD_PRINTTALK, "None of the rebels has been killed in this game! Congratulations!") 
 end
 
-timer.Simple(6, function() PrintMessage(HUD_PRINTTALK, "You can check the scoreboard by typing !score.") end)
+timer.Simple(6, function() PrintMessage(HUD_PRINTTALK, "You can check the scoreboard by typing !teamscore.") end)
 end
 
 
@@ -1140,7 +1140,7 @@ end
 function waveend()
 WAVESPAWN = 1
 
-OverwatchAmbientOne()
+timer.Simple (1, OverwatchAmbientOne)
 		if Wave < 5 then
 			PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..Wave.." proven unable to contain hostiles.")
 		end
