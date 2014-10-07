@@ -321,9 +321,12 @@ end
 end )
 
 concommand.Add( "h_version", function(ply)
-ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.0. Date: 27/09/2014")
-ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added various maps. Tweaked various map-things again.")
+ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.1. Date: 7/10/2014")
+ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added rp_nova_prospekt_v4. Added addon weapons for the workshop version.")
 ply:PrintMessage(HUD_PRINTTALK, "Running the GitHub version.")
+end )
+concommand.Add( "h_pos", function(ply)
+print(ply:GetPos())
 end )
 
 
@@ -889,7 +892,7 @@ ply.canspawn = 1
 end
 end)
 
-
+/*
 if PLAYERSINMAP > 1 then
 	local players_defeated = 1
 	table.foreach(player.GetAll(), function(key,value)
@@ -900,6 +903,7 @@ if PLAYERSINMAP > 1 then
 	CanCheck = 0
 	end
 end
+*/
 
 if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
 table.remove(zonescovered)
@@ -1715,6 +1719,15 @@ NPC:SetKeyValue("AmmoType", 5)
 NPC:Spawn()
 end
 
+
+function SpawnTriplaser( pos, ang )
+NPC = ents.Create( "combine_tripmine" )
+NPC:SetPos( pos )
+NPC:SetName("Triplaser")
+NPC:SetAngles( ang ) 
+NPC:Spawn()
+end
+
 function SpawnAmmoCrate( pos, ang, ammotype )
 NPC = ents.Create( "item_ammo_crate" )
 NPC:SetPos( pos )
@@ -1979,8 +1992,65 @@ end)
 else 
 print("[The Hunt]: MAP_PROPS not found, will not add dynamic weapon spawnpoints.")
 end
-
 ORIGINAL_ZONES_NUMBER = table.Count(zonescovered)
+
+if GetConVarString("h_STALKER_sweps") == "1" then
+print("[The Hunt]: Adding STALKER Sweps")
+if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
+
+table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+end
+
+if GetConVarString("h_MR_PYROUS_sweps") == "1" then
+print("[The Hunt]: Adding Mr. Pyrous Sweps")
+if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
+
+table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
+while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+
+end
+
+if GetConVarString("h_MAD_COWS_sweps") == "1" then
+print("[The Hunt]: Adding MadCows Sweps")
+if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
+
+table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+end
+
+
+if GetConVarString("h_M9K_SPECIALITIES_sweps") == "1" then
+print("[The Hunt]: Adding MadCows Sweps")
+if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
+
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+end
 print("---------------THE HUNT LOADED-------------")
 end)
 end
@@ -2179,6 +2249,7 @@ ent:Fire("Explode",0,0)
 
 if victim:GetClass() == "npc_turret_floor" then
 nearbycombinecome(victim)
+table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added")
 end
 if victim:GetClass() == "npc_turret_ceiling" then
 nearbycombinecome(killer)
@@ -2196,6 +2267,8 @@ if killer:IsNPC() then
 end
 
 if victim:GetClass() == "npc_metropolice" or victim:GetClass() == "npc_combine_s" then
+			table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added")
+
 CombineAssisting = CombineAssisting/2
 COMBINE_KILLED = COMBINE_KILLED+1
 if killer:IsPlayer() then
@@ -2208,7 +2281,6 @@ if killer:IsPlayer() then
 			end
 		net.WriteString( ""..victim:GetName().."" )
 		net.Broadcast()
-			table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added")
 
 			if !victim:GetEnemy() then
 			killer.SilentKills=killer.SilentKills+1 team_silent_kills=team_silent_kills+1
@@ -2336,7 +2408,7 @@ end
 end
 end
 if damaged:GetClass() == "npc_sniper" then
-if damage:GetInflictor():GetClass() == "crossbow_bolt" or damage:IsDamageType(64) or damage:IsDamageType(67108864) then
+if damage:GetInflictor():GetClass() == "crossbow_bolt" or damage:IsDamageType(64) or damage:IsDamageType(67108864) or damage:GetDamage() > 50 then
 damaged:SetHealth(0)
 PrintMessage(HUD_PRINTTALK, ""..damage:GetAttacker():GetName().." got that Sniper out of the way ")
 end
@@ -2357,7 +2429,7 @@ hook.Add("ScaleNPCDamage","ScaleNPCDamage",ScaleNPCDamage)
 
 
 function GM:EntityTakeDamage(damaged,damage)
-print(""..damaged:GetClass().." taken damage")
+--print(""..damaged:GetClass().." taken damage")
 
 if damage:GetAttacker():GetClass() == "monster_apc" then
 damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))

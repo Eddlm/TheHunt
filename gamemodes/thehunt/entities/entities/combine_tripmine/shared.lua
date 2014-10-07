@@ -22,6 +22,8 @@ end
 
 function ENT:Initialize()
 if SERVER then
+lasertime = CurTime()
+
 
 self:SetName("CombineTripmine"..self:EntIndex().."")
 
@@ -40,19 +42,22 @@ self.laser = ents.Create( "env_laser" )
 	self.laser:SetKeyValue( "texture", "sprites/laserbeam.spr" )
 	self.laser:SetKeyValue( "renderfx", "16" )
 
-	self.laser:SetKeyValue( "damage", "10" )
+	self.laser:SetKeyValue( "damage", "60" )
 	self.laser:SetKeyValue( "spawnflags", "1" )
 	self.laser:SetRenderMode(RENDERMODE_TRANSALPHA)
 	self.laser:Spawn()
 
 timer.Simple(0.2, function()
-	self.laser:SetPos(self:GetPos()+Vector(13,0,0))
-	self.target:SetPos(self:GetPos()+Vector(200,0,0))
+	self.laser:SetPos(self:GetPos()+self:GetForward()*13)
+	self.target:SetPos(self:GetPos()+self:GetForward()*200)
 end)
 self:SetModel( "models/props_lab/tpplug.mdl" )
 self:SetSolid( SOLID_VPHYSICS )
 self:SetMoveType(MOVETYPE_NONE)
 self:SetUseType(SIMPLE_USE)
+
+self:SetPos(self:GetPos()+ (self:GetForward()*-5))
+
 end
 end
 
@@ -65,10 +70,43 @@ end
 
 
 
+function Check()
+
+end
+
 function ENT:Think()
+if SERVER then
+if CurTime() > lasertime then
+--print(traceRes.Entity)
+--print(self:GetName())
+--print(t)
+
+local nearby = 0
+
+/*
 traceRes = util.QuickTrace( self:GetPos(), self:GetForward()*200, self)
 if traceRes.Entity:IsNPC() or traceRes.Entity:IsPlayer() then
 print(traceRes.Entity)
+end
+*/
+
+for k, v in pairs(ents.FindInSphere(self:GetPos(),100)) do
+if v then
+if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then
+nearby = 1
+--print("player")
+end
+end
+
+if nearby == 1 then 
+self.target:SetPos(self:GetPos()+self:GetForward()*14) 
+else
+self.target:SetPos(self:GetPos()+self:GetForward()*200)
+end
+end
+
+lasertime = math.Round(CurTime())+0.2
+end
 end
 end
 

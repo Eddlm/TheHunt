@@ -252,9 +252,9 @@ for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
 NumHelis=NumHelis+1
 end
 
-if NumHelis > 0 then print("too much helis")
+if NumHelis > -1 then print("too much helis")
 else 
-SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,0,1)
+--SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,0,1)
 end
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end

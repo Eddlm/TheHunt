@@ -88,7 +88,7 @@
 			"text"		"Player lifes"
 			"help"		"When player wastes all his lifes, he won't be able to spawn until the round ends."
 			"type"		"Numeric"
-			"default"	"20"
+			"default"	"10"
 		}	
 		11
 		{
@@ -130,8 +130,46 @@
 			"type"		"CheckBox"
 			"default"	"1"
 		}
-
+		16
+		{
+			"name"		"h_max_weapons_carrying"
+			"text"		"Max weapons to hold"
+			"help"		"How many weapons a player can carry"
+			"type"		"Numeric"
+			"default"	"-1"
+		}
+		17
+		{
+			"name"		"h_STALKER_sweps"
+			"text"		"Add STALKER sweps"
+			"help"		"Add STALKER sweps into the weapon mix"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		18
+		{
+			"name"		"h_MR_PYROUS_sweps"
+			"text"		"Add MrPyrous sweps"
+			"help"		"Add MrPyrous sweps into the weapon mix"
+			"type"		"CheckBox"
+			"default"	"0"
+		}		
+		19
+		{
+			"name"		"h_MAD_COWS_sweps"
+			"text"		"Add MadCows sweps"
+			"help"		"Add MadCows sweps into the weapon mix"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		20
+		{
+			"name"		"h_M9K_SPECIALITIES_sweps"
+			"text"		"Add M9K Specialities sweps"
+			"help"		"Add M9K Specialities sweps into the weapon mix"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 	}
-
 }
 

@@ -1,26 +1,19 @@
 /*-----------------------The Hunt Configuration File--------------------------
-This configuration file allows to add custom weapons to the game.
-Be sure to configure all the fields or the gamemode won't work properly.
-
-List of HL2 entities: https://developer.valvesoftware.com/wiki/List_of_HL2_entities
-To know the classname of an item/weapon: http://i.imgur.com/OkNNLe3.jpg an paste it here.
-You can spawn NPCs, Entities or Weapons. DO NOT USE "PROP_PHYSICS" OR ANYTHING SIMILAR OR IT WILL EXPLODE.
+Special configuration file for the STALKER Weapon pack
+-> http://steamcommunity.com//sharedfiles/filedetails/?id=197240079
 ----------------------------------------------------------------------------*/
-
-/*--------------------WEAPON SETUP---------------------
-Here you must configure your custom weapons so the game reacts apropiately.
--------------------------------------------------------*/
 
 RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade", "XBowBolt"}
 -- Don't add anything to this. Is what kind of ammo the NPC rebels will give you. You can prevent them for giving X type of ammo if you delete it from this table, but you can't add new values here. It will explode.
 
-STARTING_LOADOUT ={"weapon_slam","weapon_crossbow","weapon_frag","weapon_physcannon","weapon_shotgun"}
+STARTING_LOADOUT ={"stalker_baretta_dual","stalker_vintorez","weapon_frag","stalker_f2000","stalker_winchester"}
 -- If the custom loadout is enabled, you will spawn with this weapons.
 
 MEDIUMWEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
+
 -- Weapons the gamemode will spawn around. 
 
-SILENTKILLREWARD = { "item_healthvial","weapon_slam"}
+SILENTKILLREWARD = { "item_healthvial","weapon_slam","weapon_frag"}
 --Items that a combine could spawn if silent-killed. Its useful to put addon weapons there, as it's the only way to refill them with ammo at this time.
 
 /*--------------Stealth (lighting)----------------------------
@@ -51,7 +44,7 @@ If a weapon doesn't make noise when used (Left Click), add it to SILENT_WEAPONS.
 If a weapon has a loud secondary fire (Right click), add it to the SECONDARY_FIRE_WEAPONS.
 The gamemode doesn't check for USE or RELOAD actions for now. These are always silent.
 --------------------------------------------------------------*/
-SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu"}
+SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez","stalker_val", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu","stalker_enfield"}
 -- Using them will attract nearby combine. Don't add multimode weapons there, only the ones who are "silenced" all the time.
 
 SILENT_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_slam",
@@ -64,7 +57,9 @@ SILENT_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_slam",
 -- FA:S support
 "fas2_ifak","fas2_machete","kf_knife_fas","fas2_dv2",
 -- Mad Cow's Weapons Support
-"weapon_mad_tmp","weapon_mad_c4","weapon_mad_charge","weapon_mad_flash","weapon_mad_grenade","weapon_mad_crossbow","weapon_mad_incendiary","weapon_mad_knife","weapon_mad_smoke","weapon_mad_magnade"} 
+"weapon_mad_tmp","weapon_mad_c4","weapon_mad_charge","weapon_mad_flash","weapon_mad_grenade","weapon_mad_crossbow","weapon_mad_incendiary","weapon_mad_knife","weapon_mad_smoke","weapon_mad_magnade",
+-- STALKER
+"stalker_knife"}
 -- Using them wont atract anyone.
 
 SECONDARY_FIRE_WEAPONS = { "weapon_ar2", "weapon_shotgun"}

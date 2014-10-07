@@ -143,8 +143,14 @@ candrop = 0
 end
 
 if candrop == 1 then
-ply:PrintMessage(HUD_PRINTTALK, "Dropped "..ply:GetActiveWeapon():GetClass()..".")
-ply:DropWeapon(ply:GetActiveWeapon())
+			if ply:GetActiveWeapon():Clip1() == 0 then
+				ply:GetActiveWeapon():Remove()
+				ply:PrintMessage(HUD_PRINTTALK, "Removed "..ply:GetActiveWeapon():GetClass()..".")
+				else
+				ply:PrintMessage(HUD_PRINTTALK, "Dropped "..ply:GetActiveWeapon():GetClass()..".")
+				ply:DropWeapon(ply:GetActiveWeapon())
+			end
+
 else
 ply:PrintMessage(HUD_PRINTTALK, "You can't drop "..ply:GetActiveWeapon():GetClass()..". Sorry.")
 end
@@ -238,7 +244,7 @@ end
 
 function GM:PlayerCanPickupWeapon(ply, wep)
 --print(""..ply:GetName().." trying to get " ..wep:GetClass().."")
-CANPICKUP = 1
+local CANPICKUP = 1
 table.foreach(ONLY_PICKUP_ONCE, function(key,value)
 if wep:GetClass() == value then
 	for k,v in pairs (ply:GetWeapons()) do
@@ -249,9 +255,21 @@ if wep:GetClass() == value then
 	end
 end
 end)
+
+if GetConVarString("h_weight_system") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
+
+if GetConVarNumber("h_max_weapons_carrying") > -1 and CANPICKUP == 1 then
+if wep:GetClass() != "weapon_frag" then
+local numweapons = 0
+table.foreach(ply:GetWeapons(), function(key,value)
+numweapons = numweapons+1
+end)
+if numweapons > GetConVarNumber("h_max_weapons_carrying") then return false end
+end
+end
 if CANPICKUP == 0 then return false end
-if GetConVarString("h_weight_system") == "1" or GetConVarString("h_hardcore_mode") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
 CANPICKUP = nil
+
 return true end
 
 function AdjustWeight(ply)
@@ -501,3 +519,15 @@ playermodelsfemale = {
 "models/player/group03/female_05.mdl",
 "models/player/group03/female_06.mdl",
 }
+
+
+
+-- Weapons mix
+STALKER_SWEPS ={
+"stalker_deagle","stalker_ak74_u","stalker_usp","stalker_p220","stalker_baretta_dual","stalker_dragunov","stalker_ak74","stalker_p99","stalker_gauss","stalker_eliminator","stalker_pkm","stalker_ots","stalker_lr300","stalker_rpg","stalker_f2000","stalker_winchester","stalker_sg550","stalker_abaton","stalker_vintorez","stalker_baretta_single","stalker_makarov","stalker_val","stalker_spas","stalker_svu","stalker_knife","stalker_enfield","stalker_fort_12","stalker_colt","stalker_mp5","stalker_bulldog","stalker_g36","stalker_pb","stalker_browning"}
+
+MR_PYROUS_SWEPS ={"pspak_benli_m4","pspak_ops_mac10","pspak_mr_96","pspak_cz_75","pspak_pp_bizon","pspak_hk_416","pspak_p228","pspak_bleh","pspak_benli_m3","pspak_fn_fal","pspak_hk_g36c","pspak_waltr_2000","pspak_moss_590","pspak_tact_mp5k","pspak_sg_552","pspak_m4a1","pspak_irq_ak47","pspak_ris_ar15","pspak_m60"}
+
+MAD_COWS_SWEPS ={"weapon_mad_alyxgun","weapon_mad_dual","weapon_mad_grenade","weapon_mad_p228","weapon_mad_xm1014","weapon_mad_usp_match","weapon_mad_mac10","weapon_mad_ump","weapon_mad_incendiary","weapon_mad_sg552","weapon_mad_spas","weapon_mad_ar2","weapon_mad_57","weapon_mad_glock","weapon_mad_armor","weapon_mad_tmp","weapon_mad_knife","weapon_mad_auto_glock","weapon_mad_mp7","weapon_mad_shield","weapon_mad_famas","weapon_mad_sg550","weapon_mad_scout","weapon_mad_charge","weapon_mad_awm","weapon_mad_m249","weapon_mad_rpg","weapon_mad_p90","weapon_mad_357","weapon_mad_g3","weapon_mad_mp5","weapon_mad_combinepistol","weapon_mad_mine","weapon_mad_galil","weapon_mad_medic","weapon_mad_m4","weapon_mad_magnade","weapon_mad_deagle","weapon_mad_usp","weapon_mad_flare","weapon_mad_m47","weapon_mad_engineer","weapon_mad_gnome","weapon_mad_crowbar","weapon_mad_c4","weapon_mad_aug","weapon_mad_grenadelauncher","weapon_mad_ak47","weapon_mad_crossbow","weapon_mad_m3","weapon_mad_smoke"}
+
+M9K_SPECIALITIES={"m9k_nerve_gas","m9k_damascus","m9k_milkormgl","m9k_sticky_grenade","weapon_base","m9k_suicide_bomb","m9k_rpg7","m9k_proxy_mine","m9k_fists","m9k_knife","m9k_m202","m9k_ied_detonator","m9k_orbital_strike","m9k_m79gl","flechette_gun","m9k_nitro","m9k_machete","m9k_ex41","m9k_matador","m9k_davy_crockett","m9k_harpoon","m9k_m61_frag"}
