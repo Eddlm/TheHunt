@@ -170,6 +170,30 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
+		21
+		{
+			"name"		"h_FAS_sweps"
+			"text"		"Add FAS sweps"
+			"help"		"Add FAS sweps into the weapon mix"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		22
+		{
+			"name"		"h_M9K_ASSAULT_RIFLES_sweps"
+			"text"		"Add M9K Assault Rifles"
+			"help"		"Add M9K Assault Rifles"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		23
+		{
+			"name"		"h_supersoldier"
+			"text"		"Add the Combine SuperSoldier"
+			"help"		"Adds the Combine SuperSoldier to the combine spawns"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 	}
 }
 

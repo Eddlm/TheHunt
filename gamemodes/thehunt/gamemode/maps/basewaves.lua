@@ -44,6 +44,13 @@ Wave = 4
 	else
 		SpawnCombineElite1(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 	end
+	
+	
+if GetConVarString("h_supersoldier") == "1" then
+if math.random (1,10) == 2 then 
+SpawnCombineSynth(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+end
+end
 
 -- CanCheck = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
@@ -59,6 +66,11 @@ Wave = 5
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 	end
 
+if GetConVarString("h_supersoldier") == "1" then
+if math.random (1,10) == 2 then 
+SpawnCombineSynth(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+end
+end
 -- CanCheck = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
@@ -75,6 +87,11 @@ Wave = 6
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 	end
 
+if GetConVarString("h_supersoldier") == "1" then
+if math.random (1,10) == 2 then 
+SpawnCombineSynth(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+end
+end
 -- CanCheck = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end

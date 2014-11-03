@@ -133,8 +133,6 @@ if GetConVarString("h_weight_system") == "1" then timer.Simple(1, function() Adj
 ManualWeaponDrop(ply)
 end )
 
-
-
 concommand.Add( "h_revealcombinespawnpoints", function(player, command, arguments )
 table.foreach(combinespawnzones, function(key,value)
 local sprite = ents.Create( "env_sprite" )
@@ -235,7 +233,7 @@ end
 
 if GetConVarString("h_autostart") == "1" then
 if win == 1 then
-timer.Simple(10, autofirstwave)
+timer.Simple(20, autofirstwave)
 end
 else
 end
@@ -321,8 +319,8 @@ end
 end )
 
 concommand.Add( "h_version", function(ply)
-ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.1. Date: 7/10/2014")
-ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added rp_nova_prospekt_v4. Added addon weapons for the workshop version.")
+ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.2. Date: 3/11/2014")
+ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added cs_Assault & cs_compound. Added Firearms: Source to the weapon mix options.")
 ply:PrintMessage(HUD_PRINTTALK, "Running the GitHub version.")
 end )
 concommand.Add( "h_pos", function(ply)
@@ -660,7 +658,12 @@ print("[The Hunt]: Spawned.")
 end
 end )
 
-
+concommand.Add( "SpawnCombineSynth", function(ply)
+if ply:IsAdmin() then
+SpawnCombineSynth( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
+print("[The Hunt]: Spawned.")
+end
+end )
 concommand.Add( "SpawnFastZombie", function(ply)
 if ply:IsAdmin() then
 SpawnFastZombie( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
@@ -1488,9 +1491,31 @@ combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_AVERAGE )	
 NPC:Fire("StartPatrolling","",0)
- 
 
 end
+
+function SpawnCombineSynth ( pos )
+NPC = ents.Create( "npc_combine_s" )
+NPC:SetKeyValue("NumGrenades", ""..math.random(1,3).."") 
+NPC:SetPos( pos )
+NPC:SetKeyValue( "ignoreunseenenemies", 0 )
+NPC:SetKeyValue( "spawnflags", 512 )
+NPC:SetKeyValue( "model", "models/elite_synth/elite_synth.mdl" )
+NPC:SetSkin(0)
+NPC:Spawn()
+--NPC:Give("ai_weapon_shotgun")
+NPC:Give("NPC_Minigun")
+
+combinen = combinen + 1
+NPC:SetName("Combine nº"..combinen.."")
+NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )	
+NPC:Fire("StartPatrolling","",0)
+NPC:SetHealth(500)
+
+end
+
+
+
 
 function SpawnCombineShotgunner ( pos )
 NPC = ents.Create( "npc_combine_s" )
@@ -1634,7 +1659,7 @@ function SpawnCombineElite2( pos )
 	NPC:SetKeyValue( "spawnflags", "256" )
 	NPC:SetPos( pos )
 	NPC:SetKeyValue( "spawnflags", 512 )
-
+	NPC:SetHealth(2)
 	NPC:Spawn()
 	NPC:Give( "ai_weapon_ar2" )
 	combinen = combinen + 1
@@ -1642,7 +1667,6 @@ function SpawnCombineElite2( pos )
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )
 	NPC:Fire("StartPatrolling","",0)
 	 
-
 end
 
 
@@ -1995,6 +2019,7 @@ end
 ORIGINAL_ZONES_NUMBER = table.Count(zonescovered)
 
 if GetConVarString("h_STALKER_sweps") == "1" then
+--if stalker_deagle:IsValid() then
 print("[The Hunt]: Adding STALKER Sweps")
 if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
 
@@ -2005,10 +2030,19 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
+
 while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+else
+print("[The Hunt]: You DON'T have the STALKER Sweps addon! Won't add it")
+
+--end
+
 end
 
 if GetConVarString("h_MR_PYROUS_sweps") == "1" then
+--if pspak_waltr_2000:IsValid() then
 print("[The Hunt]: Adding Mr. Pyrous Sweps")
 if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
 
@@ -2019,11 +2053,17 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
-while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
 
+while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+else
+print("[The Hunt]: You DON'T have the Mr. Pyrous Sweps addon! Won't add it")
+--end
 end
 
 if GetConVarString("h_MAD_COWS_sweps") == "1" then
+--if weapon_mad_alyxgun:IsValid() then
 print("[The Hunt]: Adding MadCows Sweps")
 if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
 
@@ -2034,12 +2074,21 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
+
 while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+else
+print("[The Hunt]: You DON'T have the MadCows Sweps addon! Won't add it")
+
+--end
+
 end
 
 
 if GetConVarString("h_M9K_SPECIALITIES_sweps") == "1" then
-print("[The Hunt]: Adding MadCows Sweps")
+--if m9k_nerve_gas:IsValid() then
+print("[The Hunt]: Adding M9K Specialities Sweps")
 if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
 
 table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
@@ -2049,8 +2098,68 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
+
 while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+
+else
+print("[The Hunt]: You DON'T have the M9K Specialities Sweps addon! Won't add it")
+
 end
+
+
+
+if GetConVarString("h_FAS_sweps") == "1" then
+--if m9k_nerve_gas:IsValid() then
+print("[The Hunt]: Adding FAS Sweps")
+if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
+
+table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
+
+while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+table.insert(MEDIUMWEAPONS, "fas2_att_suppressor")
+
+else
+print("[The Hunt]: You DON'T have the FAS Sweps addon! Won't add it")
+
+end
+
+
+if GetConVarString("h_M9K_ASSAULT_RIFLES_sweps") == "1" then
+--if m9k_nerve_gas:IsValid() then
+print("[The Hunt]: Adding M9K Assault Rifles")
+if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
+
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
+
+while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+
+else
+print("[The Hunt]: You DON'T have the M9K Assault Riflesaddon! Won't add it")
+
+end
+
+
+
+--end
 print("---------------THE HUNT LOADED-------------")
 end)
 end
@@ -2521,18 +2630,26 @@ if player:GetActiveWeapon():Clip1() then
 if player:GetActiveWeapon():Clip1() < clip then
 if player:GetActiveWeapon():Clip1() > -1 then
 local silenced = 0
-	if player:GetActiveWeapon().Silenced == true then print("Silenced 1") silenced = 1 end
+	if player:GetActiveWeapon().Silenced == true then
+	--print("Silenced 1")
+	silenced = 1 end
 table.foreach(SILENCED_WEAPONS, function(key,value)
-	if player:GetActiveWeapon():GetClass() == value then print("Silenced 2") silenced = 1 end
+	if player:GetActiveWeapon():GetClass() == value then
+	--print("Silenced 2")
+	silenced = 1 end
 	end)
 	if player:GetActiveWeapon().Primary then 
-		if player:GetActiveWeapon().Primary.Sound == "Weapon_USP.SilencedShot" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" then print("Silenced 3") silenced = 1 end 
+		if player:GetActiveWeapon().Primary.Sound == "Weapon_USP.SilencedShot" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" then
+		--print("Silenced 3")
+		silenced = 1 end 
 	end
 	if player:GetActiveWeapon().dt then
-			if player:GetActiveWeapon().dt.Suppressed == true then print("Silenced 4") silenced = 1 end
+			if player:GetActiveWeapon().dt.Suppressed == true then
+			--print("Silenced 4")
+			silenced = 1 end
 	end
 	if silenced == 0 then
-	print("NOT Silenced")
+	--print("NOT Silenced")
 	allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate")) 
 	end
 	if silenced == 1 then
