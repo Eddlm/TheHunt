@@ -14,6 +14,7 @@ CombineFifthWave = 1
 CombineInfiniteWave = 50
 
 CUSTOMWAVESPAWN = 70
+
 ITEMPLACES ={
 Vector(5598.376953, 845.021606, 169.564438),
 Vector(4811.672852, 2020.771118, -242.142380),
@@ -104,6 +105,7 @@ Vector( 2775.436523, -3403.709473, 64.031250),
 
 
 SPECIALITEMPLACES = {Vector(2323.769531, -2851.547852, -255.968750),}
+
 MAP_PROPS = {"models/props_combine/breendesk.mdl","models/props_junk/wood_crate001a.mdl","models/props_c17/FurnitureDrawer001a.mdl",
 "models/props_wasteland/prison_bedframe001b.mdl","models/props_c17/oildrum001.mdl","models/props_c17/FurnitureTable002a.mdl",
 "models/props_c17/furniturecouch001a.mdl","models/props_c17/furniturecouch002a.mdl","models/props_junk/trashdumpster01a.mdl",
@@ -563,19 +565,5 @@ Wave = 6
 	else
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
-
-local NumHelis = 0
-for k, v in pairs(ents.FindByClass("npc_helicopter")) do
-NumHelis=NumHelis+1
-end
-
-for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
-NumHelis=NumHelis+1
-end
-
-if NumHelis > 0 then print("too much helis")
-else 
-SpawnHeliA(Vector(-3741.778320, 4829.747559, 2343.333008), ""..table.Random(AirEnemies).."" ,0,1)
-end
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
+HelicopterWave()
 end

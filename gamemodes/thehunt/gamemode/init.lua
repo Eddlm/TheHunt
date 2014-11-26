@@ -30,6 +30,21 @@ lua_run print("Model: ") print(player.GetByID(1):GetEyeTrace().Entity:GetModel()
 */
 
 
+function HelicopterWave()
+local NumHelis = 0
+for k, v in pairs(ents.FindByClass("npc_helicopter")) do
+NumHelis=NumHelis+1
+end
+for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
+NumHelis=NumHelis+1
+end
+
+if NumHelis > 0 then print("too much helis")
+elseif teamscore > 0 and HeliCanSpawn == true then
+SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,0,1)
+end
+end
+
 net.Receive( "light_above_limit", function( length, client )
 net.Start( "Visible" )
 net.Send(client)
@@ -73,7 +88,8 @@ end
 
 
 function GM:Initialize()
-
+HeliCanSpawn = true
+max_weapons_total = 999
 RunConsoleCommand( "mp_falldamage", "1") 
 RunConsoleCommand( "g_ragdoll_maxcount", "6")
 RunConsoleCommand( "r_shadowdist", "200") 
@@ -269,8 +285,6 @@ end
 
 ORIGINAL_ZONES_NUMBER = table.Count(zonescovered)
 print("---------------THE HUNT LOADED-------------")
-
-
 end)
 
 
@@ -884,8 +898,8 @@ if ply.lifes == 0  then
 ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left.")
 if PLAYERSINMAP > 1 then
 ply:PrintMessage(HUD_PRINTTALK, "You can see your teammates using right click.")
-else
-CanCheck = 0
+--else
+--CanCheck = 0
 end
 ply:PrintMessage(HUD_PRINTTALK, "Check your score by typing !myscore or !teamscore.")
 
@@ -922,6 +936,9 @@ table.remove(zonescovered)
 print("Patrol zones restarted")
 end		
 table.insert(zonescovered, ply:GetPos()+Vector(0,0,30)) print("Patrol zone added")
+
+
+teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
 end
 
 function NearbyEntities()
@@ -971,6 +988,7 @@ end
 
 
 function wavefinishedchecker()
+--print("Checking if wave is defeated...")
 timer.Create( "wavefinishedchecker", 10, 1, wavefinishedchecker)
 EnemiesRemainining=0
 local BossHeliAlive=0
@@ -2423,6 +2441,9 @@ if killer:IsPlayer() then
 
 		end
 end
+
+teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
+
 end
 
 function GM:PlayerSelectSpawn( pl )
@@ -2480,10 +2501,13 @@ function ScaleNPCDamage( damaged, hitgroup, damage )
 	end
 
 	
-	
-
+if damaged:GetClass() == "npc_gunship" then
+HeliCanSpawn = false
+end
 if damaged:GetClass() == "npc_helicopter" then
-
+HeliCanSpawn = false
+print("Helicopters disabled for 500 seconds.")
+timer.Create( "HeliCoolDown", 500, 1, function() HeliCanSpawn = true print("Helicopters can spawn again.") end )
 if damaged:Health() < 800 and damaged:Health() > 650 then
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: Air enforcement unit, you are now free to employ aggresive containment tactics.")
 

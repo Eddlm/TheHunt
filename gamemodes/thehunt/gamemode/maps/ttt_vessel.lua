@@ -55,8 +55,6 @@ end
 
 function MapSetup()
 
-
-
 for k,v in pairs(ents.FindByClass("func_door_rotating")) do 
 if v:EntIndex() != 232 then
 print(v:GetClass())
@@ -343,6 +341,7 @@ Wave = 6
 	else
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
+HelicopterWave()
 
 -- CanCheck = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)

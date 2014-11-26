@@ -1,13 +1,12 @@
 /*-----------------------The Hunt Configuration File--------------------------
-Special configuration file for the STALKER Weapon pack
--> http://steamcommunity.com//sharedfiles/filedetails/?id=197240079
+To know the name of any item/weapon/entity of the game, right-click on its icon on Sandbox and click Copy to Clipboard; or point at it and run lua_run print("Model: ") print(player.GetByID(1):GetEyeTrace().Entity:GetModel()) on the console.
 ----------------------------------------------------------------------------*/
 
 RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade", "XBowBolt"}
 -- Don't add anything to this. Is what kind of ammo the NPC rebels will give you. You can prevent them for giving X type of ammo if you delete it from this table, but you can't add new values here. It will explode.
 
-STARTING_LOADOUT ={"stalker_baretta_dual","stalker_vintorez","weapon_frag","stalker_f2000","stalker_winchester"}
--- If the custom loadout is enabled, you will spawn with this weapons.
+STARTING_LOADOUT = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
+-- If the custom loadout is enabled, you will spawn with these weapons.
 
 MEDIUMWEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
 
@@ -32,7 +31,7 @@ Dark weapons don't add luminosity.
 TOO_BRIGHT_WEAPONS = { "weapon_crossbow", "weapon_physcannon", "weapon_rpg", "weapon_medkit"}
 -- Weapons that make you more visible. It's harder to hide while carrying this weapon.
 
-DARK_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_357","weapon_slam" }
+DARK_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_357","weapon_slam","fas2_dv2","fas2_ammobox","fas2_ifak","fas2_machete","stalker_knife","m9k_machete" }
 -- Weapons that don't have any bright items on them. It's easier to hide while carrying this weapon.
 
 /*--------------Stealth (sounds)----------------------------

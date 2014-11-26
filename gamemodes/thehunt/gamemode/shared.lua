@@ -68,7 +68,7 @@ end
     end
 
 	if text == "!teamscore" or text == "!TEAMSCORE" then
-	local teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
+	teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
 
 	for k,player in pairs(player.GetAll()) do
 	local killpercent = ((player.Kills+player.SilentKills)/(team_kills+team_silent_kills))*100
@@ -267,9 +267,16 @@ end)
 if numweapons > GetConVarNumber("h_max_weapons_carrying") then return false end
 end
 end
+
+if GetConVarNumber("h_selective_weapon_pickup") == "1" then
+if wep:GetClass() != "weapon_crowbar" then 
+if !ply:KeyDown(IN_USE) then CANPICKUP = 0
+end
+end
+end
+
 if CANPICKUP == 0 then return false end
 CANPICKUP = nil
-
 return true end
 
 function AdjustWeight(ply)
@@ -285,9 +292,10 @@ ply:SetRunSpeed(250*weight)
 if ply:GetWalkSpeed() < 150 then
 --ply:PrintMessage(HUD_PRINTTALK, "Te pesa el culo")
 end
-end  
-function ItemRespawnSystem()
+end 
 
+
+function ItemRespawnSystem()
 if GetConVarString("h_item_respawn_system") == "1" then
 local CAN = 1
 local PLAYERS = 0

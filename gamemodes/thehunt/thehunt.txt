@@ -7,7 +7,6 @@
 
 	"settings"
 	{
-
 		1
 		{
 			"name"		"h_autostart"
@@ -24,7 +23,6 @@
 			"type"		"Numeric"
 			"default"	"3"
 		}
-		
 		3
 		{
 			"name"		"h_maxhelp"
@@ -33,7 +31,6 @@
 			"type"		"Numeric"
 			"default"	"4"
 		}
-		
 		4
 		{
 			"name"		"h_npcscaledamage"
@@ -140,13 +137,21 @@
 		}
 		17
 		{
+			"name"		"h_selective_weapon_pickup"
+			"text"		"Press E to pick up weapons"
+			"help"		"Enable this if you don't want to pick up everything you pass by. Useful if using the weapon weight feature."
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		18
+		{
 			"name"		"h_STALKER_sweps"
 			"text"		"Add STALKER sweps"
 			"help"		"Add STALKER sweps into the weapon mix"
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		18
+		19
 		{
 			"name"		"h_MR_PYROUS_sweps"
 			"text"		"Add MrPyrous sweps"
@@ -154,7 +159,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}		
-		19
+		20
 		{
 			"name"		"h_MAD_COWS_sweps"
 			"text"		"Add MadCows sweps"
@@ -162,7 +167,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		20
+		21
 		{
 			"name"		"h_M9K_SPECIALITIES_sweps"
 			"text"		"Add M9K Specialities sweps"
@@ -170,7 +175,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		21
+		22
 		{
 			"name"		"h_FAS_sweps"
 			"text"		"Add FAS sweps"
@@ -178,7 +183,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		22
+		23
 		{
 			"name"		"h_M9K_ASSAULT_RIFLES_sweps"
 			"text"		"Add M9K Assault Rifles"
@@ -186,7 +191,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		23
+		24
 		{
 			"name"		"h_supersoldier"
 			"text"		"Add the Combine SuperSoldier"

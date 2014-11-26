@@ -77,16 +77,7 @@ Wave = 6
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 	end
 
-
-local NumHelis = 0
-for k, v in pairs(ents.FindByClass("npc_helicopter")) do
-NumHelis=NumHelis+1
-end
-
-if NumHelis > 1 then print("too much helis")
-else 
-SpawnHeliA(Vector(967.547241, 722.096069, 465.658081), "npc_helicopter" ,1,1)
-end
+HelicopterWave()
 RPGCANSPAWN = 1
 end
 

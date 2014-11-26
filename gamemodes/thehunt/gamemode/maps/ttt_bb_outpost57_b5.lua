@@ -1,8 +1,8 @@
 CombineFirstWave = 10
 CombineSecondWave = 15
-CombineThirdWave = 20
+CombineThirdWave =15
 CombineFourthWave = 20
-CombineFifthWave = 25
+CombineFifthWave = 20
 CombineInfiniteWave = 30
 
 zonescovered ={
@@ -46,7 +46,13 @@ Vector(-91.709137, -1926.874512, 58.770119),
 Vector(-887.924316, 58.292992, 59.438839),
 Vector(-106.984421, -360.119507, 59.180744),
 Vector(974.280090, -319.648590, 57.114319),
+
+Vector(-119.634842, -1066.284058, 111.867310),
+Vector(-66.452393, -1083.290283, 111.867302),
+Vector(1127.096069, -2402.647705, 111.867310),
 }
+
+
 
 combinespawnzones = {
 Vector(4096.670898, -6061.298828, 64.031250),
@@ -114,11 +120,9 @@ Vector(891.305481, 3098.393799, 505.166901),
 
 
 Vector(1824.416992, 4941.949219, 612.871033),
-
 Vector(1153.156738, 1026.154907, 1206.616577),
 Vector(2306.674805, 998.639771, 1201.390625),
 Vector(1160.156982, -308.380188, 1167.871948),
-
 Vector(2473.772705, -278.279938, 1205.697021),
 Vector(2762.834961, 481.550049, 1225.123901),
 Vector(1709.734863, 1431.063843, 1248.798096),
@@ -127,6 +131,7 @@ Vector(1160.156982, -308.380188, 1167.871948),
 
 }
 
+MAP_PROPS = {"models/props/cs_office/table_coffee.mdl",}
 
 function GM:PlayerInitialSpawn(ply)
 timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: Protection team alert, evidence of anticivil activity in this island.") end )
@@ -135,7 +140,6 @@ timer.Simple(8, function() ply:PrintMessage(HUD_PRINTTALK, "[Overwatch]: A maxim
 
 timer.Simple(15, function()ply:PrintMessage(HUD_PRINTTALK, "Type !help to see the game mechanics. ") end )
 end
-
 
 function MapSetup()
 table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value)
@@ -147,6 +151,20 @@ end)
 table.foreach(HELIPATHS, function(key,value)
 CreateHeliPath(value)
 end)
+
+
+SpawnAmmoCrate(Vector(2499.685059, -208.392242, 176.459091),Angle(0,-90,0),3)
+SpawnAmmoCrate(Vector(2690.037354, -2164.723389, 16.499569),Angle(0,-120,0),3)
+
+SpawnItem("npc_tripmine", Vector(4173.258789, -448.507080, 96.556381), Angle(90.000, 164.999, 0.000))
+SpawnItem("npc_tripmine", Vector(4173.847656, -446.308472, 71.358345), Angle(90.001, 165.000, 0.000))
+
+
+if math.random(1,2) == 1 then
+SpawnItem("npc_sniper", Vector(1691.767822, -74.572777, 2247.031250)+Vector(0,0,-45), Angle(0.000, 142.000, 0.000))
+else
+SpawnItem("npc_sniper", Vector(1809.938354, -107.346931, 2247.031250)+Vector(0,0,-45), Angle(0.000, -8.000, 0.000))
+end
 
 SpawnItem("info_player_start", Vector(3055.548340, -4653.457520, -400.377014)+Vector(0,0,-45), Angle(-4,128,0))
 SpawnItem("info_player_start", Vector(1249.424805, 3229.356445, 220.614929)+Vector(0,0,-45), Angle(17,33,0))
@@ -218,18 +236,8 @@ RPGCANSPAWN = 1
 	else
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
-local NumHelis = 0
-for k, v in pairs(ents.FindByClass("npc_helicopter")) do
-NumHelis=NumHelis+1
-end
-
-for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
-NumHelis=NumHelis+1
-end
-if NumHelis > 0 then print("too much helis")
-else 
-SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,0,1)
-end
+	
+HelicopterWave()
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
 
@@ -243,18 +251,6 @@ Wave = 6
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
 
-local NumHelis = 0
-for k, v in pairs(ents.FindByClass("npc_helicopter")) do
-NumHelis=NumHelis+1
-end
-
-for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
-NumHelis=NumHelis+1
-end
-
-if NumHelis > -1 then print("too much helis")
-else 
---SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,0,1)
-end
+HelicopterWave()
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end

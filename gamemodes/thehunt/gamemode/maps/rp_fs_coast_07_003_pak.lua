@@ -88,7 +88,7 @@ NumHelis=NumHelis+1
 end
 
 if NumHelis > 2 then print("too much helis")
-else 
+else
 SpawnHeliA(Vector(-3741.778320, 4829.747559, 2343.333008), ""..table.Random(AirEnemies).."" ,0,1)
 end
 
