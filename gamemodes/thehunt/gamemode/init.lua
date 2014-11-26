@@ -333,10 +333,11 @@ end
 end )
 
 concommand.Add( "h_version", function(ply)
-ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.2. Date: 3/11/2014")
-ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added cs_Assault & cs_compound. Added Firearms: Source to the weapon mix options.")
+ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.3. Date: 26/11/2014")
+ply:PrintMessage(HUD_PRINTTALK, "Last changes: Helicopters are less persistent & Combine Super Soldiers only appear in the infinite wave.")
 ply:PrintMessage(HUD_PRINTTALK, "Running the GitHub version.")
 end )
+
 concommand.Add( "h_pos", function(ply)
 print(ply:GetPos())
 end )
@@ -894,17 +895,20 @@ ply:SetMoveType(10)
 ply:SpectateEntity(attacker)
 end
 
+
+
+if PLAYERSINMAP > 1 then
 if ply.lifes == 0  then
 ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left.")
-if PLAYERSINMAP > 1 then
 ply:PrintMessage(HUD_PRINTTALK, "You can see your teammates using right click.")
+ply:PrintMessage(HUD_PRINTTALK, "Check your score by typing !myscore or !teamscore.")
 --else
 --CanCheck = 0
-end
-ply:PrintMessage(HUD_PRINTTALK, "Check your score by typing !myscore or !teamscore.")
-
 else
 ply:PrintMessage(HUD_PRINTTALK, "You have "..ply.lifes.." lifes left.")
+ply.canspawn = 1
+end
+else
 ply.canspawn = 1
 end
 end)
@@ -1016,9 +1020,13 @@ if CanCheck == 1 then
 	end
 	
 	table.foreach(player.GetAll(), function(key,value)
+	if value.lifes < 1 then 
 	value.canspawn = 1
-	value.lifes=GetConVarNumber("h_player_lifes")
-	if !value:Alive() then value:PrintMessage(HUD_PRINTTALK, "You can spawn now.") end end)
+	value.lifes = 1
+	if !value:Alive() then value:PrintMessage(HUD_PRINTTALK, "You can spawn now.") end
+	end
+	end)
+	
 	
 	if COMBINE_KILLED > GetConVarNumber("h_combine_killed_to_win") then
 	
@@ -1677,7 +1685,7 @@ function SpawnCombineElite2( pos )
 	NPC:SetKeyValue( "spawnflags", "256" )
 	NPC:SetPos( pos )
 	NPC:SetKeyValue( "spawnflags", 512 )
-	NPC:SetHealth(2)
+	--NPC:SetHealth(2)
 	NPC:Spawn()
 	NPC:Give( "ai_weapon_ar2" )
 	combinen = combinen + 1
