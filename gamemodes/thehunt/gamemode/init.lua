@@ -11,6 +11,8 @@ util.AddNetworkString( "Visible" )
 util.AddNetworkString( "NotVisible" )
 util.AddNetworkString( "PlayerKillNotice" )
 util.AddNetworkString( "Scoreboard" )
+util.AddNetworkString( "ShowHUDScoreboard" )
+util.AddNetworkString( "HideHUDScoreboard" )
 
 util.PrecacheModel("models/Combine_Soldier.mdl")
 util.PrecacheModel("models/Combine_Super_Soldier.mdl")
@@ -88,6 +90,7 @@ end
 
 
 function GM:Initialize()
+teamscore = 0
 HeliCanSpawn = true
 max_weapons_total = 999
 RunConsoleCommand( "mp_falldamage", "1") 
@@ -142,6 +145,13 @@ for k,v in pairs( weapons.GetList() ) do
 print( v.ClassName )
 end 
 print("")
+end)
+
+
+concommand.Add( "h_gameweapons", function(player, command, arguments )
+
+PrintTable(MEDIUMWEAPONS)
+
 end)
 
 concommand.Add( "h_dropweapon", function(ply, command, arguments )
@@ -941,8 +951,8 @@ print("Patrol zones restarted")
 end		
 table.insert(zonescovered, ply:GetPos()+Vector(0,0,30)) print("Patrol zone added")
 
-
 teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
+CalculatePlayerScore(ply)
 end
 
 function NearbyEntities()
@@ -1194,7 +1204,12 @@ timer.Simple (1, OverwatchAmbientOne)
 				infinitewavehandler()
 
 		end
-		end
+			table.foreach(player.GetAll(), function(key,ply)
+			ply:SetNWInt("ReferentScore",ply:GetNWInt("Score"))
+			CalculatePlayerScore(ply)
+			end)
+
+end
 		
 function infinitewavehandler()
 
@@ -2184,7 +2199,31 @@ print("[The Hunt]: You DON'T have the M9K Assault Riflesaddon! Won't add it")
 end
 
 
+if GetConVarString("h_CUSTOMIZABLE_WEAPONRY_2_0_sweps") == "1" then
+--if m9k_nerve_gas:IsValid() then
+print("[The Hunt]: ")
+if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
 
+table.insert(MEDIUMWEAPONS, ""..table.Random(Customizable_Weaponry).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(Customizable_Weaponry).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(Customizable_Weaponry).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(Customizable_Weaponry).."")
+
+while table.Count(MEDIUMWEAPONS) > 12 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+table.insert(MEDIUMWEAPONS, "cw_ammo_crate_small")
+
+else
+print("[The Hunt]: You DON'T have the Customizable Weaponry 2.0 Sweps addon! Won't add it")
+
+end
+print("[The Hunt]: Loaded "..GetConVarString("h_personalized_sweps").." as an extra.")
+
+local sentence = ""..GetConVarString("h_personalized_sweps")..""
+local words = string.Explode( ",", sentence )
+
+table.foreach(words, function(key,value)
+table.insert(MEDIUMWEAPONS, value)
+end)
 --end
 print("---------------THE HUNT LOADED-------------")
 end)
@@ -2370,7 +2409,6 @@ end
 
 -- GM HOOKS v
 function GM:OnNPCKilled(victim, killer, weapon)
-wavefinishedchecker()
 local victimpos = victim:GetPos()
 -- Uncomment to for-the-lulz explosion kills
 /*
@@ -2450,8 +2488,13 @@ if killer:IsPlayer() then
 		end
 end
 
-teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
+-- Calculate scores only if the "killed" npc isn't a turret. They have no "killers" when they die
+if !victim:GetClass() == "npc_turret_floor" then
+CalculatePlayerScore(killer)
+end
 
+wavefinishedchecker()
+teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
 end
 
 function GM:PlayerSelectSpawn( pl )
@@ -2493,7 +2536,7 @@ function ScaleNPCDamage( damaged, hitgroup, damage )
 	if damaged:GetClass() == value  then
 	if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) end -- flee from fire and friendly fire
 		if damaged:GetEnemy() == nil then
-		damage:ScaleDamage(GetConVarNumber("h_npcscaledamage")*2)
+		damage:ScaleDamage(GetConVarNumber("h_npcscaledamage")+30)
 		else
 		damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
 		end
@@ -2510,12 +2553,16 @@ function ScaleNPCDamage( damaged, hitgroup, damage )
 
 	
 if damaged:GetClass() == "npc_gunship" then
-HeliCanSpawn = false
+	if damaged:Health() < damage:GetDamage() then
+	HeliCanSpawn = false
+	print("Helicopters disabled for 500 seconds.")
+	timer.Create( "HeliCoolDown", 500, 1, function() HeliCanSpawn = true print("Helicopters can spawn again.") end )
+	damaged.spotlight:Fire("LightOff","",0)
+	PrintMessage(HUD_PRINTTALK, "[Overwatch]: All units, "..damaged:GetName().." state changed to: inoperative.")
+	end
 end
+
 if damaged:GetClass() == "npc_helicopter" then
-HeliCanSpawn = false
-print("Helicopters disabled for 500 seconds.")
-timer.Create( "HeliCoolDown", 500, 1, function() HeliCanSpawn = true print("Helicopters can spawn again.") end )
 if damaged:Health() < 800 and damaged:Health() > 650 then
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: Air enforcement unit, you are now free to employ aggresive containment tactics.")
 
@@ -2542,6 +2589,11 @@ end
 */
 
 if damaged:Health() < damage:GetDamage() then
+
+HeliCanSpawn = false
+print("Helicopters disabled for 500 seconds.")
+timer.Create( "HeliCoolDown", 500, 1, function() HeliCanSpawn = true print("Helicopters can spawn again.") end )
+
 damaged.spotlight:Fire("LightOff","",0)
 PrintMessage(HUD_PRINTTALK, "[Overwatch]: All units, "..damaged:GetName().." state changed to: inoperative.")
 --print("dead")
@@ -2749,6 +2801,13 @@ end
 		end
 
 end
+
+		if key ==  IN_SCORE then
+		net.Start( "ShowHUDScoreboard" )
+		
+		net.Send(player)
+		end
+
 end
 
 
@@ -2770,6 +2829,7 @@ ply.deaths=0
 ply.Kills=0
 ply.SilentKills=0
 NUMPLAYERS()
+ply:SetNWInt("ReferentScore", 0)
 if DARKNESS then
 ply:SendLua("CLDARKNESS="..DARKNESS.."" )
 end

@@ -10,7 +10,12 @@ light_above_limit = 3
 LIGHTEXT = 'Visible'
 LIGHTCOLOR = Color(255,0,0)
 lightcol = 0
-CLDARKNESS = 3
+CLDARKNESS = 9
+score_color=Color(150,150,150)
+
+hook.Add( "ChatText", "hide_joinleave", function( index, name, text, typ )
+	if ( typ == "joinleave" ) then return true end
+end )
 
 if !ConVarExists("h_outline_radius") then
 CreateClientConVar( "h_outline_radius", "1000", true, false )
@@ -32,11 +37,23 @@ end )
 
 
 
+net.Receive( "ShowHUDScoreboard", function( len, ply )
+ShowScoreboard=true
+timer.Simple(4, function() ShowScoreboard=false end)
+end)
+
+net.Receive( "HideHUDScoreboard", function( len, ply )
+end)
+
+
 net.Receive( "PlayerKillNotice", function( len, ply )
 GAMEMODE:AddDeathNotice(net.ReadString(), 0, net.ReadString(), net.ReadString(), 1001)
 end)
 
 
+net.Receive( "PlayerKillNotice", function( len, ply )
+GAMEMODE:AddDeathNotice(net.ReadString(), 0, net.ReadString(), net.ReadString(), 1001)
+end)
 
 net.Receive( "Spotted", function( length, client )
 	HUDTEXT = 'Spotted'
@@ -60,10 +77,18 @@ if GetConVarNumber("h_hud_left") == 0 then
 
 	else
 
-	draw.RoundedBox(6 , ScrW()*0.025, ScrH() * 0.83, 140, 67, Color(255,255,255,20))
-	draw.DrawText( "Illumination: "..math.Round(lightcol,1).."", "TargetID", ScrW() * 0.03, ScrH() * 0.86, darkencolor, TEXT_ALIGN_LEFT )
+	draw.RoundedBox(6 , ScrW()*0.025, ScrH() * 0.815, 140, 67, Color(255,255,255,20))
+
+	draw.DrawText( "Score: "..LocalPlayer():GetNWInt("Score").."", "TargetID", ScrW() * 0.03, ScrH() * 0.82, score_color, TEXT_ALIGN_LEFT )
 	draw.DrawText( LIGHTEXT, "TargetID", ScrW() * 0.03, ScrH() * 0.84, LIGHTCOLOR, TEXT_ALIGN_LEFT )
+	draw.DrawText( "Illumination: "..math.Round(lightcol,1).."", "TargetID", ScrW() * 0.03, ScrH() * 0.86, darkencolor, TEXT_ALIGN_LEFT )
 	draw.DrawText( HUDTEXT, "TargetID", ScrW() * 0.03, ScrH() * 0.88, HUDCOLOR, TEXT_ALIGN_LEFT )
+	end
+	
+	if ShowScoreboard==true then
+		draw.DrawText( "Kills: "..LocalPlayer():GetNWInt("Kills").."", "TargetID", ScrW() * 0.03, ScrH() * 0.74, Color(0,255,0), TEXT_ALIGN_LEFT )
+		draw.DrawText( "Silent Kills: "..LocalPlayer():GetNWInt("SilentKills").."", "TargetID", ScrW() * 0.03, ScrH() * 0.76, Color(0,255,0), TEXT_ALIGN_LEFT )
+		draw.DrawText( "Deaths: "..LocalPlayer():GetNWInt("Deaths").."", "TargetID", ScrW() * 0.03, ScrH() * 0.78, Color(0,255,0), TEXT_ALIGN_LEFT )
 	end
 end
 end)

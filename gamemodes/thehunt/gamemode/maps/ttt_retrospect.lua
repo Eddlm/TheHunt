@@ -6,7 +6,7 @@ CombineFourthWave = 10
 CombineFifthWave = 10
 CombineInfiniteWave = 20
 
-MAP_PROPS = {"models/props_combine/breendesk.mdl","models/fallout3/dinertable01.mdl","models/props_c17/furnituretable001a.mdl","models/props_c17/bench01a.mdl"}
+MAP_PROPS = {"models/props_combine/breendesk.mdl","models/fallout3/dinertable01.mdl","models/props_c17/furnituretable001a.mdl","models/props_c17/bench01a.mdl","models/props_c17/furnituretable002a.mdl","models/props_wasteland/controlroom_desk001b.mdl","models/props_interiors/furniture_desk01a.mdl"}
 
 zonescovered ={
 Vector(-728.273376, 812.751465, -557.888794),
@@ -21,6 +21,7 @@ ITEMPLACES ={
 Vector(-114.795677, 536.869995, -562.824768),
 Vector(-950.040100, 801.052551, -545.57428),
 Vector(-769.884766, -10.406260, -568.583557),
+Vector(-640.742432, 454.084381, -339.968750),
 
 }
 

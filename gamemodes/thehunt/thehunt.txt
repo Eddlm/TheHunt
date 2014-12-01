@@ -145,13 +145,21 @@
 		}
 		18
 		{
+			"name"		"h_supersoldier"
+			"text"		"Add the Combine SuperSoldier"
+			"help"		"Adds the Combine SuperSoldier to the combine spawns"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		19
+		{
 			"name"		"h_STALKER_sweps"
 			"text"		"Add STALKER sweps"
 			"help"		"Add STALKER sweps into the weapon mix"
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		19
+		20
 		{
 			"name"		"h_MR_PYROUS_sweps"
 			"text"		"Add MrPyrous sweps"
@@ -159,7 +167,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}		
-		20
+		21
 		{
 			"name"		"h_MAD_COWS_sweps"
 			"text"		"Add MadCows sweps"
@@ -167,7 +175,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		21
+		22
 		{
 			"name"		"h_M9K_SPECIALITIES_sweps"
 			"text"		"Add M9K Specialities sweps"
@@ -175,7 +183,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		22
+		23
 		{
 			"name"		"h_FAS_sweps"
 			"text"		"Add FAS sweps"
@@ -183,7 +191,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		23
+		24
 		{
 			"name"		"h_M9K_ASSAULT_RIFLES_sweps"
 			"text"		"Add M9K Assault Rifles"
@@ -191,14 +199,23 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		24
+		25
 		{
-			"name"		"h_supersoldier"
-			"text"		"Add the Combine SuperSoldier"
-			"help"		"Adds the Combine SuperSoldier to the combine spawns"
+			"name"		"h_CUSTOMIZABLE_WEAPONRY_2_0_sweps"
+			"text"		"Add Customizable Weaponry 2.0 Sweps"
+			"help"		"Add Customizable Weaponry 2.0 Sweps"
 			"type"		"CheckBox"
 			"default"	"0"
 		}
+		26
+		{
+			"name"		"h_personalized_sweps"
+			"text"		"Add these weapons (separate with , )"
+			"help"		"Add these weapons (ex "crowbar","rpg")"
+			"type"		"Text"
+			"default"	""
+		}
+
 	}
 }
 

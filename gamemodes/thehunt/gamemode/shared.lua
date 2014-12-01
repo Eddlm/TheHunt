@@ -31,12 +31,56 @@ DermaListView:AddColumn("Score")
 
 for k,v in pairs(player.GetAll()) do
 
-DermaListView:AddLine(v:Nick(),v:Frags(),v:GetNetworkedString("SilentKills"),""..v:GetNetworkedString("Killpercent").."%",v:Deaths(),""..v:GetNetworkedString("Deathpercent").."%",v:GetNetworkedString("Score"))
+DermaListView:AddLine(v:Nick(),v:Frags(),v:GetNWString("SilentKills"),""..v:GetNWString("Killpercent").."%",v:Deaths(),""..v:GetNWString("Deathpercent").."%",v:GetNWInt("Score"))
 end
 DermaListView:AddLine("Team",team_kills+team_silent_kills,team_silent_kills,"-",team_deaths,"-",teamscore)
 
 
 end )
+
+
+function CalculatePlayerScore(ply)
+	local killpercent = ((ply.Kills+ply.SilentKills)/(team_kills+team_silent_kills))*100
+	local deathpercent = (ply.deaths/team_deaths)*100
+	local player_points = ((ply.Kills+(ply.SilentKills*3)-ply.deaths*2))
+
+	if ply.deaths==0 then ply:SetNWInt("Survivor", 1) else ply:SetNWInt("Survivor", 0) end
+	ply:SetNWString("Killpercent", ""..math.Round(killpercent).."")
+	ply:SetNWString("SilentKills", ""..ply.SilentKills.."")
+	ply:SetNWString("Deathpercent", ""..math.Round(deathpercent).."")
+	ply:SetNWInt("Kills", ply.Kills+ply.SilentKills)
+	ply:SetNWInt("Deaths", ""..ply.deaths.."")
+	ply:SetNWInt("Score", ""..player_points.."")
+
+	ply:SendLua("team_kills="..team_kills.."" )
+	ply:SendLua("team_silent_kills="..team_silent_kills.."" )
+	ply:SendLua("team_deaths="..team_deaths.."" )
+	ply:SendLua("teamscore="..teamscore.."" )
+	
+	local score=tonumber(ply:GetNWInt("Score"),10)
+	local referencescore=tonumber(ply:GetNWInt("ReferentScore"),10)
+
+	if score < referencescore then
+	ply:SendLua("score_color=Color(255,179,0)" )
+	end
+	
+	if score < referencescore - 4 then
+	ply:SendLua("score_color=Color(255,8,8)" )
+	end
+	
+	if score == referencescore then
+	ply:SendLua("score_color=Color(200,200,200)" )
+	end
+	
+	if score > referencescore then
+	ply:SendLua("score_color=Color(156,255,120)" )
+	end
+	
+	if score > referencescore + 4 then
+	ply:SendLua("score_color=Color(0,255,0)" )
+	end
+
+end
 
 function ISaid( ply, text, public )
 local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLED
@@ -75,10 +119,10 @@ end
 	local deathpercent = (player.deaths/team_deaths)*100
 	local player_points = ((player.Kills+(player.SilentKills*3)-player.deaths*2))
 
-	player:SetNetworkedString("Killpercent", ""..math.Round(killpercent).."")
-	player:SetNetworkedString("SilentKills", ""..player.SilentKills.."")
-	player:SetNetworkedString("Deathpercent", ""..math.Round(deathpercent).."")
-	player:SetNetworkedString("Score", ""..player_points.."")
+	player:SetNWString("Killpercent", ""..math.Round(killpercent).."")
+	player:SetNWString("SilentKills", ""..player.SilentKills.."")
+	player:SetNWString("Deathpercent", ""..math.Round(deathpercent).."")
+	player:SetNWInt("Score", ""..player_points.."")
 	ply:SendLua("team_kills="..team_kills.."" )
 	ply:SendLua("team_silent_kills="..team_silent_kills.."" )
 	ply:SendLua("team_deaths="..team_deaths.."" )
@@ -268,7 +312,7 @@ if numweapons > GetConVarNumber("h_max_weapons_carrying") then return false end
 end
 end
 
-if GetConVarNumber("h_selective_weapon_pickup") == "1" then
+if GetConVarNumber("h_selective_weapon_pickup") == 1 then
 if wep:GetClass() != "weapon_crowbar" then 
 if !ply:KeyDown(IN_USE) then CANPICKUP = 0
 end
@@ -543,5 +587,5 @@ M9K_SPECIALITIES={"m9k_nerve_gas","m9k_damascus","m9k_milkormgl","m9k_sticky_gre
 M9K_ASSAULT_RIFLES={"m9k_winchester73","m9k_acr","m9k_ak47","m9k_ak74","m9k_amd65","m9k_an94","m9k_val","m9k_f2000","m9k_famas","m9k_fal","m9k_g36","m9k_m416","m9k_g3a3","m9k_l85","m9k_m14sp","m9k_m16a4_acog","m9k_m4a1","m9k_scar","m9k_vikhr","m9k_auga3","m9k_tar21"}
 
 FAS={"fas2_ak12","fas2_ak47","fas2_ak74","fas2_an94","fas2_dv2","fas2_famas","fas2_g36c","fas2_g3","fas2_glock20","fas2_deagle","fas2_galil","fas2_uzi","fas2_ifak","fas2_ks23","fas2_mac11","fas2_m14","fas2_m1911","fas2_m21","fas2_m24","fas2_m3s90","fas2_m4a1","fas2_m67","fas2_m79","fas2_m82","fas2_machete","fas2_mp5a5","fas2_mp5k","fas2_mp5sd6","fas2_ots33","fas2_p226","fas2_pp19","fas2_ragingbull","fas2_rem870","fas2_rpk","fas2_rk95","fas2_sg550","fas2_sg552","fas2_sks","fas2_sr25","fas2_toz34"}
-
+Customizable_Weaponry={"cw_ak74","cw_ar15","cw_g3a3","cw_mp5","cw_deagle","cw_mr96"}
 

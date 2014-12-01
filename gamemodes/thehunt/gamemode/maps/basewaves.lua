@@ -78,7 +78,7 @@ Wave = 6
 	end
 
 if GetConVarString("h_supersoldier") == "1" then
-if math.random (1,10) == 2 then 
+if math.random (1,20) == 1 then 
 SpawnCombineSynth(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 end
 end
