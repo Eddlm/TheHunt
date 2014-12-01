@@ -5,7 +5,7 @@ To know the name of any item/weapon/entity of the game, right-click on its icon 
 RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade", "XBowBolt"}
 -- Don't add anything to this. Is what kind of ammo the NPC rebels will give you. You can prevent them for giving X type of ammo if you delete it from this table, but you can't add new values here. It will explode.
 
-STARTING_LOADOUT = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
+STARTING_LOADOUT = { "weapon_crossbow","weapon_frag","m9k_colt1911","weapon_physcannon","m9k_val","m9k_svu,"weapon_slam","item_healthvial","weapon_shotgun"}
 -- If the custom loadout is enabled, you will spawn with these weapons.
 
 MEDIUMWEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
@@ -43,7 +43,7 @@ If a weapon doesn't make noise when used (Left Click), add it to SILENT_WEAPONS.
 If a weapon has a loud secondary fire (Right click), add it to the SECONDARY_FIRE_WEAPONS.
 The gamemode doesn't check for USE or RELOAD actions for now. These are always silent.
 --------------------------------------------------------------*/
-SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez","stalker_val", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu","stalker_enfield"}
+SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez","stalker_val", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu","stalker_enfield","m9k_val"}
 -- Using them will attract nearby combine. Don't add multimode weapons there, only the ones who are "silenced" all the time.
 
 SILENT_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_slam",
