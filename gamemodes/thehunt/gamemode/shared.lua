@@ -302,15 +302,6 @@ end)
 
 if GetConVarString("h_weight_system") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
 
-if GetConVarNumber("h_max_weapons_carrying") > -1 and CANPICKUP == 1 then
-if wep:GetClass() != "weapon_frag" then
-local numweapons = 0
-table.foreach(ply:GetWeapons(), function(key,value)
-numweapons = numweapons+1
-end)
-if numweapons > GetConVarNumber("h_max_weapons_carrying") then return false end
-end
-end
 
 if GetConVarNumber("h_selective_weapon_pickup") == 1 then
 if wep:GetClass() != "weapon_crowbar" then 
@@ -340,14 +331,13 @@ end
 
 
 function ItemRespawnSystem()
-if GetConVarString("h_item_respawn_system") == "1" then
+if 1 == 1 then
 local CAN = 1
 local PLAYERS = 0
 local NUMBER = 0
 for k,weapon in pairs(ents.FindByClass("player")) do 
 PLAYERS = PLAYERS + 1
 end
-local OFFSET = PLAYERS + GetConVarNumber("h_weaponoffset")
 --print("")
 if PLAYERS > 3 then PLAYERS = PLAYERS/2 end
 table.foreach(MEDIUMWEAPONS, function(key,value)
@@ -355,7 +345,7 @@ for k,weapon in pairs(ents.FindByClass(value)) do
  NUMBER=NUMBER+1
 end
 --print("[The Hunt]: There are "..NUMBER.." "..value.."")
-while NUMBER < OFFSET do
+while NUMBER < PLAYERS do
 --print("[The Hunt]: Added 1 of "..value.."")
 SpawnItem(value, table.Random(ITEMPLACES), Angle(0,0,math.random(-180,180)) )
 NUMBER = NUMBER+1
@@ -419,6 +409,42 @@ end
 
 SPAWNPOINTS_TO_DELETE = {"info_player_terrorist", "info_player_counterterrorist", "info_player_start", "info_player_deathmatch",
 }
+
+
+RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade", "XBowBolt"}
+
+
+
+TOO_BRIGHT_WEAPONS = { "weapon_crossbow", "weapon_physcannon", "weapon_rpg", "weapon_medkit"}
+-- Weapons that make you more visible. It's harder to hide while carrying this weapon.
+
+DARK_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_357","weapon_slam","fas2_dv2","fas2_ammobox","fas2_ifak","fas2_machete","stalker_knife","m9k_machete" }
+-- Weapons that don't have any bright items on them.
+
+SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez","stalker_val", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu","stalker_enfield","kf_mac10_fas","pspak_m14",}
+-- Using them will attract nearby combine.
+
+SILENT_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_slam",
+-- DOOM SWEPS support
+"weapon_doom3_fists","weapon_doom3_fists",
+-- M90 Suppport
+"m9k_damascus","m9k_fists","m9k_m61_frag","m9k_harpoon","m9k_ied_detonator","m9k_knife","m9k_machete","m9k_nerve_gas","m9k_nitro","m9k_orbital_strike","m9k_proxy_mine","m9k_sticky_grenade","m9k_suicide_bomb",
+-- Serious Sam Support
+"weapon_ss_knife",
+-- FA:S support
+"fas2_ifak","fas2_machete","kf_knife_fas","fas2_dv2",
+-- Mad Cow's Weapons Support
+"weapon_mad_tmp","weapon_mad_c4","weapon_mad_charge","weapon_mad_flash","weapon_mad_grenade","weapon_mad_crossbow","weapon_mad_incendiary","weapon_mad_knife","weapon_mad_smoke","weapon_mad_magnade",
+-- STALKER
+"stalker_knife"}
+-- Using them wont atract anyone.
+
+SECONDARY_FIRE_WEAPONS = { "weapon_ar2", "weapon_shotgun"}
+-- Weapons that have a loud secondary fire.
+
+
+ONLY_PICKUP_ONCE = { "weapon_physcannon","seal6-claymore","weapon_doom3_chainsaw","death_note","weapon_stunstick","m9k_machete","goldenpan","weapon_stickyrifle"}
+-- The game will prevent people from picking up this weapons if they already have them. Useful for weapons with infinite uses, preventing the player from picking up a weapon he doesn't need to, leaving the weapon for others.
 
 
 VanillaWeapons = { "weapon_shotgun", "weapon_ar2","weapon_pistol", "weapon_crossbow", "weapon_physcannon","weapon_smg1","weapon_357"}
@@ -589,3 +615,4 @@ M9K_ASSAULT_RIFLES={"m9k_winchester73","m9k_acr","m9k_ak47","m9k_ak74","m9k_amd6
 FAS={"fas2_ak12","fas2_ak47","fas2_ak74","fas2_an94","fas2_dv2","fas2_famas","fas2_g36c","fas2_g3","fas2_glock20","fas2_deagle","fas2_galil","fas2_uzi","fas2_ifak","fas2_ks23","fas2_mac11","fas2_m14","fas2_m1911","fas2_m21","fas2_m24","fas2_m3s90","fas2_m4a1","fas2_m67","fas2_m79","fas2_m82","fas2_machete","fas2_mp5a5","fas2_mp5k","fas2_mp5sd6","fas2_ots33","fas2_p226","fas2_pp19","fas2_ragingbull","fas2_rem870","fas2_rpk","fas2_rk95","fas2_sg550","fas2_sg552","fas2_sks","fas2_sr25","fas2_toz34"}
 Customizable_Weaponry={"cw_ak74","cw_ar15","cw_g3a3","cw_mp5","cw_deagle","cw_mr96"}
 
+VANILLA_WEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}

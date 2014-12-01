@@ -39,7 +39,7 @@ end )
 
 net.Receive( "ShowHUDScoreboard", function( len, ply )
 ShowScoreboard=true
-timer.Simple(4, function() ShowScoreboard=false end)
+timer.Simple(2, function() ShowScoreboard=false end)
 end)
 
 net.Receive( "HideHUDScoreboard", function( len, ply )
@@ -77,7 +77,7 @@ if GetConVarNumber("h_hud_left") == 0 then
 
 	else
 
-	draw.RoundedBox(6 , ScrW()*0.025, ScrH() * 0.815, 140, 67, Color(255,255,255,20))
+	draw.RoundedBox(6 , ScrW()*0.027, ScrH() * 0.82, 140, 84, Color(255,255,255,20))
 
 	draw.DrawText( "Score: "..LocalPlayer():GetNWInt("Score").."", "TargetID", ScrW() * 0.03, ScrH() * 0.82, score_color, TEXT_ALIGN_LEFT )
 	draw.DrawText( LIGHTEXT, "TargetID", ScrW() * 0.03, ScrH() * 0.84, LIGHTCOLOR, TEXT_ALIGN_LEFT )
@@ -168,7 +168,9 @@ CombineBootSound = {
 function light()
 timer.Simple( 0.2, light )
 
+if LocalPlayer() then
 if LocalPlayer():Alive() then
+
 lightcol = (render.GetLightColor(LocalPlayer():GetPos())*Vector(100,100,100)):Length()
 --lightcol = (render.ComputeDynamicLighting(LocalPlayer():GetPos(),Vector( 0, 0, 0 ))*Vector(100,100,100)):Length()
 
@@ -211,6 +213,7 @@ if lightcol > 2 then
 	net.SendToServer()
 	end
 	end
+end
 end
 end
 end

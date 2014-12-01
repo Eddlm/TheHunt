@@ -21,7 +21,7 @@
 			"text"		"Min. Enemies to win"
 			"help"		"If the combine number is below this, the wave is defeated."
 			"type"		"Numeric"
-			"default"	"3"
+			"default"	"2"
 		}
 		3
 		{
@@ -57,21 +57,13 @@
 		}		
 		7
 		{
-			"name"		"h_weaponoffset"
-			"text"		"Player - Weapons balance"
-			"help"		"This value allows to ballance how many weapons should be available on the map. Positive values mean more weapons than players, negative values mean less weapons than players. The ideal is 0."
-			"type"		"Numeric"
-			"default"	"0"
-		}			
-		8
-		{
 			"name"		"h_rpgmax"
 			"text"		"Max RPG to spawn"
 			"help"		"Maximun number of RPGs that would spawn on an rpg-allowed map."
 			"type"		"Numeric"
 			"default"	"1"
 		}		
-		9
+		8
 		{
 			"name"		"h_maxgunshotinvestigate"
 			"text"		"Gunshot alerts NºCombine"
@@ -79,15 +71,15 @@
 			"type"		"Numeric"
 			"default"	"4"
 		}
-		10
+		9
 		{
 			"name"		"h_player_lifes"
 			"text"		"Player lifes"
 			"help"		"When player wastes all his lifes, he won't be able to spawn until the round ends."
 			"type"		"Numeric"
-			"default"	"10"
+			"default"	"50"
 		}	
-		11
+		10
 		{
 			"name"		"h_time_between_waves"
 			"text"		"Time between waves"
@@ -95,23 +87,15 @@
 			"type"		"Numeric"
 			"default"	"15"
 		}
-		12
+		11
 		{
 			"name"		"h_combine_killed_to_win"
-			"text"		"Combine limit:"
+			"text"		"Combine killed to win"
 			"help"		"When you reach this limit, you automatically win."
 			"type"		"Numeric"
-			"default"	"120"
+			"default"	"100"
 		}
-		13
-		{
-			"name"		"h_custom_loadout"
-			"text"		"Custom Loadouts"
-			"help"		"If enabled, you will spawn with weapons defined in the STARTING_LOADOUT table (config.lua)."
-			"type"		"CheckBox"
-			"default"	"0"
-		}
-		14
+		12
 		{
 			"name"		"h_weight_system"
 			"text"		"Weight system"
@@ -119,7 +103,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		15
+		13
 		{
 			"name"		"h_item_respawn_system"
 			"text"		"Spawn items and weapons"
@@ -129,27 +113,27 @@
 		}
 		16
 		{
-			"name"		"h_max_weapons_carrying"
-			"text"		"Max weapons to hold"
-			"help"		"How many weapons a player can carry"
-			"type"		"Numeric"
-			"default"	"-1"
-		}
-		17
-		{
 			"name"		"h_selective_weapon_pickup"
 			"text"		"Press E to pick up weapons"
 			"help"		"Enable this if you don't want to pick up everything you pass by. Useful if using the weapon weight feature."
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		18
+		17
 		{
 			"name"		"h_supersoldier"
 			"text"		"Add the Combine SuperSoldier"
 			"help"		"Adds the Combine SuperSoldier to the combine spawns"
 			"type"		"CheckBox"
 			"default"	"0"
+		}
+		18
+		{
+			"name"		"h_vanilla_weapons"
+			"text"		"Add default HL2 Weapons"
+			"help"		"Add default HL2 Weapons"
+			"type"		"CheckBox"
+			"default"	"1"
 		}
 		19
 		{
@@ -209,13 +193,28 @@
 		}
 		26
 		{
+			"name"		"h_default_loadout"
+			"text"		"Default loadout (separate with , )"
+			"help"		"Default loadout (separate with , )"
+			"type"		"Text"
+			"default"	""
+		}
+		27
+		{
 			"name"		"h_personalized_sweps"
 			"text"		"Add these weapons (separate with , )"
 			"help"		"Add these weapons (ex "crowbar","rpg")"
 			"type"		"Text"
-			"default"	""
+			"default"	"item_healthvial"
 		}
-
+		28
+		{
+			"name"		"h_silent_kill_rewards"
+			"text"		"Silent Kill rewards(separate with , )"
+			"help"		"Silent Kill rewards(separate with , )"
+			"type"		"Text"
+			"default"	"weapon_slam"
+		}
 	}
 }
 

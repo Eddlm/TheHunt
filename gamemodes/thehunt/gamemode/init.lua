@@ -1,6 +1,5 @@
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
-AddCSLuaFile( "config.lua" )
 include( "shared.lua" )
 include( "config.lua" )
 util.AddNetworkString( "Spotted" )
@@ -90,6 +89,13 @@ end
 
 
 function GM:Initialize()
+
+
+STARTING_LOADOUT = {}
+MEDIUMWEAPONS = {}
+SILENTKILLREWARD = {"item_healthvial"}
+
+
 teamscore = 0
 HeliCanSpawn = true
 max_weapons_total = 999
@@ -343,9 +349,8 @@ end
 end )
 
 concommand.Add( "h_version", function(ply)
-ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.3. Date: 26/11/2014")
-ply:PrintMessage(HUD_PRINTTALK, "Last changes: Helicopters are less persistent & Combine Super Soldiers only appear in the infinite wave.")
-ply:PrintMessage(HUD_PRINTTALK, "Running the GitHub version.")
+ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.5. Date: 1/12/2014")
+ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added CW2.0 weapons and tweaked options.")
 end )
 
 concommand.Add( "h_pos", function(ply)
@@ -1849,14 +1854,16 @@ function GM:PlayerSpawn(ply)
     ply:SetCustomCollisionCheck(true)
 	ply:StripAmmo()
 	ply:StripWeapons()
-	if GetConVarString("h_custom_loadout") == "1" then
+	ply:Give("weapon_crowbar")
+
+	if GetConVarString("h_default_loadout") == "" then 	
+	else
 	table.foreach(STARTING_LOADOUT, function(key,value)
 		ply:Give(""..value.."")
-	end)
-	else
-	ply:Give("weapon_crowbar")
-	end
+		--SpawnItem(value, ply:GetPos(), Angle(0,0,0))
 
+	end)
+	end
 	ply:SetupHands()
 	ply:SetWalkSpeed(150)
 	ply:SetRunSpeed(250)
@@ -2023,9 +2030,9 @@ end
 
 if GetConVarString("h_autostart") == "1" then
 if win == 1 then
-timer.Simple(10, autofirstwave)
+timer.Simple(GetConVarNumber("h_time_between_waves"), autofirstwave)
 end
-else
+else 
 end
 
 Wave=0
@@ -2058,6 +2065,19 @@ else
 print("[The Hunt]: MAP_PROPS not found, will not add dynamic weapon spawnpoints.")
 end
 ORIGINAL_ZONES_NUMBER = table.Count(zonescovered)
+
+
+if GetConVarString("h_vanilla_weapons") == "1" then
+--if m9k_nerve_gas:IsValid() then
+print("[The Hunt]: Adding Vanilla weapons")
+
+table.foreach(VANILLA_WEAPONS, function(key,weapon)
+table.insert(MEDIUMWEAPONS,weapon)
+end)
+else
+
+end
+
 
 if GetConVarString("h_STALKER_sweps") == "1" then
 --if stalker_deagle:IsValid() then
@@ -2149,8 +2169,6 @@ print("[The Hunt]: You DON'T have the M9K Specialities Sweps addon! Won't add it
 
 end
 
-
-
 if GetConVarString("h_FAS_sweps") == "1" then
 --if m9k_nerve_gas:IsValid() then
 print("[The Hunt]: Adding FAS Sweps")
@@ -2216,14 +2234,36 @@ else
 print("[The Hunt]: You DON'T have the Customizable Weaponry 2.0 Sweps addon! Won't add it")
 
 end
-print("[The Hunt]: Loaded "..GetConVarString("h_personalized_sweps").." as an extra.")
 
+
+if GetConVarString("h_default_loadout") == "" then else
+print("[The Hunt]: Loaded "..GetConVarString("h_default_loadout").." as an extra.")
+local sentence = ""..GetConVarString("h_default_loadout")..""
+local words = string.Explode( ",", sentence )
+table.foreach(words, function(key,value)
+table.insert(STARTING_LOADOUT, value)
+end)
+end
+
+
+if GetConVarString("h_personalized_sweps") == "" then else
+print("[The Hunt]: Loaded "..GetConVarString("h_personalized_sweps").." as an extra.")
 local sentence = ""..GetConVarString("h_personalized_sweps")..""
 local words = string.Explode( ",", sentence )
-
 table.foreach(words, function(key,value)
 table.insert(MEDIUMWEAPONS, value)
 end)
+end
+
+if GetConVarString("h_silent_kill_rewards") == "" then else
+print("[The Hunt]: Loaded "..GetConVarString("h_silent_kill_rewards").." for the silent kill rewards.")
+local sentence = ""..GetConVarString("h_silent_kill_rewards")..""
+local words = string.Explode( ",", sentence )
+table.foreach(words, function(key,value)
+table.insert(SILENTKILLREWARD, value)
+end)
+end
+
 --end
 print("---------------THE HUNT LOADED-------------")
 end)
@@ -2489,7 +2529,7 @@ if killer:IsPlayer() then
 end
 
 -- Calculate scores only if the "killed" npc isn't a turret. They have no "killers" when they die
-if !victim:GetClass() == "npc_turret_floor" then
+if victim:GetClass() != "npc_turret_floor" then
 CalculatePlayerScore(killer)
 end
 
@@ -2602,6 +2642,10 @@ end
 end
 if damaged:GetClass() == "npc_sniper" then
 if damage:GetInflictor():GetClass() == "crossbow_bolt" or damage:IsDamageType(64) or damage:IsDamageType(67108864) or damage:GetDamage() > 50 then
+damaged:SetHealth(0)
+PrintMessage(HUD_PRINTTALK, ""..damage:GetAttacker():GetName().." got that Sniper out of the way ")
+
+elseif math.random(1,5) == 3 then
 damaged:SetHealth(0)
 PrintMessage(HUD_PRINTTALK, ""..damage:GetAttacker():GetName().." got that Sniper out of the way ")
 end
