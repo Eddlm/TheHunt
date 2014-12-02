@@ -10,7 +10,7 @@
 		1
 		{
 			"name"		"h_autostart"
-			"text"		"Allow autostart"
+			"text"		"Auto-Start the waves"
 			"help"		"If enabled then the first wave will start automatically"
 			"type"		"CheckBox"
 			"default"	"1"
@@ -18,7 +18,7 @@
 		2
 		{
 			"name"		"h_minenemies"
-			"text"		"Min. Enemies to win"
+			"text"		"Min. Enemies to defeat wave"
 			"help"		"If the combine number is below this, the wave is defeated."
 			"type"		"Numeric"
 			"default"	"2"
@@ -50,7 +50,7 @@
 		6
 		{
 			"name"		"h_lostplayertimeout"
-			"text"		"Combine give up time "
+			"text"		"Combine give up time"
 			"help"		"How many seconds have to pass before a combine gives up on chasing you."
 			"type"		"Numeric"
 			"default"	"10"
@@ -66,7 +66,7 @@
 		8
 		{
 			"name"		"h_maxgunshotinvestigate"
-			"text"		"Gunshot alerts NºCombine"
+			"text"		"Gunshot alerts Nº Combine"
 			"help"		"Maximun number of combine who will come to investigate a gunshot"
 			"type"		"Numeric"
 			"default"	"4"
@@ -98,7 +98,7 @@
 		12
 		{
 			"name"		"h_weight_system"
-			"text"		"Weight system"
+			"text"		"Weapon weight system"
 			"help"		"If enabled, every weapon you carry will slow you down a little. Prevents people from running to get all the weapons."
 			"type"		"CheckBox"
 			"default"	"0"
@@ -114,7 +114,7 @@
 		16
 		{
 			"name"		"h_selective_weapon_pickup"
-			"text"		"Press E to pick up weapons"
+			"text"		"Selective weapon pickup (Press E)"
 			"help"		"Enable this if you don't want to pick up everything you pass by. Useful if using the weapon weight feature."
 			"type"		"CheckBox"
 			"default"	"0"
@@ -122,15 +122,15 @@
 		17
 		{
 			"name"		"h_supersoldier"
-			"text"		"Add the Combine SuperSoldier"
-			"help"		"Adds the Combine SuperSoldier to the combine spawns"
+			"text"		"Add the Combine Elite Synth"
+			"help"		"Adds theCombine Elite Synth to the combine spawns"
 			"type"		"CheckBox"
 			"default"	"0"
 		}
 		18
 		{
 			"name"		"h_vanilla_weapons"
-			"text"		"Add default HL2 Weapons"
+			"text"		"Spawn HL2 Weapons"
 			"help"		"Add default HL2 Weapons"
 			"type"		"CheckBox"
 			"default"	"1"
@@ -138,7 +138,7 @@
 		19
 		{
 			"name"		"h_STALKER_sweps"
-			"text"		"Add STALKER sweps"
+			"text"		"Spawn STALKER sweps"
 			"help"		"Add STALKER sweps into the weapon mix"
 			"type"		"CheckBox"
 			"default"	"0"
@@ -146,7 +146,7 @@
 		20
 		{
 			"name"		"h_MR_PYROUS_sweps"
-			"text"		"Add MrPyrous sweps"
+			"text"		"Spawn MrPyrous sweps"
 			"help"		"Add MrPyrous sweps into the weapon mix"
 			"type"		"CheckBox"
 			"default"	"0"
@@ -154,7 +154,7 @@
 		21
 		{
 			"name"		"h_MAD_COWS_sweps"
-			"text"		"Add MadCows sweps"
+			"text"		"Spawn MadCows sweps"
 			"help"		"Add MadCows sweps into the weapon mix"
 			"type"		"CheckBox"
 			"default"	"0"
@@ -162,7 +162,7 @@
 		22
 		{
 			"name"		"h_M9K_SPECIALITIES_sweps"
-			"text"		"Add M9K Specialities sweps"
+			"text"		"Spawn M9K Specialities sweps"
 			"help"		"Add M9K Specialities sweps into the weapon mix"
 			"type"		"CheckBox"
 			"default"	"0"
@@ -170,15 +170,15 @@
 		23
 		{
 			"name"		"h_FAS_sweps"
-			"text"		"Add FAS sweps"
-			"help"		"Add FAS sweps into the weapon mix"
+			"text"		"Spawn FA:S sweps"
+			"help"		"Add FA:S sweps into the weapon mix"
 			"type"		"CheckBox"
 			"default"	"0"
 		}
 		24
 		{
 			"name"		"h_M9K_ASSAULT_RIFLES_sweps"
-			"text"		"Add M9K Assault Rifles"
+			"text"		"Spawn M9K Assault Rifles"
 			"help"		"Add M9K Assault Rifles"
 			"type"		"CheckBox"
 			"default"	"0"
@@ -186,7 +186,7 @@
 		25
 		{
 			"name"		"h_CUSTOMIZABLE_WEAPONRY_2_0_sweps"
-			"text"		"Add Customizable Weaponry 2.0 Sweps"
+			"text"		"Spawn Custom. Weapory 2.0 Sweps"
 			"help"		"Add Customizable Weaponry 2.0 Sweps"
 			"type"		"CheckBox"
 			"default"	"0"
@@ -202,7 +202,7 @@
 		27
 		{
 			"name"		"h_personalized_sweps"
-			"text"		"Add these weapons (separate with , )"
+			"text"		"Custom weapons to spawn around (separate with , )"
 			"help"		"Add these weapons (ex "crowbar","rpg")"
 			"type"		"Text"
 			"default"	"item_healthvial"
@@ -210,8 +210,8 @@
 		28
 		{
 			"name"		"h_silent_kill_rewards"
-			"text"		"Silent Kill rewards(separate with , )"
-			"help"		"Silent Kill rewards(separate with , )"
+			"text"		"Silent Kill rewards (separate with , )"
+			"help"		"Silent Kill rewards (separate with , )"
 			"type"		"Text"
 			"default"	"weapon_slam"
 		}

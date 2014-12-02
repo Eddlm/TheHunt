@@ -2529,7 +2529,7 @@ if killer:IsPlayer() then
 end
 
 -- Calculate scores only if the "killed" npc isn't a turret. They have no "killers" when they die
-if victim:GetClass() != "npc_turret_floor" then
+if victim:GetClass() != "npc_turret_floor" and killer:IsPlayer() then
 CalculatePlayerScore(killer)
 end
 
