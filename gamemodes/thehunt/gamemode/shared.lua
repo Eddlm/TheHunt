@@ -2,7 +2,6 @@ GM.Name = "The Hunt"
 GM.Author = "Eddlm"
 GM.Email = "eddmalaga@gmail.com"
 GM.Website = "http://facepunch.com/showthread.php?t=1391522"
-include( "config.lua" )
 
 net.Receive( "Scoreboard", function( length, client )
 local DermaPanel = vgui.Create( "DFrame" )
@@ -40,6 +39,8 @@ end )
 
 
 function CalculatePlayerScore(ply)
+teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
+
 	local killpercent = ((ply.Kills+ply.SilentKills)/(team_kills+team_silent_kills))*100
 	local deathpercent = (ply.deaths/team_deaths)*100
 	local player_points = ((ply.Kills+(ply.SilentKills*3)-ply.deaths*2))
@@ -85,6 +86,15 @@ end
 function ISaid( ply, text, public )
 local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLED
 
+
+    if text == "!listmaps" or text == "!LISTMAPS" then
+	MapVoteThing(ply)
+	return false end
+	
+    if text == "!taunt" or text == "taunt" then
+	if ply.sex=="female" then ply:EmitSound(table.Random(femaletaunts), 100, 100) else ply:EmitSound(table.Random(maletaunts), 100, 100) end
+nearbycombinecomesilent(ply)
+return false end
     if text == "!remain" or text == "!REMAIN" then
 	PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Number "..Wave..", you have "..EnemiesRemainining.." units remaining.")
 	timer.Simple(3, function() PrintMessage(HUD_PRINTTALK, "[Overwatch]: Mission failure if "..GlobalRemaining.." ground units are lost.") end)
@@ -112,7 +122,7 @@ end
     end
 
 	if text == "!teamscore" or text == "!TEAMSCORE" then
-	teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(2*PLAYERSINMAP))
+	teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
 
 	for k,player in pairs(player.GetAll()) do
 	local killpercent = ((player.Kills+player.SilentKills)/(team_kills+team_silent_kills))*100
@@ -256,7 +266,24 @@ if suspect:GetPos() then
 end
 end
 
+function nearbycombinecomesilent(suspect)
 
+if suspect:GetPos() then
+	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),512)) do
+		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
+			if v:GetPos():Distance(suspect:GetPos()) > 10 then
+				if !v:GetEnemy() then
+					if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
+						v:SetLastPosition(suspect:GetPos())
+						v:SetSchedule(SCHED_FORCED_GO)
+						end
+				end
+			end
+		end
+	end
+
+end
+end
 
 function allthecombinecome(suspect,MAXCOMBINERUSH)
 local coming=0
@@ -560,6 +587,28 @@ femalecomments={
 "vo/npc/female01/yeah02.wav",
 }
 
+femaletaunts={
+"vo/npc/female01/gethellout.wav",
+"vo/npc/female01/watchout.wav",
+"vo/npc/female01/combine01.wav",
+"vo/npc/female01/combine02.wav",
+"vo/npc/female01/headsup01.wav",
+"vo/npc/female01/headsup02.wav",
+"vo/npc/female01/overhere01.wav",
+}
+
+maletaunts={
+"vo/npc/male01/gethellout.wav",
+"vo/npc/male01/hacks01.wav",
+"vo/npc/male01/incoming02.wav",
+"vo/npc/male01/letsgo02.wav",
+"vo/npc/male01/squad_approach04.wav",
+"vo/npc/male01/upthere01.wav",
+"vo/npc/male01/thehacks01.wav",
+"vo/npc/male01/watchout.wav",
+}
+
+
 malewin={
 "vo/npc/male01/yeah02.wav",
 "vo/npc/male01/likethat.wav",
@@ -616,3 +665,5 @@ FAS={"fas2_ak12","fas2_ak47","fas2_ak74","fas2_an94","fas2_dv2","fas2_famas","fa
 Customizable_Weaponry={"cw_ak74","cw_ar15","cw_g3a3","cw_mp5","cw_deagle","cw_mr96"}
 
 VANILLA_WEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
+
+MHs_Super_Battle_Pack_PART_II ={"acid_sprayer_minds","acidball_minds","alienblasterx_minds","sniperrifle_minds","autoshot_lua","handcannon_minds","crazygbombgun_minds","crazyheligun_minds","crazymelongun_minds","cutter_minds","demoniccarsg_minds","fireball_minds","flamethrower_minds","frostball_minds","gbomb_minds","grapplinggun_minds","grapplinghook_minds","grenader_minds","heligrenade_minds","airboatgun_minds","laser_minds","ln2_sprayer_minds","melongrenade_minds","mrproper_minds","physautomat_minds","rifle_minds","nrocket_launcher_minds"}

@@ -215,6 +215,15 @@
 			"type"		"Text"
 			"default"	"weapon_slam"
 		}
+		29
+		{
+			"name"		"h_MHs_Super_Battle_Pack_PART_II_sweps"
+			"text"		"Spawn MHs SBP Part II sweps"
+			"help"		"Silent Kill rewards (separate with , )"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		
 	}
 }
 

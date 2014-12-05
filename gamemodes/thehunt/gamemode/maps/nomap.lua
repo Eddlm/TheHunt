@@ -19,7 +19,6 @@ Vector(0,0,0)
 function FirstSpawn()
 PrintMessage(HUD_PRINTTALK, "Sorry! "..game.GetMap().." it's not compatible with The Hunt yet.")
 PrintMessage(HUD_PRINTTALK, " Go to Facepunch>Garrysmod>Gamemode&Addon releases>TheHunt for more information.")
-
 end
 
 function MapSetup()

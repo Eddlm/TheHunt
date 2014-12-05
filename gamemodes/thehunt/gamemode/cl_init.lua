@@ -1,7 +1,6 @@
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "config.lua" )
 include( "shared.lua" )
-include( "config.lua" )
 
 darkencolor = Color(255,0,0)
 HUDTEXT = "Hidden"
@@ -67,7 +66,7 @@ end )
 end )
 
 hook.Add( "HUDPaint", "HuntHud", function()
-if LocalPlayer():Alive() then
+if LocalPlayer():Alive() and LocalPlayer():IsValid() then
 if GetConVarNumber("h_hud_left") == 0 then
 
 	draw.RoundedBox(6 , ScrW()*0.885, ScrH() * 0.90, 140, 67, Color(255,255,255,20))
