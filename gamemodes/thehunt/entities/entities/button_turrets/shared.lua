@@ -10,7 +10,7 @@ ENT.Instructions	= ""
 function ENT:Initialize()
 if SERVER then
 ARMED=0
-self:SetModel( "models/props_combine/combine_intmonitor003.mdl" )
+self:SetModel( "models/props_combine/combine_intmonitor001.mdl" )
 self:SetSolid( SOLID_VPHYSICS )
 self:SetMoveType(MOVETYPE_NONE)
 self:SetUseType(SIMPLE_USE)

@@ -86,10 +86,12 @@ end
 function ISaid( ply, text, public )
 local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLED
 
-
+	
     if text == "!listmaps" or text == "!LISTMAPS" then
 	MapVoteThing(ply)
 	return false end
+
+	
 	
     if text == "!taunt" or text == "taunt" then
 	if ply.sex=="female" then ply:EmitSound(table.Random(femaletaunts), 100, 100) else ply:EmitSound(table.Random(maletaunts), 100, 100) end
@@ -104,7 +106,6 @@ return false end
 
 	if text == "!remove" or text == "!REMOVE" then
 	ply:PrintMessage(HUD_PRINTTALK, ""..ply:GetActiveWeapon():GetClass().." removed from your inventary.")
-
 	ply:StripWeapon(ply:GetActiveWeapon():GetClass())
 	return false end
 	
@@ -245,7 +246,7 @@ end
 function nearbycombinecomecasual(suspect)
 	local come = 0
 if suspect:GetPos() then
-	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),512)) do
+	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
 		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
 			if v:GetPos():Distance(suspect:GetPos()) > 10 then
 				if come < 1 then 
@@ -269,7 +270,7 @@ end
 function nearbycombinecomesilent(suspect)
 
 if suspect:GetPos() then
-	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),512)) do
+	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),812)) do
 		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
 			if v:GetPos():Distance(suspect:GetPos()) > 10 then
 				if !v:GetEnemy() then
@@ -412,7 +413,7 @@ for k,v in pairs(ents.FindByClass("item_suitcharger")) do
 	if canrespawn == 1 then
 	--print("[The Hunt]: player not found, will respawn charger")
 	v:Remove()
-	SpawnItem("item_healthcharger", chargerpos, chargerangles )
+	SpawnSuitCharger(chargerpos, chargerangles )
 	end
 end
 end
@@ -448,7 +449,7 @@ TOO_BRIGHT_WEAPONS = { "weapon_crossbow", "weapon_physcannon", "weapon_rpg", "we
 DARK_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_357","weapon_slam","fas2_dv2","fas2_ammobox","fas2_ifak","fas2_machete","stalker_knife","m9k_machete" }
 -- Weapons that don't have any bright items on them.
 
-SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez","stalker_val", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu","stalker_enfield","kf_mac10_fas","pspak_m14",}
+SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez","stalker_val", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu","stalker_enfield","kf_mac10_fas","pspak_m14","bakker's blaster","murphy's law","the hammerhead","the pea shooter","the quadruple agent","the reanimated rocket rifle","the secret carbine","the sleeping pill",}
 -- Using them will attract nearby combine.
 
 SILENT_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_slam",
@@ -463,10 +464,11 @@ SILENT_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_slam",
 -- Mad Cow's Weapons Support
 "weapon_mad_tmp","weapon_mad_c4","weapon_mad_charge","weapon_mad_flash","weapon_mad_grenade","weapon_mad_crossbow","weapon_mad_incendiary","weapon_mad_knife","weapon_mad_smoke","weapon_mad_magnade",
 -- STALKER
-"stalker_knife"}
+"stalker_knife",
+"the penguinade",}
 -- Using them wont atract anyone.
 
-SECONDARY_FIRE_WEAPONS = { "weapon_ar2", "weapon_shotgun"}
+SECONDARY_FIRE_WEAPONS = { "weapon_ar2", "weapon_shotgun","the kilroy warhammer"}
 -- Weapons that have a loud secondary fire.
 
 
@@ -667,3 +669,8 @@ Customizable_Weaponry={"cw_ak74","cw_ar15","cw_g3a3","cw_mp5","cw_deagle","cw_mr
 VANILLA_WEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
 
 MHs_Super_Battle_Pack_PART_II ={"acid_sprayer_minds","acidball_minds","alienblasterx_minds","sniperrifle_minds","autoshot_lua","handcannon_minds","crazygbombgun_minds","crazyheligun_minds","crazymelongun_minds","cutter_minds","demoniccarsg_minds","fireball_minds","flamethrower_minds","frostball_minds","gbomb_minds","grapplinggun_minds","grapplinghook_minds","grenader_minds","heligrenade_minds","airboatgun_minds","laser_minds","ln2_sprayer_minds","melongrenade_minds","mrproper_minds","physautomat_minds","rifle_minds","nrocket_launcher_minds"}
+
+
+
+spastiks_toybox={"bakker's blaster","gabriel","gretchen","henderson","lil' jim","murphy's law","the aerosol ar","the anti-rifle","the backscratcher","the bfhmg","the camper's choice","the coiled snake","the commander's compact","the doorman","the eleventh hour","the fire hazard","the fodder buster","the gambler","the grand prize","the greaser","the guerilla","the hammerhead","the hide n' seek advanced","the hometown slugger","the junkmaster","the kilroy warhammer","the lawnmower","the lobotomizer","the morning hail","the night light","the panther fist","the pea shooter","the penguinade","the pepper grinder","the quadruple agent","the rainmaker","the reanimated rocket rifle","the rusted bangstick","the salvaged sidearm","the secret carbine","the segundo pocket pistol","the sleeping pill","the spastik special","the special delivery","the straight razor","the swiss hellbringer","the trash compactor","the turbo lover","the waiting game"}
+

@@ -223,7 +223,15 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		
+		30
+		{
+			"name"		"h_spastiks_toybox_sweps"
+			"text"		"Spawn Spastik's Toybox SWEPS"
+			"help"		"Add Spastik's Toybox SWEPS"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+				
 	}
 }
 

@@ -24,13 +24,13 @@ NPC:SetKeyValue( "model", "models/elite_synth/elite_synth.mdl" )
 NPC:SetSkin(1)
 
 Get info from an entity typing this on the console while facing at it
-lua_run print("Entity: ") print(player.GetByID(1):GetEyeTrace().Entity) print("Position: ") print(player.GetByID(1):GetEyeTrace().Entity:GetPos()) print("Angles: ") print(player.GetByID(1):GetEyeTrace().Entity:GetAngles())
+lua_run print("Entity: ") print(player.GetByID(1):GetEyeTrace().Entity) print("Position: ") print(player.GetByID(1):GetEyeTrace().Entity:GetPos()) print("Angles: ") print(player.GetByID(1):GetEyeTrace().Entity:GetAngles()) print(player.GetByID(1):GetEyeTrace().Entity:EntIndex())
 
 lua_run print("Model: ") print(player.GetByID(1):GetEyeTrace().Entity:GetModel())
 */
 
 
-SUPPORTED_MAPS={"de_aztec","de_dust","ttt_retrospect","ttt_vessel","gm_excess_island_night","ttt_bb_outpost57_b5","zs_dockhouse","rp_fs_coast_07_003_pak","gmt_virus_facility202","cs_compound","cs_assault","rp_nova_prospekt_v4","cs_italy","dm_inevitableconflict","ttt_amsterville","ph_restaurant","gm_laboratory_alt","de_port","de_wanda","slender_infirmary","rp_construct_v1","zs_last_mansion_v3","zs_infirmary","de_prodigy","ttt_theship_v1","ttt_glacier","gm_construct","ttt_casino_b2","ttt_skyscraper","ttt_fallout","cs_office"}
+SUPPORTED_MAPS={"cs_assault","cs_compound","cs_italy","cs_militia","cs_office","de_aztec","de_chateau","de_dust","de_dust2","de_inferno","de_nuke","de_piranesi","de_port","de_prodigy","de_tides","de_train","de_wanda","dm_inevitableconflict","gmt_virus_facility202","gm_arena_submerge","gm_construct","gm_excess_island_night","gm_laboratory_alt","gm_ssewersv2","ph_islandhouse","ph_restaurant","rp_construct_v1","rp_fs_coast_07_003_pak","rp_nova_prospekt_v4","slender_infirmary","template config","ttt_amsterville","ttt_bb_outpost57_b5","ttt_casino_b2","ttt_fallout","ttt_glacier","ttt_retrospect","ttt_skyscraper","ttt_theship_v1","ttt_vessel","zs_dockhouse","zs_infirmary","zs_last_mansion_v3","zs_snowedin"}
 SUPPORTED_MAPS_INSTALLED={}
 
 function MapVoteThing(ply)
@@ -45,21 +45,65 @@ end
 end)
 end
 
+-- Map Configuration tools v
+function PlayerSpawnpointTool(ply)
 
-function HelicopterWave()
-local NumHelis = 0
-for k, v in pairs(ents.FindByClass("npc_helicopter")) do
-NumHelis=NumHelis+1
-end
-for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
-NumHelis=NumHelis+1
+local plypos = tostring(ply:GetPos())
+local pos = string.Explode( " ", plypos )
+--PrintTable( words )
+advancedpos = string.Implode( ", ", pos)
+
+local plyangles = tostring(ply:GetAngles())
+local angles = string.Explode( " ", plyangles )
+
+--table.foreach(angles, function(key,value) math.Round(value) print(value) end)
+--PrintTable(angles)
+
+
+
+
+advancedangles = string.Implode( ", ", angles)
+print("Vector("..advancedpos.."),Angle("..advancedangles..")")
+
 end
 
-if NumHelis > 0 then print("too much helis")
-elseif teamscore > 50 and HeliCanSpawn == true then
-SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,0,1)
+
+function PropSpawnpointTool(ply)
+
+local plypos = tostring(ply:GetEyeTraceNoCursor().Entity:GetPos())
+local pos = string.Explode( " ", plypos )
+--PrintTable( words )
+advancedpos = string.Implode( ", ", pos)
+
+local plyangles = tostring(ply:GetEyeTraceNoCursor().Entity:GetAngles())
+local angles = string.Explode( " ", plyangles )
+
+--table.foreach(angles, function(key,value) math.Round(value) print(value) end)
+--PrintTable(angles)
+
+
+
+
+advancedangles = string.Implode( ", ", angles)
+print("Vector("..advancedpos.."),Angle("..advancedangles..")")
 end
+
+function ItemSpawnpointTool(ply)
+
+local plypos = tostring(ply:GetPos())
+local pos = string.Explode( " ", plypos )
+--PrintTable( words )
+advancedpos = string.Implode( ", ", pos)
+
+--table.foreach(angles, function(key,value) math.Round(value) print(value) end)
+--PrintTable(angles)
+
+print("Vector("..advancedpos.."),")
+
 end
+-- Map Configuration tools ^
+
+
 
 net.Receive( "light_above_limit", function( length, client )
 net.Start( "Visible" )
@@ -353,7 +397,7 @@ print("[The Hunt]: found a props table, will add dynamic weapon spawnpoints. ")
 table.foreach(MAP_PROPS, function(key,propclass)
 for k, v in pairs(ents.GetAll()) do
 	if v:GetModel() == propclass then
-	table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,v:BoundingRadius()+20))
+	table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,v:BoundingRadius()))
 	v:SetKeyValue("minhealthdmg", "9001")
 	v:Fire("DisableMotion","",0)
 	print("[The Hunt]: "..v:GetModel().." is now a weapon spawnpoint.")
@@ -412,8 +456,8 @@ end
 end )
 
 concommand.Add( "h_version", function(ply)
-ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.6. Date: 1/12/2014")
-ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added addon checking for the weapon mix and a new command: !listmaps.")
+ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.7. Date: 8/12/2014")
+ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added a tool for configuring maps, added some new maps.")
 end )
 
 concommand.Add( "h_pos", function(ply)
@@ -765,6 +809,27 @@ end )
 
 -- UTILITY FUNCTIONS v (called by the commands or by game hooks)
 
+
+
+-- Called by waves if the wave should spawn an helicopter.
+function HelicopterWave()
+local NumHelis = 0
+for k, v in pairs(ents.FindByClass("npc_helicopter")) do
+NumHelis=NumHelis+1
+end
+for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
+NumHelis=NumHelis+1
+end
+
+if NumHelis > 0 then print("too much helis")
+elseif teamscore > 50 and HeliCanSpawn == true then
+SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,0,1)
+end
+end
+
+
+
+
 -- Counts the players.
 function NUMPLAYERS()
 PLAYERSINMAP=0
@@ -805,103 +870,6 @@ end
 end
 
 
--- What happens when a player is beind killed.
-function GM:DoPlayerDeath( ply, attacker, dmginfo )
-timer.Simple(1, npcforget)
-ply:CreateRagdoll()
-ply:AddDeaths(1)
-NUMPLAYERS()
-ply.canspawn = 0
-ply.lifes=ply.lifes-1
-ply.deaths=ply.deaths+1
-team_deaths=team_deaths+1
-
-if attacker:IsNPC() then
-attacker:EmitSound(table.Random(CombineKillSounds), 100, 100)
-end
-
-
--- One npc_sniper can only kill one player, then, it won't shoot players anymore. So I remove it and respawn another when he kills a player.
-if attacker:GetClass() == "npc_sniper" then
-local pos = attacker:GetPos()
-local ang = attacker:GetAngles()
-attacker:Remove()
-SpawnItem("npc_sniper", pos, ang)
-end
-
-
-table.foreach( ply:GetWeapons(), function(key,value)
-	if key > 1 then
-		if value:Clip1() then
-			if value:Clip1() == 0 then
-				value:Remove()
-				else
-				ply:DropWeapon(value)
-			end
-		end
-	end
-end)
-
-
-
-timer.Simple(1, function()
-if attacker:IsNPC() then
-ply:Spectate(5)
-ply:SetMoveType(10)
-ply:SpectateEntity(attacker)
-end
-
-
-
-if PLAYERSINMAP > 1 then
-if ply.lifes == 0  then
-ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left.")
-ply:PrintMessage(HUD_PRINTTALK, "You can see your teammates using right click.")
-ply:PrintMessage(HUD_PRINTTALK, "Check your score by typing !myscore or !teamscore.")
---else
---CanCheck = 0
-else
-ply:PrintMessage(HUD_PRINTTALK, "You have "..ply.lifes.." lifes left.")
-ply.canspawn = 1
-end
-else
-ply.canspawn = 1
-end
-end)
-
-
--- Failed attempt to make the game end if every player is dead and has no lifes.
-/*
-if PLAYERSINMAP > 1 then
-	local players_defeated = 1
-	table.foreach(player.GetAll(), function(key,value)
-	if value:Alive() or value.lifes>0 then players_defeated = 0 end
-	end)
-	if players_defeated == 1  then 
-	PlayerDefeat()
-	CanCheck = 0
-	end
-end
-*/
-
-if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
-table.remove(zonescovered)
-table.remove(zonescovered)
-table.remove(zonescovered)
-table.remove(zonescovered)
-table.remove(zonescovered)
-table.remove(zonescovered)
-table.remove(zonescovered)
-table.remove(zonescovered)
-table.remove(zonescovered)
-table.remove(zonescovered)
-print("Patrol zones restarted")
-end
-table.insert(zonescovered, ply:GetPos()+Vector(0,0,30)) print("Patrol zone added")
-
---teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
-CalculatePlayerScore(ply)
-end
 
 function NearbyEntities()
 print("[The Hunt]: Entities found:")
@@ -949,7 +917,7 @@ end
 
 
 function wavefinishedchecker()
-if team_kills > 80 then
+if teamscore > 69 and team_deaths < 10 then
 if math.random (1,4) == 1 then
 timer.Create("mortar_attacks", 4, math.random(1,4), LaunchMortarWave)
 end
@@ -1023,7 +991,7 @@ local WorstPlayer
 local MostSilentKills = 0
 local MostSilentPlayer
 for k,v in pairs( player.GetAll() ) do  
-	local Frags = v.kills()       // Getting a player's frags
+	local Frags = v.Kills()       // Getting a player's frags
 	if Frags > MostKills then     // If it's higher then the current MostKills then
 		MostKills = Frags     // Make it the new MostKills
 		BestPlayer = v:Name() // And make the player the new BestPlayer
@@ -1751,43 +1719,6 @@ end
 -- UTILITY FUNCTIONS ^
 
 
--- v PRE-PLAY THINGS
-
-function GM:PlayerSpawn(ply)
-	--timer.Simple (1.3, npcforget)
-
-	ply:SetTeam(1)
-    ply:SetCustomCollisionCheck(true)
-	ply:StripAmmo()
-	ply:StripWeapons()
-	ply:Give("weapon_crowbar")
-
-	if GetConVarString("h_default_loadout") == "" then 	
-	else
-	table.foreach(STARTING_LOADOUT, function(key,value)
-		ply:Give(""..value.."")
-		--SpawnItem(value, ply:GetPos(), Angle(0,0,0))
-
-	end)
-	end
-	ply:SetupHands()
-	ply:SetWalkSpeed(150)
-	ply:SetRunSpeed(250)
-	ply:SetCrouchedWalkSpeed(0.3)
-	ply:AllowFlashlight(true)
-	ply:SetNoCollideWithTeammates(1)
-	
-if math.random(1,2) == 1 then
-ply:SetModel(table.Random(playermodelsmale) )
-ply.sex="male"
-print(""..ply:GetName().." is male")
-else
-ply:SetModel(table.Random(playermodelsfemale) )
-ply.sex="female"
-print(""..ply:GetName().." is female")
-end
-end
--- ^ PRE-PLAY THINGS
 
 -- CYCLES v
 function coverzones()
@@ -1914,6 +1845,181 @@ end
 
 
 
+
+
+function CicloUnSegundo()
+table.foreach(MainEnemiesCoop, function(key,enemy)
+for k, npc in pairs(ents.FindByClass(enemy)) do
+if npc:Health() > 0 then
+
+if npc:GetEnemy() then
+	if npc:IsCurrentSchedule(SCHED_FORCED_GO) or npc:IsCurrentSchedule(SCHED_IDLE_WANDER) or npc:IsCurrentSchedule(SCHED_FORCED_GO_RUN)	then npc:ClearSchedule() end
+
+if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
+	if npc:HasCondition(10) then
+			if npc:GetEnemy().spotted != 1 then
+				if npc:GetEnemy():IsPlayer() then
+					npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
+					PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."")
+					if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					table.remove(zonescovered)
+					print("Patrol zones restarted")
+					end					
+					table.insert(zonescovered, npc:GetEnemy():GetPos()+Vector(0,0,30)) print("Patrol zone added")
+					net.Start("Spotted")
+					net.Send(npc:GetEnemy())
+					npc:GetEnemy().spotted = 1
+				end
+			end
+		npc:SetKeyValue("squadname", "CombineSquad")
+		if timer.Exists("npcforgettimer") then
+		timer.Destroy( "npcforgettimer")
+		end
+		
+		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),800)) do 
+		if ThisEnt:GetClass() == "npc_combine_s" or ThisEnt:GetClass() == "npc_metropolice" then
+				if ThisEnt:GetEnemy() == nil  then 
+					ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
+					ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
+				end
+		end
+		end
+		
+		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),2000)) do 
+		if ThisEnt:GetClass() == "npc_combine_s" or ThisEnt:GetClass() == "npc_metropolice" then
+				if ThisEnt:GetEnemy() == nil  then 
+					if CombineAssisting < GetConVarNumber("h_maxhelp") then
+					--print(ThisEnt:GetName().." is helping "..npc:GetName().."")
+					ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
+					ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
+					CombineAssisting = CombineAssisting+1
+					--print("[The Hunt]: Combines helping: "..CombineAssisting.." of "..GetConVarNumber("h_maxhelp").."")
+					end
+				end
+		end
+		end
+	else
+		if !timer.Exists("npcforgettimer") then
+		timer.Create( "npcforgettimer", GetConVarNumber("h_lostplayertimeout"), 1, npcforget ) 
+		--print("[The Hunt]: npcforget ACTIVE")
+		end
+	end		
+end
+end
+end
+end
+end)
+timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo ) 
+end
+
+function helibehavior()
+for num, Heli in pairs(ents.FindByClass("npc_helicopter")) do
+		if Heli:GetEnemy() then
+			--print ("heli has enemy: "..HeliA:GetEnemy():GetName().."")
+				if Heli:GetEnemy():IsNPC() && Heli.light then
+					Heli.light:Fire("Target", ""..Heli:GetEnemy():GetName().."", 0)
+					end
+				if Heli:GetEnemy():IsPlayer() && Heli.light  then
+				Heli:GetEnemy():SetName(""..tostring(Heli:GetEnemy():GetName()).."focus")
+				Heli.light:Fire("Target", ""..tostring(Heli:GetEnemy():GetName()).."focus", 0)
+				end
+if Heli:HasCondition(10) then
+nearbycombinecomeheli(Heli,Heli:GetEnemy())
+end
+elseif Heli.light then Heli.light:Fire("Target", "", 0)
+end
+end
+end
+
+function helipath()
+helibehavior()
+timer.Simple( 5, helipath )
+--print("Helipath")
+local found = 0
+table.foreach(AirEnemies, function(key,enemy)
+
+	for num, Heli in pairs(ents.FindByClass(enemy)) do
+
+	if Heli:GetVelocity():Length() < 240 then
+	--print("")
+	--print("Heli "..Heli:EntIndex().." searching")
+	 if Heli:GetEnemy() then
+	 nearbycombinecome(Heli:GetEnemy())
+	 		for num, HeliTrack in pairs(ents.FindInSphere(Heli:GetEnemy():GetPos(), 2000)) do
+			if found == 0 or  found == 1 then
+			if HeliTrack:GetClass() == "path_track" then
+			--print("Found one,"..HeliTrack:EntIndex().."")
+			if HeliTrack:GetName() == "used" then  found = 1 
+			--print("Is NOT Empty")
+			end
+			if HeliTrack:GetName() != "used" then
+			--print("Is Empty")
+			if Heli:Visible(HeliTrack) and HeliTrack:Visible(Heli:GetEnemy()) then
+			--print("Going to "..HeliTrack:EntIndex().."")
+			HeliTrack:SetName("going")
+			Heli:Fire("SetTrack",tostring(HeliTrack:GetName()))
+			timer.Simple (0.5, function() HeliTrack:SetName("used") end)
+			found = 2
+			end
+			end
+			end 
+			end
+			end
+	 else
+			for num, HeliTrack in pairs(ents.FindInSphere(Heli:GetPos(), 2000)) do
+			if found == 0 or  found == 1 then
+			if HeliTrack:GetClass() == "path_track" then
+			--print("Found one,"..HeliTrack:EntIndex().."")
+			if HeliTrack:GetName() == "used" then  found = 1
+			--print("Is NOT Empty")
+			end
+			if HeliTrack:GetName() != "used" then
+			--print("Is Empty")
+			if Heli:Visible(HeliTrack) then
+			--print("Going to "..HeliTrack:EntIndex().."")
+			HeliTrack:SetName("going")
+			Heli:Fire("SetTrack",tostring(HeliTrack:GetName()))
+			timer.Simple (0.5, function() HeliTrack:SetName("used") end)
+			found = 2
+			end
+			end
+			end 
+			end
+			end
+			end
+			--print("Heli "..Heli:EntIndex().." status: "..found.."")
+			if found == 0 or found == 1 then usedpaths() end
+			end
+	end
+	end)
+end
+
+function usedpaths()
+if HeliA then
+	for num, HeliTrack in pairs(ents.FindByClass("path_track")) do
+				if HeliTrack:GetName() == "used" then
+					HeliTrack:SetName("empty")
+					--print("[The Hunt]: found used and emptied")
+				end
+	end
+	end
+end
+
+
+-- CYCLES ^
+
+-- GM HOOKS v
+
+
 function GM:InitPostEntity()
 print("---------------LOADING THE HUNT-------------")
 team.SetUp( 1, "Rebels", Color( 0, 255, 0 ) )
@@ -1959,7 +2065,7 @@ print("[The Hunt]: found a props table, will add dynamic weapon spawnpoints. ")
 table.foreach(MAP_PROPS, function(key,propclass)
 for k, v in pairs(ents.GetAll()) do
 	if v:GetModel() == propclass then
-	table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,v:BoundingRadius()+20))
+	table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,v:BoundingRadius()-20))
 	v:SetKeyValue("minhealthdmg", "9001")
 	v:Fire("DisableMotion","",0)
 	print("[The Hunt]: "..v:GetModel().." is now a weapon spawnpoint.")
@@ -2155,6 +2261,28 @@ end
 end
 
 
+if GetConVarString("h_spastiks_toybox_sweps") == "1" then
+if file.Exists( "addons/spastiks_toybox_114275366.gma", "GAME" ) then
+
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
+while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
+print("[The Hunt]:  Spastik's Toybox SWEPS added successfully.")
+
+else
+print("[The Hunt]: Can't add Spastik's Toybox SWEPS, you dont have them installed.")
+end
+end
+
+
 
 if GetConVarString("h_default_loadout") == "" then else
 print("[The Hunt]: Loaded "..GetConVarString("h_default_loadout").." for the players at start.")
@@ -2164,6 +2292,8 @@ table.foreach(words, function(key,value)
 table.insert(STARTING_LOADOUT, value)
 end)
 end
+
+
 
 
 if GetConVarString("h_personalized_sweps") == "" then else
@@ -2189,185 +2319,41 @@ print("---------------THE HUNT LOADED-------------")
 end)
 end
 
+function GM:PlayerSpawn(ply)
+	--timer.Simple (1.3, npcforget)
 
-function GM:GetFallDamage( ply, speed )
-nearbycombinecomecasual(ply)
-print("lel")
-	return ( speed / 8 )
-end
+	ply:SetTeam(1)
+    ply:SetCustomCollisionCheck(true)
+	ply:StripAmmo()
+	ply:StripWeapons()
+	ply:Give("weapon_crowbar")
 
-function GM:OnEntityCreated(entity)
-	if entity:IsNPC() && entity:GetClass() != "npc_helicopter" && entity:GetClass() != "npc_combinegunship"  && entity:GetClass() != "npc_combine_s" && entity:GetClass() != "npc_metropolice" && entity:GetName() == "" then
-	ManuallySpawnedEntity = ManuallySpawnedEntity + 1
-	entity:SetName(""..entity:GetClass().." ("..entity:EntIndex()..")")
-	print(""..entity:GetName().." created")
-	end
-if entity:IsNPC() then 
-entity:SetCollisionGroup(3)
-end
-end
-
-function CicloUnSegundo()
-table.foreach(MainEnemiesCoop, function(key,enemy)
-for k, npc in pairs(ents.FindByClass(enemy)) do
-if npc:Health() > 0 then
-
-if npc:GetEnemy() then
-	if npc:IsCurrentSchedule(SCHED_FORCED_GO) or npc:IsCurrentSchedule(SCHED_IDLE_WANDER) or npc:IsCurrentSchedule(SCHED_FORCED_GO_RUN)	then npc:ClearSchedule() end
-
-if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
-	if npc:HasCondition(10) then
-			if npc:GetEnemy().spotted != 1 then
-				if npc:GetEnemy():IsPlayer() then
-					npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
-					PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."")
-					if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
-					table.remove(zonescovered)
-					table.remove(zonescovered)
-					table.remove(zonescovered)
-					table.remove(zonescovered)
-					table.remove(zonescovered)
-					table.remove(zonescovered)
-					table.remove(zonescovered)
-					table.remove(zonescovered)
-					table.remove(zonescovered)
-					table.remove(zonescovered)
-					print("Patrol zones restarted")
-					end					
-					table.insert(zonescovered, npc:GetEnemy():GetPos()+Vector(0,0,30)) print("Patrol zone added")
-					net.Start("Spotted")
-					net.Send(npc:GetEnemy())
-					npc:GetEnemy().spotted = 1
-				end
-			end
-		npc:SetKeyValue("squadname", "CombineSquad")
-		if timer.Exists("npcforgettimer") then
-		timer.Destroy( "npcforgettimer")
-		end
-		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),2000)) do 
-		if ThisEnt:GetClass() == "npc_combine_s" or ThisEnt:GetClass() == "npc_metropolice" then
-				if ThisEnt:GetEnemy() == nil  then 
-					if CombineAssisting < GetConVarNumber("h_maxhelp") then
-					--print(ThisEnt:GetName().." is helping "..npc:GetName().."")
-					ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
-					ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
-					CombineAssisting = CombineAssisting+1
-					--print("[The Hunt]: Combines helping: "..CombineAssisting.." of "..GetConVarNumber("h_maxhelp").."")
-					end
-				end
-		end
-		end
+	if GetConVarString("h_default_loadout") == "" then 	
 	else
-		if !timer.Exists("npcforgettimer") then
-		timer.Create( "npcforgettimer", GetConVarNumber("h_lostplayertimeout"), 1, npcforget ) 
-		--print("[The Hunt]: npcforget ACTIVE")
-		end
-	end		
-end
-end
-end
-end
-end)
-timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo ) 
-end
+	table.foreach(STARTING_LOADOUT, function(key,value)
+		ply:Give(""..value.."")
+		--SpawnItem(value, ply:GetPos(), Angle(0,0,0))
 
-function helibehavior()
-for num, Heli in pairs(ents.FindByClass("npc_helicopter")) do
-		if Heli:GetEnemy() then
-			--print ("heli has enemy: "..HeliA:GetEnemy():GetName().."")
-				if Heli:GetEnemy():IsNPC() && Heli.light then
-					Heli.light:Fire("Target", ""..Heli:GetEnemy():GetName().."", 0)
-					end
-				if Heli:GetEnemy():IsPlayer() && Heli.light  then
-				Heli:GetEnemy():SetName(""..tostring(Heli:GetEnemy():GetName()).."focus")
-				Heli.light:Fire("Target", ""..tostring(Heli:GetEnemy():GetName()).."focus", 0)
-				end
-if Heli:HasCondition(10) then
-nearbycombinecomeheli(Heli,Heli:GetEnemy())
-end
-elseif Heli.light then Heli.light:Fire("Target", "", 0)
-end
-end
-end
-
-function helipath()
-helibehavior()
-timer.Simple( 5, helipath )
---print("Helipath")
-local found = 0
-table.foreach(AirEnemies, function(key,enemy)
-
-	for num, Heli in pairs(ents.FindByClass(enemy)) do
-
-	if Heli:GetVelocity():Length() < 240 then
-	--print("")
-	--print("Heli "..Heli:EntIndex().." searching")
-	 if Heli:GetEnemy() then
-	 nearbycombinecome(Heli:GetEnemy())
-	 		for num, HeliTrack in pairs(ents.FindInSphere(Heli:GetEnemy():GetPos(), 2000)) do
-			if found == 0 or  found == 1 then
-			if HeliTrack:GetClass() == "path_track" then
-			--print("Found one,"..HeliTrack:EntIndex().."")
-			if HeliTrack:GetName() == "used" then  found = 1 
-			--print("Is NOT Empty")
-			end
-			if HeliTrack:GetName() != "used" then
-			--print("Is Empty")
-			if Heli:Visible(HeliTrack) and HeliTrack:Visible(Heli:GetEnemy()) then
-			--print("Going to "..HeliTrack:EntIndex().."")
-			HeliTrack:SetName("going")
-			Heli:Fire("SetTrack",tostring(HeliTrack:GetName()))
-			timer.Simple (0.5, function() HeliTrack:SetName("used") end)
-			found = 2
-			end
-			end
-			end 
-			end
-			end
-	 else
-			for num, HeliTrack in pairs(ents.FindInSphere(Heli:GetPos(), 2000)) do
-			if found == 0 or  found == 1 then
-			if HeliTrack:GetClass() == "path_track" then
-			--print("Found one,"..HeliTrack:EntIndex().."")
-			if HeliTrack:GetName() == "used" then  found = 1
-			--print("Is NOT Empty")
-			end
-			if HeliTrack:GetName() != "used" then
-			--print("Is Empty")
-			if Heli:Visible(HeliTrack) then
-			--print("Going to "..HeliTrack:EntIndex().."")
-			HeliTrack:SetName("going")
-			Heli:Fire("SetTrack",tostring(HeliTrack:GetName()))
-			timer.Simple (0.5, function() HeliTrack:SetName("used") end)
-			found = 2
-			end
-			end
-			end 
-			end
-			end
-			end
-			--print("Heli "..Heli:EntIndex().." status: "..found.."")
-			if found == 0 or found == 1 then usedpaths() end
-			end
-	end
 	end)
+	end
+	ply:SetupHands()
+	ply:SetWalkSpeed(150)
+	ply:SetRunSpeed(250)
+	ply:SetCrouchedWalkSpeed(0.3)
+	ply:AllowFlashlight(true)
+	ply:SetNoCollideWithTeammates(1)
+	
+if math.random(1,2) == 1 then
+ply:SetModel(table.Random(playermodelsmale) )
+ply.sex="male"
+print(""..ply:GetName().." is male")
+else
+ply:SetModel(table.Random(playermodelsfemale) )
+ply.sex="female"
+print(""..ply:GetName().." is female")
+end
 end
 
-function usedpaths()
-if HeliA then
-	for num, HeliTrack in pairs(ents.FindByClass("path_track")) do
-				if HeliTrack:GetName() == "used" then
-					HeliTrack:SetName("empty")
-					--print("[The Hunt]: found used and emptied")
-				end
-	end
-	end
-end
-
-
--- CYCLES ^
-
--- GM HOOKS v
 function GM:OnNPCKilled(victim, killer, weapon)
 local victimpos = victim:GetPos()
 -- Uncomment to for-the-lulz explosion kills
@@ -2638,16 +2624,6 @@ hook.Add("PropBreak","OnPropBreak",PropBreak)
 
 
 
-function GetAmmoForCurrentWeapon( ply )
-	if (  !IsValid( ply ) ) then return -1 end
-
-	local wep = ply:GetActiveWeapon()
-	if (  !IsValid( wep ) ) then return -1 end
- 
-	--print(ply:GetAmmoCount(wep:GetPrimaryAmmoType()))
-end
-
-
 function GM:KeyPress(player,key)
 
 if player:Alive() then
@@ -2785,7 +2761,125 @@ function GM:PlayerSetHandsModel( ply, ent )
 	end
 end
 
--- GM HOOKS ^
+
+
+function GM:GetFallDamage( ply, speed )
+nearbycombinecomecasual(ply)
+print("lel")
+	return ( speed / 8 )
+end
+
+function GM:OnEntityCreated(entity)
+	if entity:IsNPC() && entity:GetClass() != "npc_helicopter" && entity:GetClass() != "npc_combinegunship"  && entity:GetClass() != "npc_combine_s" && entity:GetClass() != "npc_metropolice" && entity:GetName() == "" then
+	ManuallySpawnedEntity = ManuallySpawnedEntity + 1
+	entity:SetName(""..entity:GetClass().." ("..entity:EntIndex()..")")
+	print(""..entity:GetName().." created")
+	end
+if entity:IsNPC() then 
+entity:SetCollisionGroup(3)
+end
+end
+
+
+-- What happens when a player is beind killed.
+function GM:DoPlayerDeath( ply, attacker, dmginfo )
+timer.Simple(1, npcforget)
+ply:CreateRagdoll()
+ply:AddDeaths(1)
+NUMPLAYERS()
+ply.canspawn = 0
+ply.lifes=ply.lifes-1
+ply.deaths=ply.deaths+1
+team_deaths=team_deaths+1
+
+if attacker:IsNPC() then
+attacker:EmitSound(table.Random(CombineKillSounds), 100, 100)
+end
+
+
+-- One npc_sniper can only kill one player, then, it won't shoot players anymore. So I remove it and respawn another when he kills a player.
+if attacker:GetClass() == "npc_sniper" then
+local pos = attacker:GetPos()
+local ang = attacker:GetAngles()
+attacker:Remove()
+SpawnItem("npc_sniper", pos, ang)
+end
+
+-- Drop the weapons, if they have ammo.
+table.foreach( ply:GetWeapons(), function(key,value)
+	if key > 1 then
+		if value:Clip1() then
+			if value:Clip1() == 0 then
+				value:Remove()
+				else
+				ply:DropWeapon(value)
+			end
+		end
+	end
+end)
+
+
+-- One second later, make the (dead) player spectate.
+timer.Simple(1, function()
+if attacker:IsNPC() then
+ply:Spectate(5)
+ply:SetMoveType(10)
+ply:SpectateEntity(attacker)
+end
+
+
+-- If there's more than one player on the map, the lifes system starts working.
+if PLAYERSINMAP > 1 then
+if ply.lifes == 0  then
+ply:PrintMessage(HUD_PRINTTALK, "You have no lifes left.")
+ply:PrintMessage(HUD_PRINTTALK, "You can see your teammates using right click.")
+ply:PrintMessage(HUD_PRINTTALK, "Check your score by typing !myscore or !teamscore.")
+else
+ply:PrintMessage(HUD_PRINTTALK, "You have "..ply.lifes.." lifes left.")
+ply.canspawn = 1
+end
+else
+ply.canspawn = 1
+end
+
+end)
+
+
+-- Failed attempt to make the game end if every player is dead and has no lifes.
+/*
+if PLAYERSINMAP > 1 then
+	local players_defeated = 1
+	table.foreach(player.GetAll(), function(key,value)
+	if value:Alive() or value.lifes>0 then players_defeated = 0 end
+	end)
+	if players_defeated == 1  then 
+	PlayerDefeat()
+	CanCheck = 0
+	end
+end
+*/
+
+-- If the zonescovered are ten more than the original number, clean it.
+if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+table.remove(zonescovered)
+print("Patrol zones restarted")
+end
+
+-- Add a patrol zone where the player died.
+table.insert(zonescovered, ply:GetPos()+Vector(0,0,30)) print("Patrol zone added")
+
+
+CalculatePlayerScore(ply)
+end
 
 function FirstSpawn(ply)
 ply.lifes=GetConVarNumber("h_player_lifes")
@@ -2799,3 +2893,20 @@ ply:SendLua("CLDARKNESS="..DARKNESS.."" )
 end
 end
 hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", FirstSpawn )
+
+
+
+-- GM HOOKS ^
+
+
+
+
+
+function GetAmmoForCurrentWeapon( ply )
+	if (  !IsValid( ply ) ) then return -1 end
+
+	local wep = ply:GetActiveWeapon()
+	if (  !IsValid( wep ) ) then return -1 end
+ 
+	--print(ply:GetAmmoCount(wep:GetPrimaryAmmoType()))
+end

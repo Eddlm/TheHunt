@@ -12,9 +12,6 @@ lightcol = 0
 CLDARKNESS = 9
 score_color=Color(150,150,150)
 
-hook.Add( "ChatText", "hide_joinleave", function( index, name, text, typ )
-	if ( typ == "joinleave" ) then return true end
-end )
 
 if !ConVarExists("h_outline_radius") then
 CreateClientConVar( "h_outline_radius", "1000", true, false )
@@ -279,8 +276,20 @@ timer.Simple ( 5, CombineBoots)
 function ChatToWebsite(pl, text)
 	if string.sub(text, 1, 6) == "!help" then
 		if pl != LocalPlayer() then return true end
-	gui.OpenURL("http://facepunch.com/showthread.php?t=1394695")
+	--gui.OpenURL("http://puu.sh/dlwWZ.pdf")
+	LocalPlayer():PrintMessage(HUD_PRINTTALK, "Hide from the Combine and try to kill them without being spotted.")
+	LocalPlayer():PrintMessage(HUD_PRINTTALK, "For commands and more details, check the console.")
+	print("")
+	print("THE HUNT: BASIC CONCEPTS")
+	print("Hide in dark areas. The combine can't see you there. The HUD will inform you when you're on an area dark enough.")
+	print("Loud weapons will be heard by the combine. Melee weapons will not.")
+	print("You gain more score by killing silently than normal combat.")
+	print("type !remain to see how many Combines are left.")
+	print("type taunt to shout something and attract combine.")
+	print("type !drop to drop your weapon. You can bind h_dropweapon to a key.")
+	print("For more info, check the forum thread: http://facepunch.com/showthread.php?t=1394695, the workshop page: http://steamcommunity.com/sharedfiles/filedetails/?id=292275126 and this document: http://puu.sh/dlwWZ.pdf")
+	print("")
+
 	return true	end
 end
-
 hook.Add("OnPlayerChat", "ChatToWebsite", ChatToWebsite)
