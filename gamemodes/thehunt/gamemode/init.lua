@@ -991,7 +991,7 @@ local WorstPlayer
 local MostSilentKills = 0
 local MostSilentPlayer
 for k,v in pairs( player.GetAll() ) do  
-	local Frags = v.Kills()       // Getting a player's frags
+	local Frags = v.Kills       // Getting a player's frags
 	if Frags > MostKills then     // If it's higher then the current MostKills then
 		MostKills = Frags     // Make it the new MostKills
 		BestPlayer = v:Name() // And make the player the new BestPlayer
