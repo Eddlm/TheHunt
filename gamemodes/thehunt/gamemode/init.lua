@@ -1,7 +1,58 @@
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
+file.CreateDir("thehunt_maps")
+
+-- WHAT-MAP-ARE-THEY-PLAYING CHECK v
+
+if file.Exists( "thehunt_maps/"..game.GetMap()..".txt", "DATA" ) then
+include("/../../../data/thehunt_maps/"..game.GetMap()..".txt")
+
+win = 1
+print("[The Hunt]: map configuration file found ("..game.GetMap()..")")
+else
+print("[The Hunt]: map config file not found.  Will try in other folder...")
+win = 0
+include("/maps/nomap.lua")
+end
+
+
+if win == 0 then
+if file.Exists( "gamemodes/thehunt/gamemode/maps/"..game.GetMap()..".lua", "GAME" ) then
+include("/maps/"..game.GetMap()..".lua")
+win = 1
+print("[The Hunt]: map configuration file found ("..game.GetMap()..")")
+else
+print("[The Hunt]: map config file not found. The Hunt will not start.")
+win = 0
+include("/maps/nomap.lua")
+end
+end
+-- WHAT-MAP-ARE-THEY-PLAYING CHECK ^
+
+
+
+
+
+if file.Exists( "thehunt_maps/best_team.txt", "DATA" ) then
 include("/../../../data/thehunt_maps/best_team.txt")
+file.Delete( "thehunt_maps/best_team.txt" )
+else
+file.Write("thehunt_maps/best_team.txt", "\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_NAMES={'Frankish Hooves','Best Korea','360 Noscope' }\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_KILLS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SILENT_KILLS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DEATHS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DATE='1/11/0000 - 00:00:00'\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SCORE=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_NAME='Eddlm'")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DATE='1/11/0000 - 00:00:00'\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_KILLS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SILENT_KILLS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DEATHS=0\n")
+include("/../../../data/thehunt_maps/best_team.txt")
+end
 
 util.AddNetworkString( "Spotted" )
 util.AddNetworkString( "Hidden" )
@@ -141,36 +192,6 @@ GAME_ENDED = 0
 print("------------------------- THE HUNT GM:Initialize LOADED -------------------------")
 
 end
-
-file.CreateDir("thehunt_maps")
-
--- WHAT-MAP-ARE-THEY-PLAYING CHECK v
-
-if file.Exists( "thehunt_maps/"..game.GetMap()..".txt", "DATA" ) then
-include("/../../../data/thehunt_maps/"..game.GetMap()..".txt")
-
-win = 1
-print("[The Hunt]: map configuration file found ("..game.GetMap()..")")
-else
-print("[The Hunt]: map config file not found. The Hunt will not start.")
-win = 0
-include("/maps/nomap.lua")
-end
-
-
-/*
-if file.Exists( "gamemodes/thehunt/gamemode/maps/"..game.GetMap()..".lua", "GAME" ) then
-include("/maps/"..game.GetMap()..".lua")
-win = 1
-print("[The Hunt]: map configuration file found ("..game.GetMap()..")")
-else
-print("[The Hunt]: map config file not found. The Hunt will not start.")
-win = 0
-include("/maps/nomap.lua")
-end
-*/
--- WHAT-MAP-ARE-THEY-PLAYING CHECK ^
-
 
 -- UTILITY COMMANDS v
 concommand.Add( "h_addonweapons", function(player, command, arguments )
