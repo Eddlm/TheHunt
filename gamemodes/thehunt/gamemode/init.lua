@@ -2265,8 +2265,6 @@ end
 
 
 if GetConVarString("h_STALKER_sweps") == "1" then
-if file.Exists( "addons/s.t.a.l.k.e.r._weapons_197240079.gma", "GAME" ) then
-if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
 
 table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
@@ -2281,15 +2279,9 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
 while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 print("[The Hunt]:  STALKER sweps added successfully.")
 
-else
-print("[The Hunt]: Can't add STALKER Sweps, you don't have them installed.")
-
-end
 end
 
 if GetConVarString("h_MR_PYROUS_sweps") == "1" then
-if file.Exists( "addons/mr._pyrous_tactical_swep_pack_v1.3_222150716.gma", "GAME" ) then
-if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
 
 table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
@@ -2303,15 +2295,10 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
 
 while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 print("[The Hunt]:  Mr. Pyrous Tactical weapons added successfully.")
-else
-print("[The Hunt]: Can't add Mr. Pyrous Sweps, you don't have them installed.")
 
-end
 end
 
 if GetConVarString("h_MAD_COWS_sweps") == "1" then
-if file.Exists( "addons/enders_mad_cows_weapons_147708337.gma", "GAME" ) then
-if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
 
 table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
@@ -2325,16 +2312,11 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
 
 while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 print("[The Hunt]:  Mad Cows sweps added successfully.")
-else
-print("[The Hunt]: Can't add Mad Cows sweps, you don't have them installed.")
 
-end
 end
 
 
 if GetConVarString("h_M9K_SPECIALITIES_sweps") == "1" then
-if file.Exists( "addons/m9k_specialties_144982052.gma", "GAME" ) then
-if table.HasValue(MEDIUMWEAPONS, "weapon_pistol" ) then MEDIUMWEAPONS = {} end
 
 table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
@@ -2349,14 +2331,10 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
 while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 print("[The Hunt]: M9K Specialities Sweps added succesfully.")
 
-else
-print("[The Hunt]: Can't add M9K Specialities Sweps, you don't have them installed.")
 
-end
 end
 
 if GetConVarString("h_FAS_sweps") == "1" then
-if file.Exists( "addons/fas_2.0_alpha_sweps_180507408.gma", "GAME" ) and file.Exists( "addons/fas_2.0_alpha_sweps_-_u._rifles_201027715.gma", "GAME" ) and file.Exists( "addons/fas_2.0_alpha_sweps_-_smgs_183139624.gma", "GAME" ) and file.Exists( "addons/fas_2.0_alpha_sweps_-_shotguns_183140076.gma", "GAME" ) and file.Exists( "addons/fas_2.0_alpha_sweps_-_rifles_181656972.gma", "GAME" ) and  file.Exists( "addons/fas_2.0_alpha_sweps_-_pistols_181283903.gma", "GAME" ) and  file.Exists( "addons/fas_2.0_alpha_sweps_-_misc_201027186.gma", "GAME" )  then
 
 table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
@@ -2371,13 +2349,10 @@ while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(
 table.insert(MEDIUMWEAPONS, "fas2_att_suppressor")
 
 print("[The Hunt]: FA:S weapons added succesfully.")
-else
-print("[The Hunt]: Can't add FA:S weapons, you don't have them installed.")
-end
+
 end
 
 if GetConVarString("h_M9K_ASSAULT_RIFLES_sweps") == "1" then
-if file.Exists( "addons/m9k_assault_rifles_128089118.gma", "GAME" ) then
 
 table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
@@ -2393,28 +2368,22 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
 while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 print("[The Hunt]:  M9K Assault Rifles added successfully.")
 
-else
-print("[The Hunt]: Can't add M9K Assault Rifles, you dont have them installed.")
-end
 end
 
 
 if GetConVarString("h_CUSTOMIZABLE_WEAPONRY_2_0_sweps") == "1" then
-if file.Exists( "addons/customizable_weaponry_2.0_349050451.gma", "GAME" ) then
+--if file.Exists( "addons/customizable_weaponry_2.0_349050451.gma", "GAME" ) then
 table.foreach(Customizable_Weaponry, function(key,weapon)
 table.insert(MEDIUMWEAPONS,weapon)
 end)
 table.insert(MEDIUMWEAPONS, "cw_ammo_crate_small")
 print("[The Hunt]: CW 2.0 weapons added successfully.")
-else
-print("[The Hunt]: Can't add CW 2.0 weapons, you dont have them installed.")
-end
+--end
 end
 
 
 
 if GetConVarString("h_MHs_Super_Battle_Pack_PART_II_sweps") == "1" then
-if file.Exists( "addons/mhs_super_battle_pack_part_ii_270907600.gma", "GAME" ) then
 
 table.insert(MEDIUMWEAPONS, ""..table.Random(MHs_Super_Battle_Pack_PART_II).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(MHs_Super_Battle_Pack_PART_II).."")
@@ -2429,14 +2398,10 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(MHs_Super_Battle_Pack_PART_II).."")
 while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 print("[The Hunt]:  MH Supper Battle Pack added successfully.")
 
-else
-print("[The Hunt]: Can't add MH Supper Battle Pack, you dont have them installed.")
-end
 end
 
 
 if GetConVarString("h_spastiks_toybox_sweps") == "1" then
-if file.Exists( "addons/spastiks_toybox_114275366.gma", "GAME" ) then
 
 table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
 table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
@@ -2451,9 +2416,6 @@ table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
 while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 print("[The Hunt]:  Spastik's Toybox SWEPS added successfully.")
 
-else
-print("[The Hunt]: Can't add Spastik's Toybox SWEPS, you dont have them installed.")
-end
 end
 
 
