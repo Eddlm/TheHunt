@@ -3,50 +3,47 @@ GM.Author = "Eddlm"
 GM.Email = "eddmalaga@gmail.com"
 GM.Website = "http://facepunch.com/showthread.php?t=1391522"
 
+
+-- Client function for the Derma scoreboard.
 net.Receive( "Scoreboard", function( length, client )
-
-local DermaPanel = vgui.Create( "DFrame" )
-DermaPanel:SetPos( ScrW() * 0.1, ScrH() * 0.1 )
-DermaPanel:SetSize( ScrW() * 0.7, ScrH() * 0.5 )
-DermaPanel:SetTitle( "Scoreboard" )
-DermaPanel:SetVisible( true )
-DermaPanel:SetDraggable( true )
-DermaPanel:ShowCloseButton( true )
-DermaPanel:SetMouseInputEnabled(false)
-DermaPanel:SetKeyboardInputEnabled(false)
-DermaPanel:MakePopup()
-
-local DermaListView = vgui.Create("DListView")
-DermaListView:SetParent(DermaPanel)
-DermaListView:SetPos(25, 50)
-DermaListView:SetSize(ScrW() * 0.65, ScrH() * 0.4)
-DermaListView:SetMultiSelect(false)
-DermaListView:AddColumn("Player")
-DermaListView:AddColumn("Total Kills")
-DermaListView:AddColumn("Silent Kills")
-DermaListView:AddColumn("% of Team Kills")
-DermaListView:AddColumn("Deaths")
-DermaListView:AddColumn("% of Team Deaths")
-DermaListView:AddColumn("Score")
-
-for k,v in pairs(player.GetAll()) do
-DermaListView:AddLine(v:Nick(),v:Frags(),v:GetNWString("SilentKills"),""..v:GetNWString("Killpercent").."%",v:Deaths(),""..v:GetNWString("Deathpercent").."%",v:GetNWInt("Score"))
-end
-DermaListView:AddLine("Team",team_kills+team_silent_kills,team_silent_kills,"-",team_deaths,"-",teamscore)
-DermaListView:AddLine("Last Best team",BEST_TEAM_KILLS+BEST_TEAM_SILENT_KILLS,BEST_TEAM_SILENT_KILLS,"-",BEST_TEAM_DEATHS,"-",BEST_TEAM_SCORE)
-DermaListView:AddLine(""..BEST_PLAYER_ALL_TIME_NAME.." (Last Best Player)",BEST_PLAYER_ALL_TIME_KILLS,BEST_PLAYER_ALL_TIME_SILENT_KILLS,"-",BEST_PLAYER_ALL_TIME_DEATHS,"-",BEST_PLAYER_ALL_TIME_SCORE)
-
+	local DermaPanel = vgui.Create( "DFrame" )
+	DermaPanel:SetPos( ScrW() * 0.1, ScrH() * 0.1 )
+	DermaPanel:SetSize( ScrW() * 0.7, ScrH() * 0.5 )
+	DermaPanel:SetTitle( "Scoreboard" )
+	DermaPanel:SetVisible( true )
+	DermaPanel:SetDraggable( true )
+	DermaPanel:ShowCloseButton( true )
+	DermaPanel:SetMouseInputEnabled(false)
+	DermaPanel:SetKeyboardInputEnabled(false)
+	DermaPanel:MakePopup()
+	
+	local DermaListView = vgui.Create("DListView")
+	DermaListView:SetParent(DermaPanel)
+	DermaListView:SetPos(25, 50)
+	DermaListView:SetSize(ScrW() * 0.65, ScrH() * 0.4)
+	DermaListView:SetMultiSelect(false)
+	DermaListView:AddColumn("Player")
+	DermaListView:AddColumn("Total Kills")
+	DermaListView:AddColumn("Silent Kills")
+	DermaListView:AddColumn("% of Team Kills")
+	DermaListView:AddColumn("Deaths")
+	DermaListView:AddColumn("% of Team Deaths")
+	DermaListView:AddColumn("Score")	
+	for k,v in pairs(player.GetAll()) do
+		DermaListView:AddLine(v:Nick(),v:Frags(),v:GetNWString("SilentKills"),""..v:GetNWString("Killpercent").."%",v:Deaths(),""..v:GetNWString("Deathpercent").."%",v:GetNWInt("Score"))
+	end
+	DermaListView:AddLine("Team",team_kills+team_silent_kills,team_silent_kills,"-",team_deaths,"-",teamscore)
+	DermaListView:AddLine("Last Best team",BEST_TEAM_KILLS+BEST_TEAM_SILENT_KILLS,BEST_TEAM_SILENT_KILLS,"-",BEST_TEAM_DEATHS,"-",BEST_TEAM_SCORE)
+	DermaListView:AddLine(""..BEST_PLAYER_ALL_TIME_NAME.." (Last Best Player)",BEST_PLAYER_ALL_TIME_KILLS,BEST_PLAYER_ALL_TIME_SILENT_KILLS,"-",BEST_PLAYER_ALL_TIME_DEATHS,"-",BEST_PLAYER_ALL_TIME_SCORE)
 end )
 
 
 function CalculatePlayerScore(ply)
-teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
-
+	teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
 	local killpercent = ((ply.Kills+ply.SilentKills)/(team_kills+team_silent_kills))*100
 	local deathpercent = (ply.deaths/team_deaths)*100
 	local player_points = ((ply.Kills+(ply.SilentKills*3)-ply.deaths*2))
 
-	if ply.deaths==0 then ply:SetNWInt("Survivor", 1) else ply:SetNWInt("Survivor", 0) end
 	ply:SetNWString("Killpercent", ""..math.Round(killpercent).."")
 	ply:SetNWString("SilentKills", ""..ply.SilentKills.."")
 	ply:SetNWString("Deathpercent", ""..math.Round(deathpercent).."")
@@ -63,23 +60,23 @@ teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
 	local referencescore=tonumber(ply:GetNWInt("ReferentScore"),10)
 
 	if score < referencescore then
-	ply:SendLua("score_color=Color(255,179,0)" )
+		ply:SendLua("score_color=Color(255,179,0)" )
 	end
 	
 	if score < referencescore - 4 then
-	ply:SendLua("score_color=Color(255,8,8)" )
+		ply:SendLua("score_color=Color(255,8,8)" )
 	end
 	
 	if score == referencescore then
-	ply:SendLua("score_color=Color(200,200,200)" )
+		ply:SendLua("score_color=Color(200,200,200)" )
 	end
 	
 	if score > referencescore then
-	ply:SendLua("score_color=Color(156,255,120)" )
+		ply:SendLua("score_color=Color(156,255,120)" )
 	end
 	
 	if score > referencescore + 4 then
-	ply:SendLua("score_color=Color(0,255,0)" )
+		ply:SendLua("score_color=Color(0,255,0)" )
 	end
 
 end
@@ -89,13 +86,10 @@ end
 
 
 function ComparePlayerScore(ply)
-teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
-
+	teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
 	local killpercent = ((ply.Kills+ply.SilentKills)/(team_kills+team_silent_kills))*100
 	local deathpercent = (ply.deaths/team_deaths)*100
 	local player_points = ((ply.Kills+(ply.SilentKills*3)-ply.deaths*2))
-
-	if ply.deaths==0 then ply:SetNWInt("Survivor", 1) else ply:SetNWInt("Survivor", 0) end
 	ply:SetNWString("Killpercent", ""..math.Round(killpercent).."")
 	ply:SetNWString("SilentKills", ""..ply.SilentKills.."")
 	ply:SetNWString("Deathpercent", ""..math.Round(deathpercent).."")
@@ -109,85 +103,82 @@ teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
 	ply:SendLua("teamscore="..teamscore.."" )
 
 	local score=tonumber(ply:GetNWInt("Score"),10)
-
-return score
+	return score
 end
-
-
-
 
 
 function ISaid( ply, text, public )
 local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLED
-
 	
     if text == "!listmaps" or text == "!LISTMAPS" then
-	MapVoteThing(ply)
-	return false end
+		MapVoteThing(ply)
+		return false
+	end
 
-	
-	
     if text == "!taunt" or text == "taunt" then
-	if ply.sex=="female" then ply:EmitSound(table.Random(femaletaunts), 100, 100) else ply:EmitSound(table.Random(maletaunts), 100, 100) end
-nearbycombinecomesilent(ply)
-return false end
+		if ply.sex=="female" then 
+		ply:EmitSound(table.Random(femaletaunts), 100, 100)
+		else
+		ply:EmitSound(table.Random(maletaunts), 100, 100)
+		end
+		nearbycombinecomesilent(ply)
+		return false
+	end
     if text == "!remain" or text == "!REMAIN" then
-	PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Number "..Wave..", you have "..EnemiesRemainining.." units remaining.")
-	timer.Simple(3, function() PrintMessage(HUD_PRINTTALK, "[Overwatch]: Mission failure if "..GlobalRemaining.." ground units are lost.") end)
-		        return false
-
+		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Number "..Wave..", you have "..EnemiesRemainining.." units remaining.")
+		timer.Simple(3, function() PrintMessage(HUD_PRINTTALK, "[Overwatch]: Mission failure if "..GlobalRemaining.." ground units are lost.") end)
+		return false
     end
-
 	if text == "!remove" or text == "!REMOVE" then
-	ply:PrintMessage(HUD_PRINTTALK, ""..ply:GetActiveWeapon():GetClass().." removed from your inventary.")
-	ply:StripWeapon(ply:GetActiveWeapon():GetClass())
-	return false end
+		ply:PrintMessage(HUD_PRINTTALK, ""..ply:GetActiveWeapon():GetClass().." removed from your inventary.")
+		ply:StripWeapon(ply:GetActiveWeapon():GetClass())
+		return false
+	end
 	
-if text == "!drop" or text == "!DROP" then
-ManualWeaponDrop(ply)
-if GetConVarString("h_weight_system") == "1" or GetConVarString("h_hardcore_mode") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
-		        return false
-end
+	if text == "!drop" or text == "!DROP" then
+		ManualWeaponDrop(ply)
+		if GetConVarString("h_weight_system") == "1" or GetConVarString("h_hardcore_mode") == "1" then
+			timer.Simple(1, function() AdjustWeight(ply) end)
+		end
+		return false
+	end
 
 
 
 	if text == "!myscore" or text == "!MYSCORE" then
-	PlayerStats(ply)
-	return false
+		PlayerStats(ply)
+		return false
     end
 
 	if text == "!teamscore" or text == "!TEAMSCORE" then
-	teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
-
-	for k,player in pairs(player.GetAll()) do
-	local killpercent = ((player.Kills+player.SilentKills)/(team_kills+team_silent_kills))*100
-	local deathpercent = (player.deaths/team_deaths)*100
-	local player_points = ((player.Kills+(player.SilentKills*3)-player.deaths*2))
-
-	player:SetNWString("Killpercent", ""..math.Round(killpercent).."")
-	player:SetNWString("SilentKills", ""..player.SilentKills.."")
-	player:SetNWString("Deathpercent", ""..math.Round(deathpercent).."")
-	player:SetNWInt("Score", ""..player_points.."")
-	ply:SendLua("team_kills="..team_kills.."" )
-	ply:SendLua("team_silent_kills="..team_silent_kills.."" )
-	ply:SendLua("team_deaths="..team_deaths.."" )
-	ply:SendLua("teamscore="..teamscore.."" )
-	ply:SendLua("BEST_TEAM_KILLS="..BEST_TEAM_KILLS.."" )
-	ply:SendLua("BEST_TEAM_SILENT_KILLS="..BEST_TEAM_SILENT_KILLS.."" )
-	ply:SendLua("BEST_TEAM_SCORE="..BEST_TEAM_SCORE.."" )
-	ply:SendLua("BEST_TEAM_DEATHS="..BEST_TEAM_DEATHS.."" )
-	ply:SendLua("BEST_PLAYER_ALL_TIME_SCORE="..BEST_PLAYER_ALL_TIME_SCORE.."" )
-	ply:SendLua("BEST_PLAYER_ALL_TIME_KILLS="..BEST_PLAYER_ALL_TIME_KILLS.."" )
-	ply:SendLua("BEST_PLAYER_ALL_TIME_SILENT_KILLS="..BEST_PLAYER_ALL_TIME_SILENT_KILLS.."" )
-	ply:SendLua("BEST_PLAYER_ALL_TIME_DEATHS="..BEST_PLAYER_ALL_TIME_DEATHS.."" )
-	ply:SendLua("BEST_PLAYER_ALL_TIME_NAME='"..BEST_PLAYER_ALL_TIME_NAME.."'" )
-
-	
-	end
-	timer.Simple(1, function() 
-	net.Start( "Scoreboard" )
-	net.Send(ply)
-	end)
+		teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
+		for k,player in pairs(player.GetAll()) do
+			local killpercent = ((player.Kills+player.SilentKills)/(team_kills+team_silent_kills))*100
+			local deathpercent = (player.deaths/team_deaths)*100
+			local player_points = ((player.Kills+(player.SilentKills*3)-player.deaths*2))
+		
+			player:SetNWString("Killpercent", ""..math.Round(killpercent).."")
+			player:SetNWString("SilentKills", ""..player.SilentKills.."")
+			player:SetNWString("Deathpercent", ""..math.Round(deathpercent).."")
+			player:SetNWInt("Score", ""..player_points.."")
+			ply:SendLua("team_kills="..team_kills.."" )
+			ply:SendLua("team_silent_kills="..team_silent_kills.."" )
+			ply:SendLua("team_deaths="..team_deaths.."" )
+			ply:SendLua("teamscore="..teamscore.."" )
+			ply:SendLua("BEST_TEAM_KILLS="..BEST_TEAM_KILLS.."" )
+			ply:SendLua("BEST_TEAM_SILENT_KILLS="..BEST_TEAM_SILENT_KILLS.."" )
+			ply:SendLua("BEST_TEAM_SCORE="..BEST_TEAM_SCORE.."" )
+			ply:SendLua("BEST_TEAM_DEATHS="..BEST_TEAM_DEATHS.."" )
+			ply:SendLua("BEST_PLAYER_ALL_TIME_SCORE="..BEST_PLAYER_ALL_TIME_SCORE.."" )
+			ply:SendLua("BEST_PLAYER_ALL_TIME_KILLS="..BEST_PLAYER_ALL_TIME_KILLS.."" )
+			ply:SendLua("BEST_PLAYER_ALL_TIME_SILENT_KILLS="..BEST_PLAYER_ALL_TIME_SILENT_KILLS.."" )
+			ply:SendLua("BEST_PLAYER_ALL_TIME_DEATHS="..BEST_PLAYER_ALL_TIME_DEATHS.."" )
+			ply:SendLua("BEST_PLAYER_ALL_TIME_NAME='"..BEST_PLAYER_ALL_TIME_NAME.."'" )
+		end
+		timer.Simple(1, function() 
+			net.Start( "Scoreboard" )
+			net.Send(ply)
+		end)
 		return false
     end
 	/*
@@ -196,9 +187,9 @@ end
 	PrintMessage(HUD_PRINTTALK, ""..ply:GetName().." voted for a map restart by typing !restart. ")
 	VOTES_FOR_RESTART=VOTES_FOR_RESTART+1
 		if VOTES_FOR_RESTART > 0 then
-		PrintMessage(HUD_PRINTTALK, "Game restart applied.")
-		RestartGame()
-		VOTES_FOR_RESTART=0
+			PrintMessage(HUD_PRINTTALK, "Game restart applied.")
+			RestartGame()
+			VOTES_FOR_RESTART=0
 		end
 	else
 	RestartGame()
@@ -208,320 +199,399 @@ end
 	*/
 	
 		if text == "!patrolzones" or text == "!PATROLZONES" then
-		if ply:IsAdmin() then revealzonestemp() end
-		return false
+			revealzonestemp()
+			return false
 		end
-	end
-	
+	end	
 hook.Add( "PlayerSay", "ISaid", ISaid )
+
 function revealzonestemp()
-table.foreach(zonescovered, function(key,value)
-local sprite = ents.Create( "env_sprite" )
-sprite:SetPos(value)
-sprite:SetColor( Color( 255, 0, 0 ) )
-sprite:SetKeyValue( "model", "sprites/light_glow01.vmt" )
-sprite:SetKeyValue( "scale", 0.50 )
-sprite:SetKeyValue( "rendermode", 5 )
-sprite:SetKeyValue( "renderfx", 7 )
-sprite:Spawn()
-sprite:Activate()
-sprite:SetName("ZoneReveal")
-end)
-timer.Simple(4, hidezones)
+	table.foreach(zonescovered, function(key,value)
+		local sprite = ents.Create( "env_sprite" )
+		sprite:SetPos(value)
+		sprite:SetColor( Color( 255, 0, 0 ) )
+		sprite:SetKeyValue( "model", "sprites/light_glow01.vmt" )
+		sprite:SetKeyValue( "scale", 0.50 )
+		sprite:SetKeyValue( "rendermode", 5 )
+		sprite:SetKeyValue( "renderfx", 7 )
+		sprite:Spawn()
+		sprite:Activate()
+		sprite:SetName("ZoneReveal")
+	end)
+	timer.Simple(4, hidezones)
 end
+
 function GM:Initialize()
 	self.BaseClass.Initialize( self )
 end
 
 function ManualWeaponDrop(ply)
-
-local wep = ply:GetActiveWeapon():GetClass()
-local candrop = 1
-if ply:GetActiveWeapon():GetClass() == "weapon_physcannon" then
-candrop = 0 end
-
-if ply:GetActiveWeapon():Clip1() < 0 or ply:GetActiveWeapon():GetClass() == "weapon_slam" then
-candrop = 0
-end
-
-if candrop == 1 then
-			if ply:GetActiveWeapon():Clip1() == 0 then
-				ply:GetActiveWeapon():Remove()
-				ply:PrintMessage(HUD_PRINTTALK, "Removed "..ply:GetActiveWeapon():GetClass()..".")
-				else
-				ply:PrintMessage(HUD_PRINTTALK, "Dropped "..ply:GetActiveWeapon():GetClass()..".")
-				ply:DropWeapon(ply:GetActiveWeapon())
-			end
-
-else
-ply:PrintMessage(HUD_PRINTTALK, "You can't drop "..ply:GetActiveWeapon():GetClass()..". Sorry.")
-end
-
-
+	local wep = ply:GetActiveWeapon():GetClass()
+	local candrop = 1
+	if ply:GetActiveWeapon():GetClass() == "weapon_physcannon" then
+		candrop = 0
+	end
+	if ply:GetActiveWeapon():Clip1() < 0 or ply:GetActiveWeapon():GetClass() == "weapon_slam" then
+		candrop = 0
+	end	
+	if candrop == 1 then
+		if ply:GetActiveWeapon():Clip1() == 0 then
+			ply:GetActiveWeapon():Remove()
+			ply:PrintMessage(HUD_PRINTTALK, "Removed "..ply:GetActiveWeapon():GetClass()..".")
+			else
+			ply:PrintMessage(HUD_PRINTTALK, "Dropped "..ply:GetActiveWeapon():GetClass()..".")
+			ply:DropWeapon(ply:GetActiveWeapon())
+		end
+	else
+		ply:PrintMessage(HUD_PRINTTALK, "You can't drop "..ply:GetActiveWeapon():GetClass()..". Sorry.")
+	end
 end
 
 function nearbycombinecome(suspect)
-		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
-				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
-						if !v:GetEnemy() then
-						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
-							print(""..v:GetName().." heard that.")
-							v:SetLastPosition(suspect:GetPos())
-							v:SetSchedule(SCHED_FORCED_GO_RUN)
-							end
-						end
-					end
-end
+	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
+		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
+			if !v:GetEnemy() then
+				if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
+					print(""..v:GetName().." heard that.")
+					v:SetLastPosition(suspect:GetPos())
+					v:SetSchedule(SCHED_FORCED_GO_RUN)
+				end
+			end
+		end
+	end
 end
 
 function nearbycombinecomeheli(spotter,suspect)
-		for k, v in pairs(ents.FindInSphere(spotter:GetPos(),2024)) do
-				if (v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s") then 
-						if !v:GetEnemy() then
-						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
-							print(""..v:GetName().." is guided by the heli.")
-							v:SetLastPosition(suspect:GetPos())
-							v:SetSchedule(SCHED_FORCED_GO_RUN)
-							end
-						end
-					end
-end
+	for k, v in pairs(ents.FindInSphere(spotter:GetPos(),2024)) do
+		if (v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s") then 
+			if !v:GetEnemy() then
+				if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
+					print(""..v:GetName().." is guided by the heli.")
+					v:SetLastPosition(suspect:GetPos())
+					v:SetSchedule(SCHED_FORCED_GO_RUN)
+				end
+			end
+		end
+	end
 end
 
 
 
 function nearbycombinecomecasual(suspect)
 	local come = 0
-if suspect:GetPos() then
-	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
-		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
-			if v:GetPos():Distance(suspect:GetPos()) > 10 then
-				if come < 1 then 
-					if !v:GetEnemy() then
-						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
-							--print(""..v:GetName().." investigates.")
-							PrintMessage(HUD_PRINTTALK, ""..v:GetName()..": "..table.Random(CombineHearBreak).."")
-							v:SetLastPosition(suspect:GetPos())
-							v:SetSchedule(SCHED_FORCED_GO)
-							come=come+1
+	if suspect:GetPos() then
+		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
+			if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
+				if v:GetPos():Distance(suspect:GetPos()) > 10 then
+					if come < 1 then 
+						if !v:GetEnemy() then
+							if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
+								--print(""..v:GetName().." investigates.")
+								PrintMessage(HUD_PRINTTALK, ""..v:GetName()..": "..table.Random(CombineHearBreak).."")
+								v:SetLastPosition(suspect:GetPos())
+								v:SetSchedule(SCHED_FORCED_GO)
+								come=come+1
+							end
 						end
 					end
 				end
 			end
 		end
 	end
-
-end
 end
 
 function nearbycombinecomesilent(suspect)
 
-if suspect:GetPos() then
-	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),812)) do
-		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
-			if v:GetPos():Distance(suspect:GetPos()) > 10 then
-				if !v:GetEnemy() then
-					if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
-						v:SetLastPosition(suspect:GetPos())
-						v:SetSchedule(SCHED_FORCED_GO_RUN)
+	if suspect:GetPos() then
+		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),812)) do
+			if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
+				if v:GetPos():Distance(suspect:GetPos()) > 10 then
+					if !v:GetEnemy() then
+						if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
+							v:SetLastPosition(suspect:GetPos())
+							v:SetSchedule(SCHED_FORCED_GO_RUN)
+						end
 					end
 				end
 			end
 		end
 	end
-
-end
 end
 
 
 
 function allthecombinecome(suspect,MAXCOMBINERUSH)
 local coming=0
-		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
-				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
-						if !v:GetEnemy() then
-							if coming < MAXCOMBINERUSH then
-							--print(""..v:GetName().." heard that.")
-							v:SetLastPosition(suspect:GetPos())
-							v:SetSchedule(SCHED_FORCED_GO_RUN)
-							coming=coming+1
-							end
-							end
-						end
-					end
-		for k, v in pairs(ents.GetAll()) do
-				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
-						if !v:GetEnemy() then
-							if coming < MAXCOMBINERUSH then
-							--print(""..v:GetName().." heard that.")
-							v:SetLastPosition(suspect:GetPos())
-							v:SetSchedule(SCHED_FORCED_GO_RUN)
-							coming=coming+1
-							end
-							end
-						end
-					end
+	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
+		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
+			if !v:GetEnemy() then
+				if coming < MAXCOMBINERUSH then
+					--print(""..v:GetName().." heard that.")
+					v:SetLastPosition(suspect:GetPos())
+					v:SetSchedule(SCHED_FORCED_GO_RUN)
+					coming=coming+1
+				end
+			end
+		end
+	end
+	for k, v in pairs(ents.GetAll()) do
+		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
+			if !v:GetEnemy() then
+				if coming < MAXCOMBINERUSH then
+					--print(""..v:GetName().." heard that.")
+					v:SetLastPosition(suspect:GetPos())
+					v:SetSchedule(SCHED_FORCED_GO_RUN)
+					coming=coming+1
+				end
+			end
+		end
+	end
 end
 
 function GM:PlayerCanPickupWeapon(ply, wep)
---print(""..ply:GetName().." trying to get " ..wep:GetClass().."")
-local CANPICKUP = 1
-table.foreach(ONLY_PICKUP_ONCE, function(key,value)
-if wep:GetClass() == value then
-	for k,v in pairs (ply:GetWeapons()) do
-		if v:GetClass() == value then
-		--print(""..ply:GetName().." already has " ..v:GetClass().."")
-		CANPICKUP = 0 
+	--print(""..ply:GetName().." trying to get " ..wep:GetClass().."")
+	local CANPICKUP = 1
+	table.foreach(ONLY_PICKUP_ONCE, function(key,value)
+		if wep:GetClass() == value then
+			for k,v in pairs (ply:GetWeapons()) do
+				if v:GetClass() == value then
+				--print(""..ply:GetName().." already has " ..v:GetClass().."")
+				CANPICKUP = 0 
+				end
+			end
+		end
+	end)
+	
+	if GetConVarString("h_weight_system") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
+	
+	if GetConVarNumber("h_selective_weapon_pickup") == 1 then
+		if wep:GetClass() != "weapon_crowbar" then 
+			if !ply:KeyDown(IN_USE) then
+				CANPICKUP = 0
+			end
 		end
 	end
+	
+	if CANPICKUP == 0 then 
+		return false 
+	end
+	
+	CANPICKUP = nil
+	return true 
 end
-end)
-
-if GetConVarString("h_weight_system") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
-
-
-if GetConVarNumber("h_selective_weapon_pickup") == 1 then
-if wep:GetClass() != "weapon_crowbar" then 
-if !ply:KeyDown(IN_USE) then CANPICKUP = 0
-end
-end
-end
-
-if CANPICKUP == 0 then return false end
-CANPICKUP = nil
-return true end
 
 function AdjustWeight(ply)
-local weight = 1
-table.foreach(ply:GetWeapons(), function(key,value)
-
-if value:GetClass() != "weapon_frag" and value:GetClass() != "weapon_crowbar"  and value:GetClass() != "weapon_slam" and value:GetClass() != "weapon_pistol" and value:GetClass() != "weapon_smg" then
-weight=weight*0.95
+	local weight = 1
+	table.foreach(ply:GetWeapons(), function(key,value)
+		if value:GetClass() != "weapon_frag" and value:GetClass() != "weapon_crowbar"  and value:GetClass() != "weapon_slam" and value:GetClass() != "weapon_pistol" and value:GetClass() != "weapon_smg" then
+			weight=weight*0.95
+		end
+	end)
+	ply:SetWalkSpeed(150*weight)
+	ply:SetRunSpeed(250*weight)
+	if ply:GetWalkSpeed() < 100 then
+	ply:PrintMessage(HUD_PRINTTALK, "You carry too much weight. Drop some weapons by switching to them and saying !drop")
+	end
 end
-end)
-ply:SetWalkSpeed(150*weight)
-ply:SetRunSpeed(250*weight)
-if ply:GetWalkSpeed() < 150 then
---ply:PrintMessage(HUD_PRINTTALK, "Te pesa el culo")
-end
-end 
 
 
 function ItemRespawnSystem()
-if 1 == 1 then
-local CAN = 1
-local PLAYERS = 0
-local NUMBER = 0
-for k,weapon in pairs(ents.FindByClass("player")) do 
-PLAYERS = PLAYERS + 1
-end
---print("")
-if PLAYERS > 3 then PLAYERS = PLAYERS/2 end
-table.foreach(MEDIUMWEAPONS, function(key,value)
-for k,weapon in pairs(ents.FindByClass(value)) do 
- NUMBER=NUMBER+1
-end
---print("[The Hunt]: There are "..NUMBER.." "..value.."")
-while NUMBER < PLAYERS do
---print("[The Hunt]: Added 1 of "..value.."")
-SpawnItem(value, table.Random(ITEMPLACES), Angle(0,0,math.random(-180,180)) )
-NUMBER = NUMBER+1
-end
-NUMBER=0
-end)
-
-for k,v in pairs(ents.FindByClass("item_healthcharger")) do 
-	local canrespawn = 1
-	local chargerpos = v:GetPos()
-	local chargerangles = v:GetAngles()
-		for k, player in pairs(ents.FindInSphere(v:GetPos(),100)) do
-			if player:IsPlayer() then
-			canrespawn = 0
-			--print("[The Hunt]: player found, wont respawn charger")
+	if GetConVarNumber("h_item_respawn_system") == 1 then
+		local CAN = 1
+		local PLAYERS = 0
+		local NUMBER = 0
+		for k,weapon in pairs(ents.FindByClass("player")) do 
+			PLAYERS = PLAYERS + 1
+		end
+		if PLAYERS > 3 then
+			PLAYERS = PLAYERS/2 
+		end
+		table.foreach(MEDIUMWEAPONS, function(key,value)
+			for k,weapon in pairs(ents.FindByClass(value)) do 
+				NUMBER=NUMBER+1
+			end
+			--print("[The Hunt]: There are "..NUMBER.." "..value.."")
+			while NUMBER < PLAYERS do
+				--print("[The Hunt]: Added 1 of "..value.."")
+				SpawnItem(value, table.Random(ITEMPLACES), Angle(0,0,math.random(-180,180)) )
+				NUMBER = NUMBER+1
+			end
+			NUMBER=0
+		end)
+		for k,v in pairs(ents.FindByClass("item_healthcharger")) do 
+			local canrespawn = 1
+			local chargerpos = v:GetPos()
+			local chargerangles = v:GetAngles()
+			for k, player in pairs(ents.FindInSphere(v:GetPos(),100)) do
+				if player:IsPlayer() then
+					canrespawn = 0
+					--print("[The Hunt]: player found, wont respawn charger")
+				end
+			end
+			if canrespawn == 1 then
+				--print("[The Hunt]: player not found, will respawn charger")
+				v:Remove()
+				SpawnItem("item_healthcharger", chargerpos, chargerangles )
 			end
 		end
-	if canrespawn == 1 then
-	--print("[The Hunt]: player not found, will respawn charger")
-	v:Remove()
-	SpawnItem("item_healthcharger", chargerpos, chargerangles )
-	end
-end
-
-
-
-for k,v in pairs(ents.FindByClass("item_suitcharger")) do 
-	local canrespawn = 1
-	local chargerpos = v:GetPos()
-	local chargerangles = v:GetAngles()
-		for k, player in pairs(ents.FindInSphere(v:GetPos(),100)) do
-			if player:IsPlayer() then
-			canrespawn = 0
-			--print("[The Hunt]: player found, wont respawn charger")
+		
+		for k,v in pairs(ents.FindByClass("item_suitcharger")) do 
+			local canrespawn = 1
+			local chargerpos = v:GetPos()
+			local chargerangles = v:GetAngles()
+			for k, player in pairs(ents.FindInSphere(v:GetPos(),100)) do
+				if player:IsPlayer() then
+					canrespawn = 0
+					--print("[The Hunt]: player found, wont respawn charger")
+				end
+			end
+			if canrespawn == 1 then
+					--print("[The Hunt]: player not found, will respawn charger")
+					v:Remove()
+					SpawnSuitCharger(chargerpos, chargerangles )
 			end
 		end
-	if canrespawn == 1 then
-	--print("[The Hunt]: player not found, will respawn charger")
-	v:Remove()
-	SpawnSuitCharger(chargerpos, chargerangles )
 	end
-end
+	
+	if RPGCANSPAWN == 1 then
+		RPG_IN_MAP = 0
+		for k,weapon in pairs(ents.FindByClass("weapon_rpg")) do 
+			RPG_IN_MAP = RPG_IN_MAP + 1
+		end
+		--print("[The Hunt]: RPG's on map: "..RPG_IN_MAP.."")
+		RPGSPAWN = GetConVarNumber("h_rpgmax") - RPG_IN_MAP
+		while RPGSPAWN > 0 && RPGCANSPAWN == 1 do
+			--print("[The Hunt]: RPG's that will spawn: "..RPGSPAWN.."")
+			SpawnItem("weapon_rpg", table.Random(ITEMPLACES), Angle(90, 90, 0) )
+			RPGSPAWN=RPGSPAWN - 1
+		end
+	end
+	timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
+	--print("")
 end
 
-if RPGCANSPAWN == 1 then
-	RPG_IN_MAP = 0
-	for k,weapon in pairs(ents.FindByClass("weapon_rpg")) do 
-	RPG_IN_MAP = RPG_IN_MAP + 1
-	end
-	--print("[The Hunt]: RPG's on map: "..RPG_IN_MAP.."")
-	RPGSPAWN = GetConVarNumber("h_rpgmax") - RPG_IN_MAP
-	while RPGSPAWN > 0 && RPGCANSPAWN == 1 do
-	--print("[The Hunt]: RPG's that will spawn: "..RPGSPAWN.."")
-	SpawnItem("weapon_rpg", table.Random(ITEMPLACES), Angle(90, 90, 0) )
-	RPGSPAWN=RPGSPAWN - 1
-	end
-end
-timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
---print("")
-end
-
-SPAWNPOINTS_TO_DELETE = {"info_player_terrorist", "info_player_counterterrorist", "info_player_start", "info_player_deathmatch",
+SPAWNPOINTS_TO_DELETE = {
+"info_player_terrorist",
+"info_player_counterterrorist",
+"info_player_start",
+"info_player_deathmatch",
 }
 
 
-RebelsGiveAmmo = { "Pistol", "SMG1", "SMG1_Grenade", "AR2", "Buckshot", "Grenade", "XBowBolt"}
+RebelsGiveAmmo = {
+"Pistol",
+"SMG1",
+"SMG1_Grenade",
+"AR2",
+"Buckshot",
+"Grenade",
+"XBowBolt"
+}
 
 
 
-TOO_BRIGHT_WEAPONS = { "weapon_crossbow", "weapon_physcannon", "weapon_rpg", "weapon_medkit"}
+TOO_BRIGHT_WEAPONS = {
+"weapon_crossbow",
+"weapon_physcannon",
+"weapon_rpg",
+"weapon_medkit"
+}
 -- Weapons that make you more visible. It's harder to hide while carrying this weapon.
 
-DARK_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_357","weapon_slam","fas2_dv2","fas2_ammobox","fas2_ifak","fas2_machete","stalker_knife","m9k_machete" }
+DARK_WEAPONS = { "weapon_frag",
+"weapon_crowbar",
+"weapon_357",
+"weapon_slam",
+"fas2_dv2",
+"fas2_ammobox",
+"fas2_ifak",
+"fas2_machete",
+"stalker_knife",
+"m9k_machete"
+}
 -- Weapons that don't have any bright items on them.
 
-SILENCED_WEAPONS = {"weapon_crossbow", "pspak_mp9", "stalker_vintorez","stalker_val", "weapon_nomad","weapon_doom3_plasmagun","m9k_svu","stalker_enfield","kf_mac10_fas","pspak_m14","bakker's blaster","murphy's law","the hammerhead","the pea shooter","the quadruple agent","the reanimated rocket rifle","the secret carbine","the sleeping pill",}
+SILENCED_WEAPONS = {"weapon_crossbow",
+"pspak_mp9",
+"stalker_vintorez",
+"stalker_val",
+"weapon_nomad",
+"weapon_doom3_plasmagun",
+"m9k_svu",
+"stalker_enfield",
+"kf_mac10_fas",
+"pspak_m14","bakker's blaster",
+"murphy's law",
+"the hammerhead",
+"the pea shooter",
+"the quadruple agent",
+"the reanimated rocket rifle",
+"the secret carbine",
+"the sleeping pill",
+}
 -- Using them will attract nearby combine.
 
-SILENT_WEAPONS = { "weapon_frag", "weapon_crowbar","weapon_slam",
+SILENT_WEAPONS = { 
+"weapon_frag",
+"weapon_crowbar",
+"weapon_slam",
 -- DOOM SWEPS support
-"weapon_doom3_fists","weapon_doom3_fists",
+"weapon_doom3_fists",
+"weapon_doom3_fists",
 -- M90 Suppport
-"m9k_damascus","m9k_fists","m9k_m61_frag","m9k_harpoon","m9k_ied_detonator","m9k_knife","m9k_machete","m9k_nerve_gas","m9k_nitro","m9k_orbital_strike","m9k_proxy_mine","m9k_sticky_grenade","m9k_suicide_bomb",
+"m9k_damascus",
+"m9k_fists",
+"m9k_m61_frag",
+"m9k_harpoon",
+"m9k_ied_detonator",
+"m9k_knife",
+"m9k_machete"
+,"m9k_nerve_gas",
+"m9k_nitro",
+"m9k_orbital_strike",
+"m9k_proxy_mine",
+"m9k_sticky_grenade",
+"m9k_suicide_bomb",
 -- Serious Sam Support
 "weapon_ss_knife",
 -- FA:S support
-"fas2_ifak","fas2_machete","kf_knife_fas","fas2_dv2",
+"fas2_ifak",
+"fas2_machete",
+"kf_knife_fas",
+"fas2_dv2",
 -- Mad Cow's Weapons Support
-"weapon_mad_tmp","weapon_mad_c4","weapon_mad_charge","weapon_mad_flash","weapon_mad_grenade","weapon_mad_crossbow","weapon_mad_incendiary","weapon_mad_knife","weapon_mad_smoke","weapon_mad_magnade",
+"weapon_mad_tmp",
+"weapon_mad_c4",
+"weapon_mad_charge",
+"weapon_mad_flash",
+"weapon_mad_grenade",
+"weapon_mad_crossbow",
+"weapon_mad_incendiary",
+"weapon_mad_knife",
+"weapon_mad_smoke"
+,"weapon_mad_magnade",
 -- STALKER
 "stalker_knife",
-"the penguinade",}
+"the penguinade",
+}
 -- Using them wont atract anyone.
 
-SECONDARY_FIRE_WEAPONS = { "weapon_ar2", "weapon_shotgun","the kilroy warhammer"}
+SECONDARY_FIRE_WEAPONS = { "weapon_ar2",
+"weapon_shotgun",
+"the kilroy warhammer"
+}
 -- Weapons that have a loud secondary fire.
 
-
-ONLY_PICKUP_ONCE = { "weapon_physcannon","seal6-claymore","weapon_doom3_chainsaw","death_note","weapon_stunstick","m9k_machete","goldenpan","weapon_stickyrifle","weapon_nomad","nature_staff"}
+ONLY_PICKUP_ONCE = { "weapon_physcannon",
+"seal6-claymore",
+"weapon_doom3_chainsaw",
+"death_note",
+"weapon_stunstick",
+"m9k_machete",
+"goldenpan",
+"weapon_stickyrifle",
+"weapon_nomad",
+"nature_staff"}
 -- The game will prevent people from picking up this weapons if they already have them. Useful for weapons with infinite uses, preventing the player from picking up a weapon he doesn't need to, leaving the weapon for others.
 
 
@@ -532,11 +602,50 @@ MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combi
 MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship", "npc_turret_ceiling","npc_hunter"}
 MainEnemiesDamage = { "npc_combine_s", "npc_metropolice", "npc_manhack",}
 
-CombineHearBreak = {"I think I heard something.","What was that?","Something broke nearby.","Heard something broke.","...the fuck...","I think I hear dubstep somewhere.","Suspicious sounds near my position.","...going to check that.","Nearby units, the suspect must be in this area.","Here you are."}
 
-ChatEnemySpotted = {"All units, hostile spotted.","All units, hostiles near my position.","Suspect found, all units provide support.","All units: hostiles found, I repeat, hostiles found."}
+CombineHearBreak = {
+"I think I heard something.",
+"What was that?",
+"Something broke nearby.",
+"Heard something broke.",
+"...the fuck...",
+"I think I hear dubstep somewhere.",
+"Suspicious sounds near my position.",
+"...going to check that.",
+"Nearby units, the suspect must be in this area.",
+"Here you are."
+}
 
-OVERWATCH_TAUNTS = { "I'd get ready if I were you.", "Hope you like bloodbaths.", "Let's get this farce over with.", "I've calculated who will win to a 99.93% certainty, if you're interested. ", "So at least your teammates know what they're doing. ", "Your teammates are doing a really great job. ", "This is probably the most heroic thing anyone's ever done while sitting motionless in their parents' rec room. ", "You were almost helpful this time. ", " It's a good feeling, isn't it? I wouldn't get used to it. ", "That's funny, I didn't even see you cheat. ", "That should delay the inevitable slightly. ", "Great teamwork, you vicious thugs. ", "Your entire life has been a mathematical error. A mathematical error I'm about to correct.", "Someone is going to get badly hurt.", "I hate you so much.", "Did anything happen while I was out?", "Just stop it already.", "Are you testing me?" , "You really aren't getting tired of that, are you?" , "I'm done." , "Do you need real encouragement? Let's see if this helps." , "Now, you are just wasting my time." , "If you are wondering what that smell is, that is the smell of human fear." }
+ChatEnemySpotted = {
+"All units, hostile spotted.",
+"All units, hostiles near my position.",
+"Suspect found, all units provide support.",
+"All units: hostiles found, I repeat, hostiles found."
+}
+
+OVERWATCH_TAUNTS = { 
+"I'd get ready if I were you.",
+"Hope you like bloodbaths.",
+"Let's get this farce over with.",
+"I've calculated who will win to a 99.93% certainty, if you're interested. ",
+"So at least your teammates know what they're doing. ",
+"Your teammates are doing a really great job. ",
+"This is probably the most heroic thing anyone's ever done while sitting motionless in their parents' rec room. ",
+"You were almost helpful this time. ",
+"It's a good feeling, isn't it? I wouldn't get used to it. ",
+"That's funny, I didn't even see you cheat. ",
+"That should delay the inevitable slightly. ",
+"Great teamwork, you vicious thugs. ",
+"Your entire life has been a mathematical error. A mathematical error I'm about to correct.",
+"Someone is going to get badly hurt.", "I hate you so much.", "Did anything happen while I was out?",
+"Just stop it already.",
+"Are you testing me?" , 
+"You really aren't getting tired of that, are you?" , 
+"I'm done." ,
+"Do you need real encouragement? Let's see if this helps." ,
+"Now, you are just wasting my time." ,
+"If you are wondering what that smell is, that is the smell of human fear." 
+ }
 
 
 OverwatchAmbientSoundsOne = {
@@ -552,7 +661,6 @@ OverwatchAmbientSoundsOne = {
 "npc/overwatch/cityvoice/f_trainstation_assemble_spkr.wav",
 "npc/overwatch/cityvoice/f_unrestprocedure1_spkr.wav",
 "npc/overwatch/cityvoice/fprison_restrictorsdisengaged.wav","npc/overwatch/cityvoice/f_protectionresponse_5_spkr.wav",
-
 }
 
 ContactConfirmed = {
