@@ -1,7 +1,27 @@
+print("------------------------- THE HUNT init.lua LOADING -------------------------")
+
+
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
 file.CreateDir("thehunt_maps")
+
+util.AddNetworkString( "Spotted" )
+util.AddNetworkString( "Hidden" )
+util.AddNetworkString( "light_below_limit" )
+util.AddNetworkString( "light_above_limit" )
+util.AddNetworkString( "Visible" )
+util.AddNetworkString( "NotVisible" )
+util.AddNetworkString( "PlayerKillNotice" )
+util.AddNetworkString( "Scoreboard" )
+util.AddNetworkString( "ShowHUDScoreboard" )
+util.AddNetworkString( "HideHUDScoreboard" )
+
+util.PrecacheModel("models/Combine_Soldier.mdl")
+util.PrecacheModel("models/Combine_Super_Soldier.mdl")
+util.PrecacheModel("models/Police.mdl")
+
+
 
 -- WHAT-MAP-ARE-THEY-PLAYING CHECK v
 
@@ -16,7 +36,6 @@ win = 0
 include("/maps/nomap.lua")
 end
 
-
 if win == 0 then
 if file.Exists( "gamemodes/thehunt/gamemode/maps/"..game.GetMap()..".lua", "GAME" ) then
 include("/maps/"..game.GetMap()..".lua")
@@ -29,9 +48,6 @@ include("/maps/nomap.lua")
 end
 end
 -- WHAT-MAP-ARE-THEY-PLAYING CHECK ^
-
-
-
 
 
 if file.Exists( "thehunt_maps/best_team.txt", "DATA" ) then
@@ -54,22 +70,10 @@ file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DEATHS=0\n")
 include("/../../../data/thehunt_maps/best_team.txt")
 end
 
-util.AddNetworkString( "Spotted" )
-util.AddNetworkString( "Hidden" )
-util.AddNetworkString( "light_below_limit" )
-util.AddNetworkString( "light_above_limit" )
-util.AddNetworkString( "Visible" )
-util.AddNetworkString( "NotVisible" )
-util.AddNetworkString( "PlayerKillNotice" )
-util.AddNetworkString( "Scoreboard" )
-util.AddNetworkString( "ShowHUDScoreboard" )
-util.AddNetworkString( "HideHUDScoreboard" )
 
-util.PrecacheModel("models/Combine_Soldier.mdl")
-util.PrecacheModel("models/Combine_Super_Soldier.mdl")
-util.PrecacheModel("models/Police.mdl")
 
-print("------------------------- THE HUNT init.lua LOADING -------------------------")
+
+
 
 
 /*             notes
@@ -1042,10 +1046,36 @@ timer.Simple(40, function() PrintMessage(HUD_PRINTTALK, "The Hunt doesn't featur
 
 
 -- Rewrite the team file
+
+/*
 if file.Exists( "thehunt_maps/best_team.txt", "DATA" ) then
 file.Delete( "thehunt_maps/best_team.txt" )
 end
 file.Write("thehunt_maps/best_team.txt", "\n")
+*/
+
+--
+if file.Exists( "thehunt_maps/best_team.txt", "DATA" ) then
+include("/../../../data/thehunt_maps/best_team.txt")
+file.Delete( "thehunt_maps/best_team.txt" )
+else
+file.Write("thehunt_maps/best_team.txt", "\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_NAMES={'Frankish Hooves','Best Korea','360 Noscope' }\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_KILLS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SILENT_KILLS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DEATHS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DATE='1/11/0000 - 00:00:00'\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SCORE=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_NAME='Eddlm'")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DATE='1/11/0000 - 00:00:00'\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_KILLS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SILENT_KILLS=0\n")
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DEATHS=0\n")
+include("/../../../data/thehunt_maps/best_team.txt")
+end
+--
+
 
 if teamscore > BEST_TEAM_SCORE then
 file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE="..teamscore.."\n")
