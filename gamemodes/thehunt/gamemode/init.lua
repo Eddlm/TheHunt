@@ -2343,7 +2343,7 @@ end
 end
 
 function ScalePlayerDamage(ply, hitgroup, dmginfo)
-	dmginfo:ScaleDamage(GetConVarNumber("h_playerscaledamage"))
+	dmginfo:ScaleDamage(1)
 	if dmginfo:GetAttacker():IsPlayer() and !dmginfo:IsFallDamage() and !dmginfo:IsDamageType(64) then
 		dmginfo:ScaleDamage(GetConVarNumber("h_playerscaledamage")*0.1)
 	end
@@ -2357,7 +2357,7 @@ end
 hook.Add("ScalePlayerDamage","ScalePlayerDamage", ScalePlayerDamage)
 
 function ScaleNPCDamage( damaged, hitgroup, damage )
-	damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
+	damage:ScaleDamage(1)
 	table.foreach(MainEnemiesDamage, function(key,value)
 	if damaged:GetClass() == value  then
 		if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) end -- flee from fire and friendly fire
