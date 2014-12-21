@@ -161,7 +161,7 @@ Wave = 5
 	end
 
 
-HelicopterWave(0)
+HelicopterWave(1)
 -- CanCheck = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
@@ -183,7 +183,7 @@ if math.random (1,20) == 1 then
 SpawnCombineSynth(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 end
 end
-HelicopterWave(0)
+HelicopterWave(1)
 
 
 

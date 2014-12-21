@@ -237,7 +237,7 @@ RPGCANSPAWN = 1
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
 	
-HelicopterWave(0)
+HelicopterWave(1)
 RPGCANSPAWN = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
@@ -252,7 +252,7 @@ Wave = 6
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
 	end
 
-HelicopterWave(0)
+HelicopterWave(1)
 RPGCANSPAWN = 1
 timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end
