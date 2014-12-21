@@ -77,7 +77,7 @@ Wave = 6
 		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
 	end
 
-HelicopterWave()
+HelicopterWave(2)
 RPGCANSPAWN = 1
 end
 

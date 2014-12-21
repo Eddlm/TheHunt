@@ -674,8 +674,8 @@ end )
 
 
 -- Called by waves if the wave should spawn an helicopter.
-function HelicopterWave(maxhelis,minscore)
-	if teamscore > minscore and HeliCanSpawn == true then
+function HelicopterWave(maxhelis)
+	if HeliCanSpawn == true then
 		RPGCANSPAWN = 1
 		local NumHelis = 0
 		for k, v in pairs(ents.FindByClass("npc_helicopter")) do
