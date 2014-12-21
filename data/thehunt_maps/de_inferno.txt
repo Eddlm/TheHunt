@@ -67,9 +67,6 @@ SpawnItem("info_player_start", Vector(285.097961, 216.617279, 28.320465),Angle(0
 SpawnItem("info_player_start", Vector(-393.896271, -599.743530, 192.031250),Angle(0.000, 85.920, 0.000))
 SpawnItem("info_player_start", Vector(1696.404663, 1996.364380, 160.031250),Angle(0.000, 137.870, 0.000))
 
-
-
-
 end
 
 

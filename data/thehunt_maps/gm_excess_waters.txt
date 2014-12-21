@@ -1,0 +1,27 @@
+---------------------- THE HUNT CONFIGURATION FILE ----------------------
+include( 'basewaves.lua' )
+CombineFirstWave = 7
+CombineSecondWave = 10
+CombineThirdWave = 13
+CombineFourthWave = 15
+CombineFifthWave = 20
+CombineInfiniteWave = 20
+MAP_PROPS = {}
+ITEMPLACES = {Vector(5005.645996, -1767.557251, 645.115784)}
+combinespawnzones = {Vector(6752.476074, -3736.627930, 481.490173)}
+zonescovered = {Vector(7247.541992, -3403.484863, 480.370789)}
+HELIPATHS = {Vector(6709.587891, -3377.154785, 700.031250),Vector(6926.559570, -1634.116943, 892.031250),Vector(5367.272461, -3434.330811, 700.031250),Vector(8576.128906, -2451.879639, 666.211914),Vector(8368.576172, -3597.558105, 892.031250),Vector(5267.862305, -1643.898193, 860.031250),}
+function GM:PlayerInitialSpawn(ply)
+timer.Simple(2, function() ply:PrintMessage(HUD_PRINTTALK, '[Overwatch]: Protection team alert, evidence of anticivil activity in this community.') end )
+timer.Simple(4, function() ply:PrintMessage(HUD_PRINTTALK, '[Overwatch]: Code: assemble, plan, contain.') end )
+timer.Simple(10, function()ply:PrintMessage(HUD_PRINTTALK, 'Type !help to see the game mechanics.') end )
+end
+
+function MapSetup()
+for k, v in pairs(ents.FindByClass('func_door_rotating')) do print(v:GetClass()) v:SetKeyValue( 'spawnflags', '32' ) v:Fire('Open','',0) end
+table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value) for k, v in pairs(ents.FindByClass(value)) do print(v:GetClass()) v:Remove() end end)
+SpawnItem('info_player_start', Vector(6737.627930, -943.897644, 929.399597),Angle(0.000, -90.000, -0.000))
+SpawnItem('npc_sniper', Vector(4600.146973, -3672.048828, 896.676025),Angle(0.000, 0.000, 0.000))
+end
+---------------------- END OF CONFIGURATION FILE ----------------------
+

@@ -2,7 +2,7 @@ AddCSLuaFile()
 
 ENT.Type = "anim" 
 ENT.PrintName	= "button_turrets"
-ENT.Author	= "Alig96"
+ENT.Author	= "Eddlm"
 ENT.Contact	= "Don't"
 ENT.Purpose	= ""
 ENT.Instructions	= ""
@@ -26,12 +26,14 @@ function ENT:Use(activator)
 				ARMED=1
 				for k, v in pairs(ents.FindByClass("npc_turret_ceiling")) do
 					v:AddRelationship("player D_LI 999")
+					v:AddRelationship("npc_citizen D_LI 999")
 				end
 			PrintMessage(HUD_PRINTTALK, "Ceiling Turrets disarmed.")
 			end
 		end
 	end
 end
+
 function ENT:OnTakeDamage(activator)
 	if SERVER then
 	self:EmitSound( "buttons/combine_button2.wav", 200, 100 )
@@ -40,6 +42,7 @@ function ENT:OnTakeDamage(activator)
 				ARMED=1
 				for k, v in pairs(ents.FindByClass("npc_turret_ceiling")) do
 					v:AddRelationship("player D_LI 999")
+					v:AddRelationship("npc_citizen D_LI 999")
 				end
 			PrintMessage(HUD_PRINTTALK, "Ceiling Turrets disarmed.")
 			end

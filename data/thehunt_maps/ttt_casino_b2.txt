@@ -147,16 +147,7 @@ SpawnStaticProp(Vector(1949.937622, 735.193970, -249.079269),Angle(0,-180,0),"mo
 
 
 
-
-for k, v in pairs(ents.FindByClass("info_player_start")) do
-print(v:GetClass())
-v:Remove()
-end
-for k, v in pairs(ents.FindByClass("info_player_deathmatch")) do
-print(v:GetClass())
-v:Remove()
-end
-
+table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value) for k, v in pairs(ents.FindByClass(value)) do print(v:GetClass()) v:Remove() end end)
 SpawnItem("info_player_start", Vector(-429.867126, 619.942383, -394.978424), Angle(0,180,0) )
 SpawnItem("info_player_start", Vector(1996.031250, 379.810242, -543.610779), Angle(0,40,0) )
 SpawnItem("info_player_start", Vector(2786.576172, 910.185669, -553.610779), Angle(11,-60,0) )

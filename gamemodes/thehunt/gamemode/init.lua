@@ -1,6 +1,8 @@
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
+include("/../../../data/thehunt_maps/best_team.txt")
+
 util.AddNetworkString( "Spotted" )
 util.AddNetworkString( "Hidden" )
 util.AddNetworkString( "light_below_limit" )
@@ -16,8 +18,16 @@ util.PrecacheModel("models/Combine_Soldier.mdl")
 util.PrecacheModel("models/Combine_Super_Soldier.mdl")
 util.PrecacheModel("models/Police.mdl")
 
+print("------------------------- THE HUNT init.lua LOADING -------------------------")
+
 
 /*             notes
+
+Canisters 50-100 score
+Helis >80 score
+Mortars >100 score
+Combine Super Soldier - no requirements
+Hunter - no requirements
 
 
 NPC:SetKeyValue( "model", "models/elite_synth/elite_synth.mdl" )
@@ -44,64 +54,6 @@ ply:PrintMessage(HUD_PRINTTALK, value)
 end
 end)
 end
-
--- Map Configuration tools v
-function PlayerSpawnpointTool(ply)
-
-local plypos = tostring(ply:GetPos())
-local pos = string.Explode( " ", plypos )
---PrintTable( words )
-advancedpos = string.Implode( ", ", pos)
-
-local plyangles = tostring(ply:GetAngles())
-local angles = string.Explode( " ", plyangles )
-
---table.foreach(angles, function(key,value) math.Round(value) print(value) end)
---PrintTable(angles)
-
-
-
-
-advancedangles = string.Implode( ", ", angles)
-print("Vector("..advancedpos.."),Angle("..advancedangles..")")
-
-end
-
-
-function PropSpawnpointTool(ply)
-
-local plypos = tostring(ply:GetEyeTraceNoCursor().Entity:GetPos())
-local pos = string.Explode( " ", plypos )
---PrintTable( words )
-advancedpos = string.Implode( ", ", pos)
-
-local plyangles = tostring(ply:GetEyeTraceNoCursor().Entity:GetAngles())
-local angles = string.Explode( " ", plyangles )
-
---table.foreach(angles, function(key,value) math.Round(value) print(value) end)
---PrintTable(angles)
-
-
-
-
-advancedangles = string.Implode( ", ", angles)
-print("Vector("..advancedpos.."),Angle("..advancedangles..")")
-end
-
-function ItemSpawnpointTool(ply)
-
-local plypos = tostring(ply:GetPos())
-local pos = string.Explode( " ", plypos )
---PrintTable( words )
-advancedpos = string.Implode( ", ", pos)
-
---table.foreach(angles, function(key,value) math.Round(value) print(value) end)
---PrintTable(angles)
-
-print("Vector("..advancedpos.."),")
-
-end
--- Map Configuration tools ^
 
 
 
@@ -148,15 +100,20 @@ end
 
 
 function GM:Initialize()
---if !ConVarExists( h_debugmode ) then CreateConVar( h_debugmode, 0, FCVAR_NOTIFY )  end
---print("[The Hunt]: use h_debugmode 1 to activate full console notificacions. h_debugmode 0 to disable them.")
+print("------------------------- THE HUNT GM:Initialize LOADING -------------------------")
 
+if !ConVarExists("h_npctrails") then
+CreateClientConVar( "h_npctrails", "0", true, false )
+end
+TEAMKILLERS={}
 STARTING_LOADOUT = {}
 MEDIUMWEAPONS = {}
 SILENTKILLREWARD = {"item_healthvial"}
 teamscore = 0
 HeliCanSpawn = true
 max_weapons_total = 50
+
+prevent_spotlight_lag = false
 RunConsoleCommand( "mp_falldamage", "1") 
 RunConsoleCommand( "g_ragdoll_maxcount", "6")
 RunConsoleCommand( "r_shadowdist", "200") 
@@ -180,20 +137,38 @@ team_deaths =0
 team_kills =0
 COMBINE_KILLED = 0
 CAN_HEAR_BREAK = 1
+GAME_ENDED = 0
+print("------------------------- THE HUNT GM:Initialize LOADED -------------------------")
 
 end
 
+file.CreateDir("thehunt_maps")
+
 -- WHAT-MAP-ARE-THEY-PLAYING CHECK v
+
+if file.Exists( "thehunt_maps/"..game.GetMap()..".txt", "DATA" ) then
+include("/../../../data/thehunt_maps/"..game.GetMap()..".txt")
+
+win = 1
+print("[The Hunt]: map configuration file found ("..game.GetMap()..")")
+else
+print("[The Hunt]: map config file not found. The Hunt will not start.")
+win = 0
+include("/maps/nomap.lua")
+end
+
+
+/*
 if file.Exists( "gamemodes/thehunt/gamemode/maps/"..game.GetMap()..".lua", "GAME" ) then
 include("/maps/"..game.GetMap()..".lua")
 win = 1
 print("[The Hunt]: map configuration file found ("..game.GetMap()..")")
 else
-print("[The Hunt]: map config file not found. The Hunt not start.")
-print("[The Hunt]: Your'e probably playing in a map that's not supported yet. Go blame the autor.")
+print("[The Hunt]: map config file not found. The Hunt will not start.")
 win = 0
 include("/maps/nomap.lua")
 end
+*/
 -- WHAT-MAP-ARE-THEY-PLAYING CHECK ^
 
 
@@ -218,7 +193,6 @@ end )
 
 concommand.Add( "h_revealcombinespawnpoints", function(player, command, arguments )
 if player:IsAdmin() then
-
 table.foreach(combinespawnzones, function(key,value)
 local sprite = ents.Create( "env_sprite" )
 sprite:SetPos(value)
@@ -232,7 +206,7 @@ sprite:Activate()
 sprite:SetName("ZoneReveal")
 end)
 end
-end )
+end)
 
 concommand.Add( "h_revealplayerspawnpoints", function(player, command, arguments )
 if player:IsAdmin() then
@@ -341,6 +315,7 @@ end)
 
 concommand.Add( "h_restartgame", function(ply)
 RestartGame()
+
 end)
 
 
@@ -397,7 +372,7 @@ print("[The Hunt]: found a props table, will add dynamic weapon spawnpoints. ")
 table.foreach(MAP_PROPS, function(key,propclass)
 for k, v in pairs(ents.GetAll()) do
 	if v:GetModel() == propclass then
-	table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,v:BoundingRadius()))
+	table.insert(ITEMPLACES, v:GetPos()+Vector(0,0,v:BoundingRadius()+10))
 	v:SetKeyValue("minhealthdmg", "9001")
 	v:Fire("DisableMotion","",0)
 	print("[The Hunt]: "..v:GetModel().." is now a weapon spawnpoint.")
@@ -442,26 +417,9 @@ end)
 end )
 
 
-concommand.Add( "clnotarget", function(ply)
-if ply:IsAdmin() then
-
-ply:SetNoTarget(1)
-end
-end )
-
-concommand.Add( "cltarget", function(ply)
-if ply:IsAdmin() then
-ply:SetNoTarget(0)
-end
-end )
-
 concommand.Add( "h_version", function(ply)
 ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.7. Date: 8/12/2014")
 ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added a tool for configuring maps, added some new maps.")
-end )
-
-concommand.Add( "h_pos", function(ply)
-print(ply:GetPos())
 end )
 
 
@@ -587,13 +545,13 @@ print("[The Hunt]: h_version: Info about the current The Hunt version.")
 
 print("")
 print("[The Hunt]: Facepunch thread: http://facepunch.com/showthread.php?t=1394695")
-print("[The Hunt]: GitHub download: https://github.com/Eddlm/TheHunt <- This version is updated regularly and fully customizable.")
+print("[The Hunt]: GitHub download: https://github.com/Eddlm/TheHunt")
 print("[The Hunt]: Workshop download: http://steamcommunity.com/sharedfiles/filedetails/?id=292275126")
 print("[The Hunt]: Make sure to check these links to read help about how to play this gamemode, and what this gamemode can do.")
 print("")
 
 end )
-concommand.Add( "hidezones", function(ply)
+concommand.Add( "h_hidezones", function(ply)
 if ply:IsAdmin() then
 hidezones()
 print("[The Hunt]: All sprites removed.")
@@ -812,7 +770,9 @@ end )
 
 
 -- Called by waves if the wave should spawn an helicopter.
-function HelicopterWave()
+function HelicopterWave(maxhelis,minscore)
+if teamscore > minscore and HeliCanSpawn == true then
+RPGCANSPAWN = 1
 local NumHelis = 0
 for k, v in pairs(ents.FindByClass("npc_helicopter")) do
 NumHelis=NumHelis+1
@@ -821,9 +781,12 @@ for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
 NumHelis=NumHelis+1
 end
 
-if NumHelis > 0 then print("too much helis")
-elseif teamscore > 50 and HeliCanSpawn == true then
-SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,0,1)
+if NumHelis >= maxhelis then print("too much helis") else
+SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,1,1)
+end
+
+else print("Tried to spawn helis but team score is too low.")
+
 end
 end
 
@@ -909,19 +872,26 @@ end
 
 function PlayerDefeat()
 PrintMessage(HUD_PRINTTALK, "All players are dead! Rstarting the game...")
-CanCheck = 0
-timer.Simple( 20, autofirstwave)
-game.CleanUpMap()
-timer.Simple( 2, MapSetup)
+--CanCheck = 0
+--timer.Simple( 20, autofirstwave)
+--game.CleanUpMap()
+--timer.Simple( 2, MapSetup)
 end
 
 
 function wavefinishedchecker()
-if teamscore > 69 and team_deaths < 10 then
+if teamscore > 99 and team_deaths < 10 then
 if math.random (1,4) == 1 then
 timer.Create("mortar_attacks", 4, math.random(1,4), LaunchMortarWave)
 end
 end
+
+if teamscore > 49  and teamscore < 100 and team_deaths < 5 then
+if math.random (1,6) == 1 then
+SpawnCanisterWave(table.Random(player.GetAll()):GetPos())
+end
+end
+
 
 timer.Create( "wavefinishedchecker", 10, 1, wavefinishedchecker)
 EnemiesRemainining=0
@@ -950,16 +920,16 @@ if CanCheck == 1 then
 	end
 	
 	table.foreach(player.GetAll(), function(key,value)
-	if value.lifes < 1 then 
+	if value.lifes < 1 and value.teamkiller < 3 then 
 	value.canspawn = 1
-	value.lifes = 1
+	value.lifes = 2
 	if !value:Alive() then value:PrintMessage(HUD_PRINTTALK, "You can spawn now.") end
 	end
 	end)
 	
 	-- This means combine defeat.
 	if COMBINE_KILLED > GetConVarNumber("h_combine_killed_to_win") then
-	
+	GAME_ENDED = 1
 	if table.Random(player.GetAll()).sex == "male" then table.Random(player.GetAll()):EmitSound(table.Random(malewin), 100, 100) else
 	table.Random(player.GetAll()):EmitSound(table.Random(femalewin), 100, 100)
 	end
@@ -980,41 +950,55 @@ end
 
 function TeamStats()
 teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
+local TimeStr = os.date( "%d/%m/%Y - %X" )
 
 PrintMessage(HUD_PRINTTALK, "With "..PLAYERSINMAP.." members, this team killed "..team_kills+team_silent_kills.." combine and died "..team_deaths.." times.")
-PrintMessage(HUD_PRINTTALK, "Team score: "..teamscore.."")
 
 local MostKills = 0 
-local BestPlayer
+local MostKiller
 local MostDeaths = 0
 local WorstPlayer
 local MostSilentKills = 0
 local MostSilentPlayer
+local BestScore = 0
+local BestScorePlayer
+local BestScorePlayerEntity
 for k,v in pairs( player.GetAll() ) do  
-	local Frags = v.Kills       // Getting a player's frags
+	local Frags = v.Kills + v.SilentKills      // Getting a player's frags
 	if Frags > MostKills then     // If it's higher then the current MostKills then
 		MostKills = Frags     // Make it the new MostKills
-		BestPlayer = v:Name() // And make the player the new BestPlayer
+		MostKiller = v:Name() // And make the player the new MostKiller
 	end
 end
 for k,v in pairs( player.GetAll() ) do  
+
 	local Deaths = v.deaths      // Getting a player's frags
 	if Deaths > MostDeaths then     // If it's higher then the current MostKills then
 		MostDeaths = Deaths     // Make it the new MostKills
-		WorstPlayer = v:Name() // And make the player the new BestPlayer
+		WorstPlayer = v:Name() // And make the player the new MostKiller
 	end
 end
 for k,v in pairs( player.GetAll() ) do
 	local SilentKills = v.SilentKills     // Getting a player's frags
 	if SilentKills > MostSilentKills then     // If it's higher then the current MostKills then
 		MostSilentKills = SilentKills     // Make it the new MostKills
-		MostSilentPlayer = v:Name() // And make the player the new BestPlayer
+		MostSilentPlayer = v:Name() // And make the player the new MostKiller
+	end
+end
+
+for k,v in pairs( player.GetAll() ) do
+	local score = ComparePlayerScore(v)    // Getting a player's frags
+	if score > BestScore then     // If it's higher then the current MostKills then
+		BestScore = score     // Make it the new MostKills
+		BestScorePlayer = v:Name() // And make the player the new MostKiller
+		BestScorePlayerEntity = v
 	end
 end
 
 
+
 if MostKills != 0 then
-	PrintMessage(HUD_PRINTTALK, "" .. BestPlayer .. " has the most kills with " .. tostring(MostKills) .. " combine defeated!") 
+	PrintMessage(HUD_PRINTTALK, "" .. MostKiller .. " has the most kills with " .. tostring(MostKills) .. " combine defeated!") 
 else PrintMessage(HUD_PRINTTALK, "Noone killed anything for now.") 
 end
 if MostSilentKills != 0 then 
@@ -1027,18 +1011,106 @@ if MostDeaths != 0 then
 else PrintMessage(HUD_PRINTTALK, "None of the rebels has been killed in this game! Congratulations!") 
 end
 
-timer.Simple(10, function() PrintMessage(HUD_PRINTTALK, "You can check the scoreboard by typing !teamscore.") end)
-timer.Simple(20, function() PrintMessage(HUD_PRINTTALK, "The Hunt doesn't feature a map voting addon yet, but you can check wich The Hunt maps you can play on this server by typing !listmaps.") end)
+if BestScore != 0 then
+	PrintMessage(HUD_PRINTTALK, "" .. BestScorePlayer .. " has the best score, " .. tostring(BestScore) .. " points!") 
+end
 
 
+timer.Simple(20, function() PrintMessage(HUD_PRINTTALK, "You can check the scoreboard by typing !teamscore.") end)
+timer.Simple(40, function() PrintMessage(HUD_PRINTTALK, "The Hunt doesn't feature a map voting addon yet, I hope you're playing on a server wich has one. Try !rtv or !votemap.") end)
 
+
+-- Rewrite the team file
+if file.Exists( "thehunt_maps/best_team.txt", "DATA" ) then
+file.Delete( "thehunt_maps/best_team.txt" )
+end
+file.Write("thehunt_maps/best_team.txt", "\n")
+
+if teamscore > BEST_TEAM_SCORE then
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE="..teamscore.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_NAMES={")
+table.foreach(player.GetAll(), function(key,ply)
+file.Append("thehunt_maps/best_team.txt","'"..ply:GetName().."', ")
+end)
+file.Append("thehunt_maps/best_team.txt","}\n")
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_KILLS="..team_kills.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_SILENT_KILLS="..team_silent_kills.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_DEATHS="..team_deaths.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_DATE='"..TimeStr.."'\n")
+
+else
+file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE="..teamscore.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_NAMES={'"..string.Implode( "', '", BEST_TEAM_NAMES ).."'}\n")
+
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_KILLS="..BEST_TEAM_KILLS.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_SILENT_KILLS="..BEST_TEAM_SILENT_KILLS.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_DEATHS="..BEST_TEAM_DEATHS.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_TEAM_DATE='"..BEST_TEAM_DATE.."'\n")
+
+end
+
+if BestScore > BEST_PLAYER_ALL_TIME_SCORE then
+
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SCORE="..BestScore.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_NAME='"..BestScorePlayer.."'\n")
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_DATE='"..TimeStr.."'\n")
+
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_KILLS="..BestScorePlayerEntity.Kills.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_SILENT_KILLS="..BestScorePlayerEntity.SilentKills.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_DEATHS="..BestScorePlayerEntity.deaths.."\n")
+
+
+else
+file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SCORE="..BEST_PLAYER_ALL_TIME_SCORE.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_NAME='"..BEST_PLAYER_ALL_TIME_NAME.."'\n")
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_DATE='"..BEST_PLAYER_ALL_TIME_DATE.."'\n")
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_KILLS="..BEST_PLAYER_ALL_TIME_KILLS.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_SILENT_KILLS="..BEST_PLAYER_ALL_TIME_SILENT_KILLS.."\n")
+file.Append("thehunt_maps/best_team.txt","BEST_PLAYER_ALL_TIME_DEATHS="..BEST_PLAYER_ALL_TIME_DEATHS.."\n")
+
+end
+
+-- Rewrite the team file
+local players_team={}
+table.foreach(player.GetAll(), function(key,ply)
+table.insert(players_team,ply:GetName())
+end)
+
+if teamscore > BEST_TEAM_SCORE then
+
+timer.Simple(6, function()
+PrintMessage(HUD_PRINTTALK, "New Best Team!") 
+PrintMessage(HUD_PRINTTALK, ""..string.Implode( ", ", players_team ).."") 
+PrintMessage(HUD_PRINTTALK, ""..teamscore.." points ("..teamscore-BEST_TEAM_SCORE.." more than the last team)") 
+end)
+
+else
+
+timer.Simple(6, function()
+PrintMessage(HUD_PRINTTALK, "Team score: "..teamscore.."")
+PrintMessage(HUD_PRINTTALK, "Last Best Team:") 
+PrintMessage(HUD_PRINTTALK, ""..string.Implode( ", ", BEST_TEAM_NAMES ).."") 
+PrintMessage(HUD_PRINTTALK, ""..BEST_TEAM_SCORE.." points ("..BEST_TEAM_DATE..")") 
+end)
+end
+
+if BestScore > BEST_PLAYER_ALL_TIME_SCORE then
+timer.Simple(6, function()
+PrintMessage(HUD_PRINTTALK, ""..BestScorePlayer.." is the new Best Player, with "..BestScore.." points!") 
+PrintMessage(HUD_PRINTTALK, "("..BestScore-BEST_PLAYER_ALL_TIME_SCORE.." more than the last Best Player, "..BEST_PLAYER_ALL_TIME_NAME.." )") 
+end)
+else
+timer.Simple(6, function()
+PrintMessage(HUD_PRINTTALK, ""..BEST_PLAYER_ALL_TIME_NAME.." still holds the Best Player title, with "..BEST_PLAYER_ALL_TIME_SCORE.." points. ") 
+PrintMessage(HUD_PRINTTALK, ""..BEST_PLAYER_ALL_TIME_SCORE.." points (earned "..BEST_PLAYER_ALL_TIME_DATE..")") 
+end)
+end
 
 end
 
 
 function PlayerStats(ply)
-for k,ply in pairs( player.GetAll() ) do  
-
+for k,ply in pairs( player.GetAll() ) do
 local killpercent = ((ply.Kills+ply.SilentKills)/(team_kills+team_silent_kills))*100
 local deathpercent = (ply.deaths/team_deaths)*100
 local ply_points = ((ply.Kills+(ply.SilentKills*3)-ply.deaths*2))
@@ -1103,14 +1175,11 @@ PrintMessage(HUD_PRINTTALK, "[Overwatch]: Dude you fucked up.")
 end
 
 
-	timer.Create( "launchanisters", 3, 5, function()
-	SpawnCanisterWave(table.Random(player.GetAll()):GetPos())
-	end	) 
-	timer.Simple(20, function()
+timer.Simple(GetConVarNumber("h_time_between_waves"), function()
 	timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
 	timer.Create( "infinitewave", 2, CombineInfiniteWave, infinitewave )
 	timer.Simple(20, function() CanCheck = 1 end)
-	end)
+end)
 	
 end
 
@@ -1126,7 +1195,6 @@ function hidezones()
 	v:Remove()
 	end
 end
-
 
 function SpawnHeliA( pos,type,IsBoss,GunOnAtSpawn )
 RunConsoleCommand( "sk_helicopter_health", "1500")
@@ -1178,13 +1246,13 @@ CanSpotlight = CanSpotlight+1
 end
 
 if CanSpotlight > 1 then HeliCanSpotlight = 0 end
-if HeliCanSpotlight == 1 && type == "npc_helicopter" then
+if HeliCanSpotlight == 1  and type == "npc_helicopter" then
 HeliA.light = ents.Create("env_projectedtexture");
 HeliA.light:SetPos(HeliA:GetPos());
 HeliA.light:SetAngles(HeliA:GetAngles()+Angle(30,0,0) );
 HeliA.light:SetParent(HeliA);
 HeliA.light:SetKeyValue("spawnflags", 2);
-HeliA.light:SetKeyValue("enableshadows", 1);
+if prevent_spotlight_lag == true then HeliA.light:SetKeyValue("enableshadows", 0) end
 HeliA.light:SetKeyValue("farz", 2000);
 HeliA.light:SetKeyValue("target", "");
 HeliA.light:SetKeyValue("nearz", 400);
@@ -1197,8 +1265,15 @@ HeliA.light:Spawn();
 HeliA.light:Activate();
 end
 end
-end
 
+
+timer.Simple(10, function()
+HeliCanSpawn = false
+print("Helicopters disabled for 10 minutes.")
+timer.Create( "HeliCoolDown", 600, 1, function() HeliCanSpawn = true print("Helicopters can spawn again.") end )
+end)
+
+end
 function SpawnDynamicResuply( pos )
 NPC = ents.Create( "item_dynamic_resupply" )
 NPC:SetPos( pos )
@@ -1295,7 +1370,7 @@ canister:SetKeyValue( "HeadcrabCount", math.random(3,6) )
 canister:SetKeyValue( "FlightSpeed", "8000" )
 canister:SetKeyValue( "FlightTime", "3" )
 canister:SetKeyValue( "StartingHeight", "0" )
-canister:SetKeyValue( "Damage", "20" )
+canister:SetKeyValue( "Damage", "200" )
 canister:SetKeyValue( "DamageRadius", "5" )
 canister:SetKeyValue( "SmokeLifetime", "5" )
 canister:SetKeyValue( "MaxSkyboxRefireTime", "5" )
@@ -1326,8 +1401,8 @@ end
 
 function SpawnCanisterWave(pos)
 
-traceRes = util.QuickTrace(pos, Vector(0,0,500), player.GetAll())
-print(traceRes.Entity)
+traceRes = util.QuickTrace(pos, Vector(0,0,1000), player.GetAll())
+--print(traceRes.Entity)
 if traceRes.Entity == NULL then 
 print("[The Hunt]: Place is suitable for canister deployment.")
 
@@ -1339,7 +1414,7 @@ canister:SetKeyValue( "HeadcrabCount", math.random(3,8) )
 canister:SetKeyValue( "FlightSpeed", "9000" )
 canister:SetKeyValue( "FlightTime", "3" )
 canister:SetKeyValue( "StartingHeight", "0" )
-canister:SetKeyValue( "Damage", "20" )
+canister:SetKeyValue( "Damage", "200" )
 canister:SetKeyValue( "DamageRadius", "5" )
 canister:SetKeyValue( "SmokeLifetime", "5" )
 canister:SetKeyValue( "MaxSkyboxRefireTime", "5" )
@@ -1348,7 +1423,7 @@ canister:SetKeyValue( "SkyboxCannisterCount", "30" )
 canister:Fire("FireCanister","",0.7)
 canister:Spawn()
 
-timer.Simple(100, function() canister:Remove() end)
+timer.Simple(60, function() canister:Remove() end)
 else
 print("[The Hunt]: Place is NOT suitable for canister deployment. Player is under a low ceiling.")
 
@@ -1383,6 +1458,21 @@ NPC:Spawn()
 combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
 end
+
+
+function SpawnHunter(pos)
+
+NPC = ents.Create( "npc_hunter" )
+--NPC:SetKeyValue("NumGrenades", "0") 
+NPC:SetPos( pos )
+--NPC:SetKeyValue( "ignoreunseenenemies", 1 )
+NPC:Spawn()
+--NPC:Give("ai_weapon_ar2")
+combinen = combinen + 1
+NPC:SetName("Hunter")
+--NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )
+--NPC:Fire("StartPatrolling","",0)
+end
 function SpawnCombineS1 ( pos )
 NPC = ents.Create( "npc_combine_s" )
 NPC:SetKeyValue("NumGrenades", "0") 
@@ -1396,7 +1486,6 @@ combinen = combinen + 1
 NPC:SetName("Combine nº"..combinen.."")
 NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )
 NPC:Fire("StartPatrolling","",0)
-
 end
 function SpawnCombineS2 ( pos )
 NPC = ents.Create( "npc_combine_s" )
@@ -1852,13 +1941,22 @@ table.foreach(MainEnemiesCoop, function(key,enemy)
 for k, npc in pairs(ents.FindByClass(enemy)) do
 if npc:Health() > 0 then
 
+/*
+if npc:GetClass() == "npc_hunter" then
+if npc:HasCondition(10) then
+print("HUNTER")
+
+end 
+end
+*/
 if npc:GetEnemy() then
 	if npc:IsCurrentSchedule(SCHED_FORCED_GO) or npc:IsCurrentSchedule(SCHED_IDLE_WANDER) or npc:IsCurrentSchedule(SCHED_FORCED_GO_RUN)	then npc:ClearSchedule() end
 
-if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
+if npc:GetClass() == "npc_combine_s" or npc:GetClass() == "npc_metropolice" or npc:GetClass() == "npc_hunter" then
+--print("HUNTER")
 	if npc:HasCondition(10) then
 			if npc:GetEnemy().spotted != 1 then
-				if npc:GetEnemy():IsPlayer() then
+				if npc:GetEnemy():IsPlayer() or npc:GetEnemy():GetClass() == "npc_citizen" then
 					npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
 					PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."")
 					if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
@@ -1885,8 +1983,14 @@ if npc:GetClass() == "npc_combine_s" || npc:GetClass() == "npc_metropolice" then
 		timer.Destroy( "npcforgettimer")
 		end
 		
-		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),800)) do 
-		if ThisEnt:GetClass() == "npc_combine_s" or ThisEnt:GetClass() == "npc_metropolice" then
+		for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),2000)) do 
+		 if ThisEnt:GetClass() == "npc_hunter" and !ThisEnt:GetEnemy() then
+		 print("hunter called")
+			ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
+			ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
+		 end
+		 
+		if ThisEnt:GetClass() == "npc_combine_s" or ThisEnt:GetClass() == "npc_metropolice"  then
 				if ThisEnt:GetEnemy() == nil  then 
 					ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
 					ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
@@ -2021,7 +2125,8 @@ end
 
 
 function GM:InitPostEntity()
-print("---------------LOADING THE HUNT-------------")
+print("------------------------- THE HUNT GM:InitPostEntity LOADING -------------------------")
+
 team.SetUp( 1, "Rebels", Color( 0, 255, 0 ) )
 
 
@@ -2059,6 +2164,13 @@ print("[The Hunt]: Calling map setup function")
 MapSetup()
 print("[The Hunt]: Finished map setup function")
 
+if HELIPATHS then
+table.foreach(HELIPATHS, function(key,value)
+CreateHeliPath(value)
+end)
+end
+
+
 timer.Simple(1, function() 
 if MAP_PROPS then
 print("[The Hunt]: found a props table, will add dynamic weapon spawnpoints. ")
@@ -2088,6 +2200,17 @@ table.insert(MEDIUMWEAPONS,weapon)
 end)
 
 end
+
+
+for k, v in pairs(ents.GetAll()) do
+	if v:GetClass() == path_track then
+	table.insert(HELIPATHS, v:GetPos())
+	print("[The Hunt]: Heli path found.")
+	end
+end
+
+
+
 
 
 if GetConVarString("h_STALKER_sweps") == "1" then
@@ -2315,7 +2438,7 @@ end)
 end
 
 --end
-print("---------------THE HUNT LOADED-------------")
+print("------------------------- THE HUNT GM:InitPostEntity LOADED -------------------------")
 end)
 end
 
@@ -2346,11 +2469,11 @@ function GM:PlayerSpawn(ply)
 if math.random(1,2) == 1 then
 ply:SetModel(table.Random(playermodelsmale) )
 ply.sex="male"
-print(""..ply:GetName().." is male")
+print(""..ply:GetName().." spawned as male Rebel")
 else
 ply:SetModel(table.Random(playermodelsfemale) )
 ply.sex="female"
-print(""..ply:GetName().." is female")
+print(""..ply:GetName().." spawned as female Rebel")
 end
 end
 
@@ -2388,7 +2511,7 @@ end
 if victim:GetClass() == "npc_metropolice" or victim:GetClass() == "npc_combine_s" then
 			table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added")
 
-CombineAssisting = CombineAssisting/2
+CombineAssisting =0
 COMBINE_KILLED = COMBINE_KILLED+1
 if killer:IsPlayer() then
 		net.Start( "PlayerKillNotice" )
@@ -2414,7 +2537,6 @@ if killer:IsPlayer() then
 					end
 					end
 			end
-				nearbycombinecomecasual(victim) 
 					if math.random(1,2) == 1 then 
 						SpawnDynamicResuply(victim:GetPos())
 						elseif cansilentkillreward != 0 then
@@ -2426,7 +2548,8 @@ if killer:IsPlayer() then
 					if killer.sex == "male" then killer:EmitSound(table.Random(malecomments), 100, 100) else
 					killer:EmitSound(table.Random(femalecomments), 100, 100)
 					end
-					nearbycombinecome(victim) killer.Kills=killer.Kills+1
+					allthecombinecome(victim,5)
+					killer.Kills=killer.Kills+1
 					team_kills=team_kills+1
 			end
 					killer:AddFrags(1)
@@ -2460,19 +2583,25 @@ table.foreach(spawns, function(key,value)
 	--print(can)
 	if can == 1 then table.insert(availablespawns, value)end
 end)
+if table.Count(availablespawns) < 1 then
+	PrintMessage(HUD_PRINTTALK, "WARNING: The system did not find any safe spawnpoint.")
+end
    return table.Random(availablespawns)
-
 end
 
-
 function ScalePlayerDamage(ply, hitgroup, dmginfo)
+dmginfo:ScaleDamage(1)
 if dmginfo:GetAttacker():IsPlayer() and !dmginfo:IsFallDamage() and !dmginfo:IsDamageType(64) then
 dmginfo:ScaleDamage(GetConVarNumber("h_playerscaledamage")*0.1)
 end
-print(dmginfo:GetAttacker():GetClass())
 if !dmginfo:GetAttacker():IsPlayer() then
 dmginfo:ScaleDamage(GetConVarNumber("h_playerscaledamage"))
 end
+
+if dmginfo:GetAttacker():IsPlayer() and !dmginfo:IsDamageType(64) then
+dmginfo:ScaleDamage(0)
+end
+
 end
 hook.Add("ScalePlayerDamage","ScalePlayerDamage", ScalePlayerDamage)
 
@@ -2483,7 +2612,8 @@ function ScaleNPCDamage( damaged, hitgroup, damage )
 	if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) end -- flee from fire and friendly fire
 		if damaged:GetEnemy() == nil then
 		damage:ScaleDamage(GetConVarNumber("h_npcscaledamage")+30)
-		else
+		damaged:ClearSchedule() 
+		else		
 		damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
 		end
 		if damaged:Health() > damage:GetDamage() then
@@ -2491,15 +2621,19 @@ function ScaleNPCDamage( damaged, hitgroup, damage )
 		end
 	end
 	end)
-	 
+
+--npc:GetClass() == "npc_hunter" 
+
+
 	-- friendly fire between same class NPCs
+	/*
 	if damaged:GetClass() == damage:GetAttacker():GetClass() then
 		damage:ScaleDamage(0)
 	end
-
+	*/
 	
 if damaged:GetClass() == "npc_gunship" then
-	if damaged:Health() < damage:GetDamage() then
+	if damaged:Health() <= damage:GetDamage() then
 	HeliCanSpawn = false
 	print("Helicopters disabled for 500 seconds.")
 	timer.Create( "HeliCoolDown", 500, 1, function() HeliCanSpawn = true print("Helicopters can spawn again.") end )
@@ -2523,6 +2657,7 @@ if damaged.light then
 damaged.light:SetKeyValue("lightcolor", "0 0 0") 
 end
 
+
 /* -- Original "Heli tries to crash on you" code. Doesn't work for now.
 if damaged:Health() < 151 then
 timer.Simple(3, function() PrintMessage(HUD_PRINTTALK, "[Overwatch]: All units, "..damaged:GetName().." state changed to: inoperative.") end)
@@ -2534,7 +2669,8 @@ creating:SetParent(damage:GetAttacker())
 end
 */
 
-if damaged:Health() < damage:GetDamage() then
+
+if damaged:Health() <= damage:GetDamage() then
 
 HeliCanSpawn = false
 print("Helicopters disabled for 500 seconds.")
@@ -2765,7 +2901,6 @@ end
 
 function GM:GetFallDamage( ply, speed )
 nearbycombinecomecasual(ply)
-print("lel")
 	return ( speed / 8 )
 end
 
@@ -2773,13 +2908,19 @@ function GM:OnEntityCreated(entity)
 	if entity:IsNPC() && entity:GetClass() != "npc_helicopter" && entity:GetClass() != "npc_combinegunship"  && entity:GetClass() != "npc_combine_s" && entity:GetClass() != "npc_metropolice" && entity:GetName() == "" then
 	ManuallySpawnedEntity = ManuallySpawnedEntity + 1
 	entity:SetName(""..entity:GetClass().." ("..entity:EntIndex()..")")
-	print(""..entity:GetName().." created")
+	print("[The Hunt]: "..entity:GetName().." created")
 	end
 if entity:IsNPC() then 
 entity:SetCollisionGroup(3)
-end
-end
 
+		if GetConVarNumber("h_npctrails") == 1 then
+			timer.Simple( 1, function()
+			util.SpriteTrail(NPC, 1, Color(255,0,0), false, 15, 15, 50, 1/(15+1)*0.5, "trails/laser.vmt")
+		end)
+	end
+
+end
+end
 
 -- What happens when a player is beind killed.
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
@@ -2795,7 +2936,6 @@ team_deaths=team_deaths+1
 if attacker:IsNPC() then
 attacker:EmitSound(table.Random(CombineKillSounds), 100, 100)
 end
-
 
 -- One npc_sniper can only kill one player, then, it won't shoot players anymore. So I remove it and respawn another when he kills a player.
 if attacker:GetClass() == "npc_sniper" then
@@ -2838,7 +2978,7 @@ else
 ply:PrintMessage(HUD_PRINTTALK, "You have "..ply.lifes.." lifes left.")
 ply.canspawn = 1
 end
-else
+elseif ply.teamkiller < 3 then
 ply.canspawn = 1
 end
 
@@ -2850,11 +2990,11 @@ end)
 if PLAYERSINMAP > 1 then
 	local players_defeated = 1
 	table.foreach(player.GetAll(), function(key,value)
-	if value:Alive() or value.lifes>0 then players_defeated = 0 end
+	if value:Alive() or value.lifes > 0 then players_defeated = 0 end
 	end)
 	if players_defeated == 1  then 
 	PlayerDefeat()
-	CanCheck = 0
+	--CanCheck = 0
 	end
 end
 */
@@ -2871,42 +3011,51 @@ table.remove(zonescovered)
 table.remove(zonescovered)
 table.remove(zonescovered)
 table.remove(zonescovered)
-print("Patrol zones restarted")
+print("[The Hunt]: Patrol zones cleaned")
 end
 
 -- Add a patrol zone where the player died.
-table.insert(zonescovered, ply:GetPos()+Vector(0,0,30)) print("Patrol zone added")
+table.insert(zonescovered, ply:GetPos()+Vector(0,0,30)) print("[The Hunt]: Patrol zone added")
 
+-- Anti teamkill shit. If a player kills another player with a prop or a satchel charge, they will recieve a warning. The third time they will be killed and not able to spawn.
 
+if attacker:IsPlayer() and dmginfo:GetInflictor():GetClass() == "prop_physics_multiplayer" or dmginfo:GetInflictor():GetClass() == "prop_physics" or dmginfo:GetInflictor():GetClass() == "cw_ammo_crate_small" or dmginfo:GetInflictor():GetClass() == "npc_satchel" then
+if attacker:EntIndex() != ply:EntIndex() then
+attacker.teamkiller=attacker.teamkiller+1
+dmginfo:GetAttacker():PrintMessage(HUD_PRINTCENTER, "Try to avoid killing teammates.")
+
+if dmginfo:GetAttacker().teamkiller > 2 then
+dmginfo:GetAttacker():PrintMessage(HUD_PRINTCENTER, "Killed.")
+dmginfo:GetAttacker():Kill()
+dmginfo:GetAttacker().lifes=0
+dmginfo:GetAttacker().canspawn = 0
+end
+end
+
+else
+print(""..ply:GetName().." died by "..dmginfo:GetInflictor():GetClass().."")
+end
 CalculatePlayerScore(ply)
 end
 
+
 function FirstSpawn(ply)
+
 ply.lifes=GetConVarNumber("h_player_lifes")
 ply.deaths=0
 ply.Kills=0
 ply.SilentKills=0
+ply.teamkiller=0
 NUMPLAYERS()
 ply:SetNWInt("ReferentScore", 0)
 if DARKNESS then
 ply:SendLua("CLDARKNESS="..DARKNESS.."" )
 end
+
+
+
 end
 hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", FirstSpawn )
-
-
-
 -- GM HOOKS ^
+print("------------------------- THE HUNT init.lua LOADED SUCCESSFULLY -------------------------")
 
-
-
-
-
-function GetAmmoForCurrentWeapon( ply )
-	if (  !IsValid( ply ) ) then return -1 end
-
-	local wep = ply:GetActiveWeapon()
-	if (  !IsValid( wep ) ) then return -1 end
- 
-	--print(ply:GetAmmoCount(wep:GetPrimaryAmmoType()))
-end

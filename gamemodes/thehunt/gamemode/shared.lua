@@ -4,6 +4,7 @@ GM.Email = "eddmalaga@gmail.com"
 GM.Website = "http://facepunch.com/showthread.php?t=1391522"
 
 net.Receive( "Scoreboard", function( length, client )
+
 local DermaPanel = vgui.Create( "DFrame" )
 DermaPanel:SetPos( ScrW() * 0.1, ScrH() * 0.1 )
 DermaPanel:SetSize( ScrW() * 0.7, ScrH() * 0.5 )
@@ -29,11 +30,11 @@ DermaListView:AddColumn("% of Team Deaths")
 DermaListView:AddColumn("Score")
 
 for k,v in pairs(player.GetAll()) do
-
 DermaListView:AddLine(v:Nick(),v:Frags(),v:GetNWString("SilentKills"),""..v:GetNWString("Killpercent").."%",v:Deaths(),""..v:GetNWString("Deathpercent").."%",v:GetNWInt("Score"))
 end
 DermaListView:AddLine("Team",team_kills+team_silent_kills,team_silent_kills,"-",team_deaths,"-",teamscore)
-
+DermaListView:AddLine("Last Best team",BEST_TEAM_KILLS+BEST_TEAM_SILENT_KILLS,BEST_TEAM_SILENT_KILLS,"-",BEST_TEAM_DEATHS,"-",BEST_TEAM_SCORE)
+DermaListView:AddLine(""..BEST_PLAYER_ALL_TIME_NAME.." (Last Best Player)",BEST_PLAYER_ALL_TIME_KILLS,BEST_PLAYER_ALL_TIME_SILENT_KILLS,"-",BEST_PLAYER_ALL_TIME_DEATHS,"-",BEST_PLAYER_ALL_TIME_SCORE)
 
 end )
 
@@ -82,6 +83,39 @@ teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
 	end
 
 end
+
+
+
+
+
+function ComparePlayerScore(ply)
+teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
+
+	local killpercent = ((ply.Kills+ply.SilentKills)/(team_kills+team_silent_kills))*100
+	local deathpercent = (ply.deaths/team_deaths)*100
+	local player_points = ((ply.Kills+(ply.SilentKills*3)-ply.deaths*2))
+
+	if ply.deaths==0 then ply:SetNWInt("Survivor", 1) else ply:SetNWInt("Survivor", 0) end
+	ply:SetNWString("Killpercent", ""..math.Round(killpercent).."")
+	ply:SetNWString("SilentKills", ""..ply.SilentKills.."")
+	ply:SetNWString("Deathpercent", ""..math.Round(deathpercent).."")
+	ply:SetNWInt("Kills", ply.Kills+ply.SilentKills)
+	ply:SetNWInt("Deaths", ""..ply.deaths.."")
+	ply:SetNWInt("Score", ""..player_points.."")
+
+	ply:SendLua("team_kills="..team_kills.."" )
+	ply:SendLua("team_silent_kills="..team_silent_kills.."" )
+	ply:SendLua("team_deaths="..team_deaths.."" )
+	ply:SendLua("teamscore="..teamscore.."" )
+
+	local score=tonumber(ply:GetNWInt("Score"),10)
+
+return score
+end
+
+
+
+
 
 function ISaid( ply, text, public )
 local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLED
@@ -138,6 +172,17 @@ end
 	ply:SendLua("team_silent_kills="..team_silent_kills.."" )
 	ply:SendLua("team_deaths="..team_deaths.."" )
 	ply:SendLua("teamscore="..teamscore.."" )
+	ply:SendLua("BEST_TEAM_KILLS="..BEST_TEAM_KILLS.."" )
+	ply:SendLua("BEST_TEAM_SILENT_KILLS="..BEST_TEAM_SILENT_KILLS.."" )
+	ply:SendLua("BEST_TEAM_SCORE="..BEST_TEAM_SCORE.."" )
+	ply:SendLua("BEST_TEAM_DEATHS="..BEST_TEAM_DEATHS.."" )
+	ply:SendLua("BEST_PLAYER_ALL_TIME_SCORE="..BEST_PLAYER_ALL_TIME_SCORE.."" )
+	ply:SendLua("BEST_PLAYER_ALL_TIME_KILLS="..BEST_PLAYER_ALL_TIME_KILLS.."" )
+	ply:SendLua("BEST_PLAYER_ALL_TIME_SILENT_KILLS="..BEST_PLAYER_ALL_TIME_SILENT_KILLS.."" )
+	ply:SendLua("BEST_PLAYER_ALL_TIME_DEATHS="..BEST_PLAYER_ALL_TIME_DEATHS.."" )
+	ply:SendLua("BEST_PLAYER_ALL_TIME_NAME='"..BEST_PLAYER_ALL_TIME_NAME.."'" )
+
+	
 	end
 	timer.Simple(1, function() 
 	net.Start( "Scoreboard" )
@@ -145,6 +190,7 @@ end
 	end)
 		return false
     end
+	/*
 	if text == "!restart" or text == "!RESTART" then
 	if PLAYERSINMAP>0 then
 	PrintMessage(HUD_PRINTTALK, ""..ply:GetName().." voted for a map restart by typing !restart. ")
@@ -159,6 +205,7 @@ end
 	end
 		return false
     end
+	*/
 	
 		if text == "!patrolzones" or text == "!PATROLZONES" then
 		if ply:IsAdmin() then revealzonestemp() end
@@ -276,8 +323,8 @@ if suspect:GetPos() then
 				if !v:GetEnemy() then
 					if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
 						v:SetLastPosition(suspect:GetPos())
-						v:SetSchedule(SCHED_FORCED_GO)
-						end
+						v:SetSchedule(SCHED_FORCED_GO_RUN)
+					end
 				end
 			end
 		end
@@ -286,10 +333,12 @@ if suspect:GetPos() then
 end
 end
 
+
+
 function allthecombinecome(suspect,MAXCOMBINERUSH)
 local coming=0
 		for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
-				if v:GetClass() == "npc_metropolice" || v:GetClass() == "npc_combine_s" then 
+				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
 						if !v:GetEnemy() then
 							if coming < MAXCOMBINERUSH then
 							--print(""..v:GetName().." heard that.")
@@ -301,7 +350,7 @@ local coming=0
 						end
 					end
 		for k, v in pairs(ents.GetAll()) do
-				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" then 
+				if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
 						if !v:GetEnemy() then
 							if coming < MAXCOMBINERUSH then
 							--print(""..v:GetName().." heard that.")
@@ -472,16 +521,16 @@ SECONDARY_FIRE_WEAPONS = { "weapon_ar2", "weapon_shotgun","the kilroy warhammer"
 -- Weapons that have a loud secondary fire.
 
 
-ONLY_PICKUP_ONCE = { "weapon_physcannon","seal6-claymore","weapon_doom3_chainsaw","death_note","weapon_stunstick","m9k_machete","goldenpan","weapon_stickyrifle"}
+ONLY_PICKUP_ONCE = { "weapon_physcannon","seal6-claymore","weapon_doom3_chainsaw","death_note","weapon_stunstick","m9k_machete","goldenpan","weapon_stickyrifle","weapon_nomad","nature_staff"}
 -- The game will prevent people from picking up this weapons if they already have them. Useful for weapons with infinite uses, preventing the player from picking up a weapon he doesn't need to, leaving the weapon for others.
 
 
 VanillaWeapons = { "weapon_shotgun", "weapon_ar2","weapon_pistol", "weapon_crossbow", "weapon_physcannon","weapon_smg1","weapon_357"}
 AirEnemies = { "npc_helicopter", "npc_combinegunship"}
-MainEnemiesGround = { "npc_combine_s", "npc_metropolice"}
-MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship"}
-MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship", "npc_turret_ceiling"}
-MainEnemiesDamage = { "npc_combine_s", "npc_metropolice", "npc_manhack"}
+MainEnemiesGround = { "npc_combine_s", "npc_metropolice","npc_hunter"}
+MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_hunter"}
+MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship", "npc_turret_ceiling","npc_hunter"}
+MainEnemiesDamage = { "npc_combine_s", "npc_metropolice", "npc_manhack",}
 
 CombineHearBreak = {"I think I heard something.","What was that?","Something broke nearby.","Heard something broke.","...the fuck...","I think I hear dubstep somewhere.","Suspicious sounds near my position.","...going to check that.","Nearby units, the suspect must be in this area.","Here you are."}
 
@@ -669,7 +718,6 @@ Customizable_Weaponry={"cw_ak74","cw_ar15","cw_g3a3","cw_mp5","cw_deagle","cw_mr
 VANILLA_WEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
 
 MHs_Super_Battle_Pack_PART_II ={"acid_sprayer_minds","acidball_minds","alienblasterx_minds","sniperrifle_minds","autoshot_lua","handcannon_minds","crazygbombgun_minds","crazyheligun_minds","crazymelongun_minds","cutter_minds","demoniccarsg_minds","fireball_minds","flamethrower_minds","frostball_minds","gbomb_minds","grapplinggun_minds","grapplinghook_minds","grenader_minds","heligrenade_minds","airboatgun_minds","laser_minds","ln2_sprayer_minds","melongrenade_minds","mrproper_minds","physautomat_minds","rifle_minds","nrocket_launcher_minds"}
-
 
 
 spastiks_toybox={"bakker's blaster","gabriel","gretchen","henderson","lil' jim","murphy's law","the aerosol ar","the anti-rifle","the backscratcher","the bfhmg","the camper's choice","the coiled snake","the commander's compact","the doorman","the eleventh hour","the fire hazard","the fodder buster","the gambler","the grand prize","the greaser","the guerilla","the hammerhead","the hide n' seek advanced","the hometown slugger","the junkmaster","the kilroy warhammer","the lawnmower","the lobotomizer","the morning hail","the night light","the panther fist","the pea shooter","the penguinade","the pepper grinder","the quadruple agent","the rainmaker","the reanimated rocket rifle","the rusted bangstick","the salvaged sidearm","the secret carbine","the segundo pocket pistol","the sleeping pill","the spastik special","the special delivery","the straight razor","the swiss hellbringer","the trash compactor","the turbo lover","the waiting game"}

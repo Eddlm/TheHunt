@@ -6,7 +6,7 @@ CombineFourthWave = 15
 CombineFifthWave = 15
 CombineInfiniteWave = 20
 
-MAP_PROPS = {}
+MAP_PROPS = {'models/props/cs_militia/crate_extrasmallmill.mdl'}
 
 zonescovered ={
 Vector(1938.861328, 749.750671, -462.279480),
@@ -58,6 +58,10 @@ v:Remove()
 end
 end)
 
+SpawnProp(Vector(-1495.459595, -1319.228760, -223.152939),Angle(-0.140, 90.105, 0.686),'models/props/cs_militia/crate_extrasmallmill.mdl')
+SpawnProp(Vector(1951.016846, 966.330261, -535.507446),Angle(-2.802, -66.794, 4.451),'models/props/cs_militia/crate_extrasmallmill.mdl')
+SpawnProp(Vector(-2568.130127, 424.668610, -319.095825),Angle(0.976, 173.415, -2.329),'models/props/cs_militia/crate_extrasmallmill.mdl')
+SpawnProp(Vector(-1560.623169, -615.339844, -207.388168),Angle(0.034, 89.859, 0.019),'models/props/cs_militia/crate_extrasmallmill.mdl')
 
 SpawnItem("info_player_start", Vector(1751.910889, 1370.489990, -438.614929)+Vector(0,0,-45), Angle(0,-75,0))
 SpawnItem("info_player_start", Vector(108.704796, -144.031250, -433.585815)+Vector(0,0,-45), Angle(0,-90,0))

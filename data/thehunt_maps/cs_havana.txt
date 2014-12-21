@@ -37,5 +37,7 @@ SpawnTurret(Vector(595.234253, 2152.238525, 240.761230),Angle(0.329, -134.027, 0
 SpawnTurret(Vector(12.661597, 813.920898, 248.759430),Angle(0.334, 44.686, 0.703))
 SpawnTurret(Vector(-793.450745, 968.595032, 16.753107),Angle(0.354, -157.764, 0.783))
 SpawnTurret(Vector(-140.763184, -11.399487, 256.646545),Angle(0.216, 1.618, 0.198))
+SpawnItem('item_healthcharger', Vector(-161.968765, 2117.303955, 66.275490),Angle(0.000, 0.000, 0.000))
+
 end
 ---------------------- END OF CONFIGURATION FILE ----------------------

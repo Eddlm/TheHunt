@@ -94,7 +94,7 @@ hook.Add( "PreDrawHalos", "AddHalos", function()
 if LocalPlayer():Alive() and LocalPlayer():GetPos() then
 	--for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(), 1000)) do
 	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetEyeTraceNoCursor().HitPos, GetConVarNumber("h_outline_radius"))) do
-	if v:GetClass() == "npc_combine_s" || v:GetClass() == "npc_metropolice" then
+	if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_hunter" then
 		if v:IsValid() then
 				halo.Add( {v}, Color( 84,2,2 ), 1, 1, 1, true, true )
 		end
@@ -104,6 +104,8 @@ if LocalPlayer():Alive() and LocalPlayer():GetPos() then
  and LocalPlayer():Health() > 0 then
          halo.Add( {v}, Color( 0,204,255 ), 1, 1, 1, true, true )
 	end
+
+
 	
 	if v:IsPlayer() then
 	if v:Health() > 0 then
@@ -111,6 +113,12 @@ if LocalPlayer():Alive() and LocalPlayer():GetPos() then
 	end
 	end
 end
+
+	for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(), 300)) do
+		if v:GetClass() == "npc_tripmine" and LocalPlayer():Health() then
+         halo.Add( {v}, Color( 255,255,0 ), 1, 1, 1, true, true )
+		end
+	end
 end
 end)
 
@@ -274,21 +282,9 @@ timer.Simple ( 5, CombineBoots)
 
 
 function ChatToWebsite(pl, text)
-	if string.sub(text, 1, 6) == "!help" then
-		if pl != LocalPlayer() then return true end
-	--gui.OpenURL("http://puu.sh/dlwWZ.pdf")
-	LocalPlayer():PrintMessage(HUD_PRINTTALK, "Hide from the Combine and try to kill them without being spotted.")
-	LocalPlayer():PrintMessage(HUD_PRINTTALK, "For commands and more details, check the console.")
-	print("")
-	print("THE HUNT: BASIC CONCEPTS")
-	print("Hide in dark areas. The combine can't see you there. The HUD will inform you when you're on an area dark enough.")
-	print("Loud weapons will be heard by the combine. Melee weapons will not.")
-	print("You gain more score by killing silently than normal combat.")
-	print("type !remain to see how many Combines are left.")
-	print("type taunt to shout something and attract combine.")
-	print("type !drop to drop your weapon. You can bind h_dropweapon to a key.")
-	print("For more info, check the forum thread: http://facepunch.com/showthread.php?t=1394695, the workshop page: http://steamcommunity.com/sharedfiles/filedetails/?id=292275126 and this document: http://puu.sh/dlwWZ.pdf")
-	print("")
+	if text == "!help" then
+	if pl != LocalPlayer() then return true end
+	gui.OpenURL("http://www.googledrive.com/host/0B02m1TcaLJ-vSlQ1bkpBVlJWcG8")
 
 	return true	end
 end

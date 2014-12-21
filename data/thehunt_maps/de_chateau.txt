@@ -117,43 +117,5 @@ SpawnProp(Vector(2767.055908, 91.362663, -140.077408),Angle(-0.026, 1.523, 0.124
 
 
 
-/*
--- This creates the new player spawnpoints. Add as much as you like.
-SpawnItem("info_player_start", Vector(0,0,0),Angle(0.000, 0.000, 0.000))
-
--- This spawns a simple Health Charger. The game will refill them every 10 seconds if no players are around them.
-SpawnItem("item_healthcharger", Vector(0,0,0), Angle(0,0,0) )
-
--- This spawns a Suit Charger. They are configured to recharge suit and health with a limit of 500 for both, so use them with caution.
-SpawnSuitCharger(Vector(0,0,0), Angle(0,0,0,))
-
--- This spawns a combine turret.
-SpawnTurret(Vector(0,0,0),Angle(0,0,0))
-
-
--- This spawns a ceiling turret. Pay attention to the structure above them, as their remains could be seen in the ground above it, as this demo shows.
-SpawnCeilingTurretStrong(Vector(0,0,0),Angle(0,0,0))
-
--- This spawns a Combine Control Panel. When used, it disables the Ceiling Turrets mentioned above.
-SpawnItem("button_turrets", Vector(0,0,0), Angle(0,0,0))
-
-
--- Spawns an ammo crate, wich gives the items mentioned in the GOODCRATEITEMS table.
-SpawnDynamicAmmoCrate(Vector(0,0,0), Angle(0,0,0))
-
-
--- Spawns an infinite ammo box. The last digit is used to decide wich type of ammo it gives when used.
--- The possible types are 1(SMG) 2(AR2) 3(RPG) 5(Grenade) 8(AR2 Orbs)
-SpawnAmmoCrate(Vector(0,0,0),Angle(0,0,0),1)
-
-
--- These props have a model matching with the MAP_PROPS table we set earlier. They will become unmovable and unkillable, and will spawn weapons on top of them.
-SpawnProp(Vector(0,0,0),Angle(0,0,0),"models/props_c17/furnituredrawer001a.mdl")
-
--- You can spawn static props, too. It "flies" above the normal bathub, and can't be moved or destroyed.
-SpawnStaticProp(Vector(0,0,0),Angle(0,0,0),"models/props_c17/furniturebathtub001a.mdl")
-*/
-
-
 
 end

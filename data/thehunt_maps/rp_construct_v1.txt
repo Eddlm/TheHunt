@@ -6,10 +6,6 @@ CombineFifthWave = 1
 CombineInfiniteWave = 50
 CUSTOMWAVESPAWN = 40
 
-
-
-SPECIALITEMPLACES = {}
-
 MAP_PROPS = {"models/props_combine/breendesk.mdl","models/props_junk/wood_crate001a.mdl","models/props_c17/FurnitureDrawer001a.mdl",
 "models/props_wasteland/prison_bedframe001b.mdl","models/props_c17/oildrum001.mdl","models/props_c17/FurnitureTable002a.mdl",
 "models/props_c17/furniturecouch001a.mdl","models/props_c17/furniturecouch002a.mdl","models/props_junk/trashdumpster01a.mdl",

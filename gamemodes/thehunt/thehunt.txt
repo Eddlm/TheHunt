@@ -231,7 +231,14 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-				
+		31
+		{
+			"name"		"h_ep2_hunters"
+			"text"		"Enable EP2 Hunters"
+			"help"		"Enable EP2 Hunters"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 	}
 }
 
