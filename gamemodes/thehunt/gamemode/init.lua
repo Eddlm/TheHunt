@@ -47,23 +47,23 @@ end
 
 
 if file.Exists( "thehunt_maps/best_team.txt", "DATA" ) then
-include("/../../../data/thehunt_maps/best_team.txt")
-file.Delete( "thehunt_maps/best_team.txt" )
+	include("/../../../data/thehunt_maps/best_team.txt")
+	file.Delete( "thehunt_maps/best_team.txt" )
 else
-file.Write("thehunt_maps/best_team.txt", "\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE=0\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_NAMES={'Frankish Hooves','Best Korea','360 Noscope' }\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_KILLS=0\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SILENT_KILLS=0\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DEATHS=0\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DATE='1/11/0000 - 00:00:00'\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SCORE=0\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_NAME='Eddlm'")
-file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DATE='1/11/0000 - 00:00:00'\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_KILLS=0\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SILENT_KILLS=0\n")
-file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DEATHS=0\n")
-include("/../../../data/thehunt_maps/best_team.txt")
+	file.Write("thehunt_maps/best_team.txt", "\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE=0\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_NAMES={'Frankish Hooves','Best Korea','360 Noscope' }\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_KILLS=0\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SILENT_KILLS=0\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DEATHS=0\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DATE='1/11/0000 - 00:00:00'\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SCORE=0\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_NAME='Eddlm'")
+	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DATE='1/11/0000 - 00:00:00'\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_KILLS=0\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SILENT_KILLS=0\n")
+	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DEATHS=0\n")
+	include("/../../../data/thehunt_maps/best_team.txt")
 end
 
 
@@ -79,45 +79,43 @@ SUPPORTED_MAPS={"cs_assault","cs_compound","cs_italy","cs_militia","cs_office","
 SUPPORTED_MAPS_INSTALLED={}
 
 function MapVoteThing(ply)
-
-ply:PrintMessage(HUD_PRINTTALK, "[The Hunt]: These are the maps available on this server")
-table.foreach(SUPPORTED_MAPS, function(key,value)
-if file.Exists( "maps/"..value..".bsp", "GAME" ) then
-table.insert(SUPPORTED_MAPS_INSTALLED, value)
-ply:PrintMessage(HUD_PRINTTALK, value)
-
-end
-end)
+	ply:PrintMessage(HUD_PRINTTALK, "[The Hunt]: These are the maps available on this server")
+	table.foreach(SUPPORTED_MAPS, function(key,value)
+		if file.Exists( "maps/"..value..".bsp", "GAME" ) then
+			table.insert(SUPPORTED_MAPS_INSTALLED, value)
+			ply:PrintMessage(HUD_PRINTTALK, value)
+		end
+	end)
 end
 
 
 
 net.Receive( "light_above_limit", function( length, client )
-net.Start( "Visible" )
-net.Send(client)
-client:SetNoTarget(false)
+	net.Start( "Visible" )
+	net.Send(client)
+	client:SetNoTarget(false)
 end )
 
 net.Receive( "light_below_limit", function( length, client )
 local hidden=1
 
-for k, v in pairs(ents.FindInSphere(client:GetPos(),256)) do
-if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_helicopter" then
-if v:Health() > 0 then
-if v:GetEnemy(client) then
-hidden=0
-client:PrintMessage(HUD_PRINTTALK, ""..v:GetName().." saw you hide.")
-end
-end
-end
-end
-if hidden==1 then client:SetNoTarget(true)
-client.spotted =  0
-net.Start( "Hidden" )
-net.Send(client)
-net.Start( "NotVisible" )
-net.Send(client)
-end
+	for k, v in pairs(ents.FindInSphere(client:GetPos(),256)) do
+		if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_helicopter" then
+			if v:Health() > 0 then
+				if v:GetEnemy(client) then
+					hidden=0
+					client:PrintMessage(HUD_PRINTTALK, ""..v:GetName().." saw you hide.")
+				end
+			end
+		end
+	end
+	if hidden==1 then client:SetNoTarget(true)
+		client.spotted =  0
+		net.Start( "Hidden" )
+		net.Send(client)
+		net.Start( "NotVisible" )
+		net.Send(client)
+	end
 end)
 
   
@@ -135,45 +133,45 @@ end
 
 
 function GM:Initialize()
-print("------------------------- THE HUNT GM:Initialize LOADING -------------------------")
-
-if !ConVarExists("h_npctrails") then
-CreateClientConVar( "h_npctrails", "0", true, false )
-end
-TEAMKILLERS={}
-STARTING_LOADOUT = {}
-MEDIUMWEAPONS = {}
-SILENTKILLREWARD = {"item_healthvial"}
-teamscore = 0
-HeliCanSpawn = true
-max_weapons_total = 50
-prevent_spotlight_lag = false
-RunConsoleCommand( "mp_falldamage", "1") 
-RunConsoleCommand( "g_ragdoll_maxcount", "6")
-RunConsoleCommand( "r_shadowdist", "200") 
-RunConsoleCommand( "r_shadowcolor", ('20 20 20')) 
-RunConsoleCommand( "sk_helicopter_health", "1500") 
-RunConsoleCommand( "g_helicopter_chargetime", "2") 
-RunConsoleCommand( "sk_helicopter_burstcount", "12") 
-RunConsoleCommand( "sk_helicopter_firingcone", "20") 
-RunConsoleCommand( "sk_helicopter_roundsperburst", "5") 
-RunConsoleCommand( "air_density", "0")
-RunConsoleCommand( "ai_norebuildgraph", "1")   
-VOTES_FOR_RESTART=0
-EnemiesRemainining = 0
-combinen = 0
-CombineAssisting = 0
-ManuallySpawnedEntity = 0
-HeliAangered = 0
-CAN_HEAR_BREAK = 1
-team_silent_kills=0
-team_deaths =0
-team_kills =0
-COMBINE_KILLED = 0
-CAN_HEAR_BREAK = 1
-GAME_ENDED = 0
-print("------------------------- THE HUNT GM:Initialize LOADED -------------------------")
-end
+	print("------------------------- THE HUNT GM:Initialize LOADING -------------------------")
+	
+	if !ConVarExists("h_npctrails") then
+		CreateClientConVar( "h_npctrails", "0", true, false )
+	end
+	TEAMKILLERS={}
+	STARTING_LOADOUT = {}
+	MEDIUMWEAPONS = {}
+	SILENTKILLREWARD = {"item_healthvial"}
+	teamscore = 0
+	HeliCanSpawn = true
+	max_weapons_total = 50
+	prevent_spotlight_lag = false
+	RunConsoleCommand( "mp_falldamage", "1") 
+	RunConsoleCommand( "g_ragdoll_maxcount", "6")
+	RunConsoleCommand( "r_shadowdist", "200") 
+	RunConsoleCommand( "r_shadowcolor", ('20 20 20')) 
+	RunConsoleCommand( "sk_helicopter_health", "1500") 
+	RunConsoleCommand( "g_helicopter_chargetime", "2") 
+	RunConsoleCommand( "sk_helicopter_burstcount", "12") 
+	RunConsoleCommand( "sk_helicopter_firingcone", "20") 
+	RunConsoleCommand( "sk_helicopter_roundsperburst", "5") 
+	RunConsoleCommand( "air_density", "0")
+	RunConsoleCommand( "ai_norebuildgraph", "1")   
+	VOTES_FOR_RESTART=0
+	EnemiesRemainining = 0
+	combinen = 0
+	CombineAssisting = 0
+	ManuallySpawnedEntity = 0
+	HeliAangered = 0
+	CAN_HEAR_BREAK = 1
+	team_silent_kills=0
+	team_deaths =0
+	team_kills =0
+	COMBINE_KILLED = 0
+	CAN_HEAR_BREAK = 1
+	GAME_ENDED = 0
+	print("------------------------- THE HUNT GM:Initialize LOADED -------------------------")
+	end
 
 -- UTILITY COMMANDS v
 concommand.Add( "h_addonweapons", function(player, command, arguments )
@@ -971,7 +969,7 @@ function TeamStats()
 		file.Append("thehunt_maps/best_team.txt","BEST_TEAM_DEATHS="..team_deaths.."\n")
 		file.Append("thehunt_maps/best_team.txt","BEST_TEAM_DATE='"..TimeStr.."'\n")
 	else
-		file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE="..teamscore.."\n")
+		file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE="..BEST_TEAM_SCORE.."\n")
 		file.Append("thehunt_maps/best_team.txt","BEST_TEAM_NAMES={'"..string.Implode( "', '", BEST_TEAM_NAMES ).."'}\n")
 		file.Append("thehunt_maps/best_team.txt","BEST_TEAM_KILLS="..BEST_TEAM_KILLS.."\n")
 		file.Append("thehunt_maps/best_team.txt","BEST_TEAM_SILENT_KILLS="..BEST_TEAM_SILENT_KILLS.."\n")
