@@ -1,5 +1,5 @@
 ---------------------- THE HUNT CONFIGURATION FILE ----------------------
-include( 'basewaves.lua' )
+include( "basewaves.lua" )
 CombineFirstWave = 10
 CombineSecondWave = 15
 CombineThirdWave = 15

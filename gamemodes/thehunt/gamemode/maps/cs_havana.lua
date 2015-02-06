@@ -20,14 +20,14 @@ function MapSetup()
 for k, v in pairs(ents.FindByClass('func_door_rotating')) do print(v:GetClass()) v:SetKeyValue( 'spawnflags', '32' ) v:Fire('Open','',0) end
 table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value) for k, v in pairs(ents.FindByClass(value)) do print(v:GetClass()) v:Remove() end end)
 
-
+timer.Simple(2, function()
 table.foreach(ents.GetAll(), function(key,value)
-
 if value.EntIndex() == 518 then 
 value:Remove() 
 end
-
 end)
+end)
+
 SpawnItem('info_player_start', Vector(-682.090332, 1723.041504, 263.541565),Angle(-0.000, 90.000, 0.000))
 SpawnItem('info_player_start', Vector(-234.589890, 337.961670, 281.452454),Angle(-0.000, -90.000, -0.000))
 SpawnItem('info_player_start', Vector(-477.209137, 864.165955, 39.107853),Angle(-0.000, 45.000, -0.000))

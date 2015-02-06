@@ -118,21 +118,18 @@ SpawnSuitCharger(Vector(2632.964355, 1306.589600, -507.415039), Angle(0.000, 90.
 SpawnAmmoCrate(Vector(2589.500977, 1399.023926, -541.156372),Angle(0,-90,0),8)
 
 if math.random(1,2) == 1 then
-SpawnItem("button_turrets", Vector(-238.699768, 874.053345, -359.754150), Angle(0,180,0))
+SpawnItem('button_turrets',Vector(-347.705933, 883.829590, -364.718903),Angle(1.507, 0.066, 0.148))
 SpawnTurret(Vector(-276.811981, 702.857727, -396.902557),Angle(0.198, 93.169, 0.534))
 elseif math.random(1,2) == 1 then
-SpawnItem("button_turrets", Vector(-395.554504, 858.777649, -370.641388), Angle(0,-180,0))
+SpawnItem('button_turrets',Vector(638.710693, 1105.785889, -205.805588),Angle(0.015, -89.997, -0.005))
 SpawnTurret(Vector(-440.282837, 823.157410, -412.911774),Angle(0.261, 148.822, -0.071))
 elseif math.random(1,2) == 1 then
-SpawnItem("button_turrets", Vector(539.599976, 554.556458, -197.683426), Angle(0,-180,0))
+SpawnItem('button_turrets',Vector(2435.948975, 1055.554932, -520.570801),Angle(1.873, -0.230, 0.223))
 SpawnTurret(Vector(196.623581, 505.613708, -244.907227),Angle(0.303, 19.676, 0.406))
-elseif math.random(1,2) == 1 then
-SpawnItem("button_turrets", Vector(1870.660156, 995.599365, -440.934845), Angle(0,0,0))
-SpawnTurret(Vector(2122.213623, 942.593140, -476.876862),Angle(0.316, 133.774, 0.630))
-elseif math.random(1,2) == 1 then
-SpawnItem("button_turrets", Vector(502.875458, 809.920593, -202.281784), Angle(0,90,0))
-SpawnTurret(Vector(467.057709, 854.514771, -244.892578),Angle(0.321, 45.270, 0.732))
+
 end
+
+
 
 
 SpawnStaticProp(Vector(2199.015625, 573.703186, -537.154663),Angle(0,-90,0),"models/props_c17/furnituredrawer001a.mdl")

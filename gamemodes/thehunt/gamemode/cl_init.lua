@@ -1,7 +1,6 @@
 AddCSLuaFile( "shared.lua" )
-AddCSLuaFile( "config.lua" )
 include( "shared.lua" )
-
+noticeable={}
 darkencolor = Color(255,0,0)
 HUDTEXT = "Hidden"
 HUDCOLOR = Color(0,255,0)
@@ -93,12 +92,19 @@ hook.Add( "PreDrawHalos", "AddHalos", function()
 					halo.Add( {v}, Color( 18,176,0 ), 1, 1, 3, true, true )
 				end
 			end
+			table.foreach(noticeable, function(key,value)
+			if v:EntIndex() == value then
+				halo.Add( {v}, Color( 0,0,255 ), 1, 1, 1, true, true )
+			end
+			end)
 		end
 		for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(), 300)) do
 			if v:GetClass() == "npc_tripmine" and LocalPlayer():Health() then
 				halo.Add( {v}, Color( 255,255,0 ), 1, 1, 1, true, true )
 			end
+
 		end
+		
 	end
 end)
 
@@ -191,7 +197,7 @@ function light()
 		end
 	end
 end
-timer.Simple( 2, light )
+--timer.Simple( 2, light )
 
 function GM:HUDDrawTargetID()
 local tr = util.GetPlayerTrace( LocalPlayer() )

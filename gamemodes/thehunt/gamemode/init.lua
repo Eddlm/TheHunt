@@ -25,9 +25,9 @@ util.PrecacheModel("models/Police.mdl")
 if file.Exists( "thehunt_maps/"..game.GetMap()..".txt", "DATA" ) then
 include("/../../../data/thehunt_maps/"..game.GetMap()..".txt")
 win = 1
-print("[The Hunt]: map configuration file found ("..game.GetMap()..")")
+print("[The Hunt]: map configuration file found, "..game.GetMap()..".txt")
 else
-print("[The Hunt]: map config file not found.  Will try in other folder...")
+print("[The Hunt]: map config file not found.  Will try in /thehunt/gamemode/maps folder...")
 win = 0
 include("/maps/nomap.lua")
 end
@@ -36,7 +36,7 @@ if win == 0 then
 if file.Exists( "gamemodes/thehunt/gamemode/maps/"..game.GetMap()..".lua", "GAME" ) then
 include("/maps/"..game.GetMap()..".lua")
 win = 1
-print("[The Hunt]: map configuration file found ("..game.GetMap()..")")
+print("[The Hunt]: map configuration file found, "..game.GetMap()..".lua")
 else
 print("[The Hunt]: map config file not found. The Hunt will not start.")
 win = 0
@@ -48,7 +48,7 @@ end
 
 if file.Exists( "thehunt_maps/best_team.txt", "DATA" ) then
 	include("/../../../data/thehunt_maps/best_team.txt")
-	file.Delete( "thehunt_maps/best_team.txt" )
+	--file.Delete( "thehunt_maps/best_team.txt" )
 else
 	file.Write("thehunt_maps/best_team.txt", "\n")
 	file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE=0\n")
@@ -58,7 +58,7 @@ else
 	file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DEATHS=0\n")
 	file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DATE='1/11/0000 - 00:00:00'\n")
 	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SCORE=0\n")
-	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_NAME='Eddlm'")
+	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_NAME='Eddlm'\n")
 	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DATE='1/11/0000 - 00:00:00'\n")
 	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_KILLS=0\n")
 	file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SILENT_KILLS=0\n")
@@ -96,13 +96,15 @@ net.Receive( "light_above_limit", function( length, client )
 	client:SetNoTarget(false)
 end )
 
+
+
 net.Receive( "light_below_limit", function( length, client )
 local hidden=1
 
-	for k, v in pairs(ents.FindInSphere(client:GetPos(),256)) do
+	for k, v in pairs(ents.FindInSphere(client:GetPos(),1000)) do
 		if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_helicopter" then
 			if v:Health() > 0 then
-				if v:GetEnemy(client) then
+				if v:Visible(client) then
 					hidden=0
 					client:PrintMessage(HUD_PRINTTALK, ""..v:GetName().." saw you hide.")
 				end
@@ -134,7 +136,7 @@ end
 
 function GM:Initialize()
 	print("------------------------- THE HUNT GM:Initialize LOADING -------------------------")
-	
+	print("The Hunt version: v1.9. Date: 03/01/2015")
 	if !ConVarExists("h_npctrails") then
 		CreateClientConVar( "h_npctrails", "0", true, false )
 	end
@@ -342,8 +344,8 @@ end )
 
 
 concommand.Add( "h_version", function(ply)
-	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.7. Date: 8/12/2014")
-	ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added a tool for configuring maps, added some new maps.")
+	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.9. Date: 03/01/2015")
+	ply:PrintMessage(HUD_PRINTTALK, "Last changes: various fixes, changed combine spawn system.")
 end )
 
 
@@ -599,6 +601,21 @@ concommand.Add( "SpawnScanner", function(ply)
 	end
 end )
 
+concommand.Add( "SpawnAssasin", function(ply)
+	if ply:IsAdmin() then
+		SpawnAssasin( ply:GetEyeTraceNoCursor().HitPos)
+		print("[The Hunt]: Spawned.")
+	end
+end )
+
+concommand.Add( "SpawnCremator", function(ply)
+	if ply:IsAdmin() then
+		SpawnCremator( ply:GetEyeTraceNoCursor().HitPos)
+		print("[The Hunt]: Spawned.")
+	end
+end )
+
+
 concommand.Add( "SpawnCombineSFlashlight", function(ply)
 	print("[The Hunt]: Experimental shit I didn't implemented yet. If it explodes, is your fault.")
 	if ply:IsAdmin() then
@@ -675,7 +692,7 @@ end )
 
 -- Called by waves if the wave should spawn an helicopter.
 function HelicopterWave(maxhelis)
-	if HeliCanSpawn == true then
+	if HeliCanSpawn == true and HELIPATHS then
 		RPGCANSPAWN = 1
 		local NumHelis = 0
 		for k, v in pairs(ents.FindByClass("npc_helicopter")) do
@@ -705,6 +722,17 @@ function NUMPLAYERS()
 	end
 end
 
+-- Counts whatever entity you want to count.
+function CountEntity(ent)
+local entities=0
+		for k, v in pairs(ents.GetAll()) do
+		if v.HuntID == tostring(ent) then
+			entities=entities+1
+		end
+		end
+		print(""..entities.."")
+		return(entities)
+end
 
 -- Plays a random Overwatch announcement sound on a random player.
 function OverwatchAmbientOne()
@@ -741,7 +769,7 @@ end
 function NearbyEntities()
 	print("[The Hunt]: Entities found:")
 	for k, v in pairs(ents.FindInSphere(player.GetByID(1):GetPos(),256)) do
-		print(""..v:GetClass()..", "..v:GetName().."")
+		print(""..v:GetClass()..", "..v:GetName()..", "..v:EntIndex().."")
 	end
 	print("[The Hunt]: End of entities")
 end
@@ -823,9 +851,9 @@ function wavefinishedchecker()
 			table.foreach(player.GetAll(), function(key,value)
 				if value.lifes < 1 and value.teamkiller < 3 then 
 				value.canspawn = 1
-				value.lifes = 2
+				value.lifes = GetConVarNumber("h_player_lifes")/2
 				if !value:Alive() then
-					value:PrintMessage(HUD_PRINTTALK, "You can spawn now.")
+					value:PrintMessage(HUD_PRINTTALK, "You can spawn now. You have "..value.lifes.." lifes left.")
 				end
 				end
 			end)
@@ -917,7 +945,7 @@ function TeamStats()
 	if MostSilentKills != 0 then 
 		PrintMessage(HUD_PRINTTALK, ""..MostSilentPlayer.." has the most silent kills, "..tostring(MostSilentKills)..".")
 	else
-		PrintMessage(HUD_PRINTTALK, "Not a single silent in the entire game. Wow, people.") 
+		PrintMessage(HUD_PRINTTALK, "Not a single silent kill in the entire game. Wow, people.") 
 	end
 	
 	-- Show player with most deaths
@@ -938,10 +966,15 @@ function TeamStats()
 	
 	
 	-- Read and rewrite the best_team file with the new data (doesn't matter if there's no new data to add, rewrites it again with the old data)
+	
+	/*
 	if file.Exists( "thehunt_maps/best_team.txt", "DATA" ) then
+		print("best_team exists")
 		include("/../../../data/thehunt_maps/best_team.txt")
 		file.Delete( "thehunt_maps/best_team.txt" )
 	else
+		print("best_team does not exist")
+
 		file.Write("thehunt_maps/best_team.txt", "\n")
 		file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE=0\n")
 		file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_NAMES={'Frankish Hooves','Best Korea','360 Noscope' }\n")
@@ -950,13 +983,17 @@ function TeamStats()
 		file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DEATHS=0\n")
 		file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_DATE='1/11/0000 - 00:00:00'\n")
 		file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SCORE=0\n")
-		file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_NAME='Eddlm'")
+		file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_NAME='Eddlm'\n")
 		file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DATE='1/11/0000 - 00:00:00'\n")
 		file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_KILLS=0\n")
 		file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_SILENT_KILLS=0\n")
 		file.Append("thehunt_maps/best_team.txt", "BEST_PLAYER_ALL_TIME_DEATHS=0\n")
 		include("/../../../data/thehunt_maps/best_team.txt")
 	end
+	*/
+		include("/../../../data/thehunt_maps/best_team.txt")
+		file.Delete( "thehunt_maps/best_team.txt" )
+	
 	if teamscore > BEST_TEAM_SCORE then
 		file.Append("thehunt_maps/best_team.txt", "BEST_TEAM_SCORE="..teamscore.."\n")
 		file.Append("thehunt_maps/best_team.txt","BEST_TEAM_NAMES={")
@@ -1329,6 +1366,7 @@ end
 function SpawnRebel( pos )
 	NPC = ents.Create( "npc_citizen" )
 	NPC:SetPos( pos )
+	NPC.HuntID="Rebel"
 	NPC:SetKeyValue("squadname", "Rebels")
 	NPC:SetKeyValue("citizentype", "3")
 	NPC:Give("ai_weapon_ar2")
@@ -1359,6 +1397,7 @@ end
 function SpawnHunter(pos)
 	NPC = ents.Create( "npc_hunter" )
 	NPC:SetPos( pos )
+	NPC.HuntID="Hunter"
 	NPC:Spawn()
 	combinen = combinen + 1
 	NPC:SetName("Hunter")
@@ -1369,6 +1408,7 @@ function SpawnCombineS1 ( pos )
 	NPC:SetPos( pos )
 	NPC:SetKeyValue( "ignoreunseenenemies", 1 )
 	NPC:SetKeyValue( "spawnflags", 512 )
+	NPC.HuntID="CombineS1"
 	NPC:Spawn()
 	NPC:Give("ai_weapon_ar2")
 	combinen = combinen + 1
@@ -1382,6 +1422,7 @@ function SpawnCombineS2 ( pos )
 	NPC:SetPos( pos )
 	NPC:SetKeyValue( "ignoreunseenenemies", 0 )
 	NPC:SetKeyValue( "spawnflags", 512 )
+	NPC.HuntID="CombineS2"
 	NPC:Spawn()
 	NPC:Give("ai_weapon_ar2")
 	combinen = combinen + 1
@@ -1398,6 +1439,7 @@ function SpawnCombineSynth ( pos )
 	NPC:SetKeyValue( "spawnflags", 512 )
 	NPC:SetKeyValue( "model", "models/elite_synth/elite_synth.mdl" )
 	NPC:SetSkin(0)
+	NPC.HuntID="CombineSynth"
 	NPC:Spawn()
 	NPC:Give("NPC_Minigun")
 	combinen = combinen + 1
@@ -1415,6 +1457,7 @@ function SpawnCombineShotgunner ( pos )
 	NPC:SetKeyValue( "ignoreunseenenemies", 0 )
 	NPC:SetKeyValue( "spawnflags", 512 )
 	NPC:SetSkin(1)
+	NPC.HuntID="CombineShotgunner"
 	NPC:Spawn()
 	NPC:Give("ai_weapon_shotgun")
 	combinen = combinen + 1
@@ -1429,6 +1472,8 @@ function SpawnCombineShotgunnerElite ( pos )
 	NPC:SetKeyValue( "ignoreunseenenemies", 0 )
 	NPC:SetKeyValue( "spawnflags", 512 )
 	NPC:SetSkin(1)
+	NPC.HuntID="CombineShotgunnerElite"
+
 	NPC:Spawn()
 	NPC:Give("ai_weapon_shotgun")
 	combinen = combinen + 1
@@ -1445,6 +1490,7 @@ function SpawnMetropoliceStunstick( pos )
 	NPC:SetKeyValue( "ignoreunseenenemies", 0 )
 	NPC:SetKeyValue( "spawnflags", "512" )
 	NPC:SetKeyValue("squadname", "")
+	NPC.HuntID="MetropoliceStunstick"
 	NPC:Spawn()
 	NPC:Give("ai_weapon_stunstick")
 	combinen = combinen + 1
@@ -1461,6 +1507,7 @@ function SpawnMetropolice( pos )
 	NPC:SetKeyValue( "ignoreunseenenemies", 0 )
 	NPC:SetKeyValue( "spawnflags", "512" )
 	NPC:SetKeyValue("squadname", "")
+	NPC.HuntID="Metropolice"
 	NPC:Spawn()
 	NPC:Give("ai_weapon_pistol")
 	combinen = combinen + 1
@@ -1478,6 +1525,7 @@ function SpawnMetropoliceHard( pos )
 	NPC:SetPos( pos )
 	NPC:SetKeyValue( "ignoreunseenenemies", 0 )
 	NPC:SetKeyValue( "spawnflags", 512 )
+	NPC.HuntID="MetropoliceHard"
 	NPC:Spawn()
 	NPC:Give("ai_weapon_smg1")
 	combinen = combinen + 1
@@ -1522,6 +1570,7 @@ function SpawnCombineElite1( pos )
 	NPC:SetKeyValue( "model", "models/Combine_Super_Soldier.mdl" )
 	NPC:SetPos( pos )
 	NPC:SetKeyValue( "spawnflags", 512 )
+	NPC.HuntID="CombineElite1"
 	NPC:Spawn()
 	NPC:Give( "ai_weapon_ar2" )
 	combinen = combinen + 1
@@ -1536,6 +1585,7 @@ function SpawnCombineElite2( pos )
 	NPC:SetKeyValue( "spawnflags", "256" )
 	NPC:SetPos( pos )
 	NPC:SetKeyValue( "spawnflags", 512 )
+	NPC.HuntID="CombineElite2"
 	NPC:Spawn()
 	NPC:Give( "ai_weapon_ar2" )
 	combinen = combinen + 1
@@ -1544,6 +1594,34 @@ function SpawnCombineElite2( pos )
 	NPC:Fire("StartPatrolling","",0) 
 end
 
+function SpawnAssassin( pos )
+	NPC = ents.Create( "npc_fassassin" )
+	--NPC:SetKeyValue( "spawnflags", "256" )
+	NPC:SetPos( pos )
+	--NPC:SetKeyValue( "spawnflags", 512 )
+	NPC.HuntID="Assassin"
+
+	NPC:Spawn()
+	--NPC:Give( "ai_weapon_ar2" )
+	--combinen = combinen + 1
+	NPC:SetName("Assassin")
+	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )
+	NPC:Fire("StartPatrolling","",0) 
+end
+
+function SpawnCremator( pos )
+	NPC = ents.Create( "npc_cremator" )
+	--NPC:SetKeyValue( "spawnflags", "256" )
+	NPC:SetPos( pos )
+	--NPC:SetKeyValue( "spawnflags", 512 )
+	NPC.HuntID="Cremator"
+	NPC:Spawn()
+	--NPC:Give( "ai_weapon_ar2" )
+	--combinen = combinen + 1
+	NPC:SetName("Cremator")
+	--NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )
+	NPC:Fire("StartPatrolling","",0) 
+end
 
 function SpawnAirboat( pos, ang )
 	spawnairboat = ents.Create("prop_vehicle_airboat")
@@ -1730,7 +1808,7 @@ function metropolicewander()
 		if !v:GetEnemy() then
 			if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
 				v:SetSchedule(SCHED_IDLE_WANDER)
-				print(""..v:GetName().." is wandering now")
+				print(""..v:GetName().." is has selected a new patrol point to go.")
 			end
 		end
 	end
@@ -1738,7 +1816,7 @@ function metropolicewander()
 for k, v in pairs(ents.FindByClass("npc_rollermine")) do
 	if !v:GetEnemy() then
 		if v:GetPhysicsObject():GetVelocity():Length() < 20 then
-		print(""..v:GetName().." is wandering now")		
+		print(""..v:GetName().." is has selected a new patrol point to go.")		
 			if math.random(1,3)==2 then
 					v:SetSchedule(SCHED_IDLE_WANDER)
 			else
@@ -1797,7 +1875,8 @@ function CicloUnSegundo()
 									if npc:GetEnemy().spotted != 1 then
 										if npc:GetEnemy():IsPlayer() or npc:GetEnemy():GetClass() == "npc_citizen" then
 											npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
-											PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."")
+											if GetConVarNumber("h_combine_chat") == 1 then
+											PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."") end
 											if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
 											table.remove(zonescovered)
 											table.remove(zonescovered)
@@ -2045,8 +2124,13 @@ function GM:InitPostEntity()
 			print("[The Hunt]: Heli path found.")
 		end
 	end
-		
+
+
+
+	
 	if GetConVarString("h_STALKER_sweps") == "1" then
+	if IsThatWeaponInstalled("stalker_ak74_u") == true then
+	
 		table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
@@ -2058,9 +2142,15 @@ function GM:InitPostEntity()
 		table.insert(MEDIUMWEAPONS, ""..table.Random(STALKER_SWEPS).."")
 		while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 		print("[The Hunt]:  STALKER sweps added successfully.")
+		else
+		print("[The Hunt]:  STALKER are NOT installed! The game won't add them.")
+		end
 	end
 	
 	if GetConVarString("h_MR_PYROUS_sweps") == "1" then
+	if IsThatWeaponInstalled("pspak_benli_m4") == true then
+		
+		
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
@@ -2072,9 +2162,14 @@ function GM:InitPostEntity()
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MR_PYROUS_SWEPS).."")
 		while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 		print("[The Hunt]:  Mr. Pyrous Tactical weapons added successfully.")
+		else
+		print("[The Hunt]:  Mr. Pyrous Tactical weapons are NOT installed! The game won't add them.")
+		end
 	end
 	
 	if GetConVarString("h_MAD_COWS_sweps") == "1" then
+		if IsThatWeaponInstalled("weapon_mad_alyxgun") == true then
+
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
@@ -2086,9 +2181,14 @@ function GM:InitPostEntity()
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MAD_COWS_SWEPS).."")
 		while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 		print("[The Hunt]:  Mad Cows sweps added successfully.")
+				else
+		print("[The Hunt]:  Mad Cows sweps are NOT installed! The game won't add them.")
+		end
 	end
 		
 	if GetConVarString("h_M9K_SPECIALITIES_sweps") == "1" then
+			if IsThatWeaponInstalled("m9k_nerve_gas") == true then
+
 		table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")
@@ -2100,9 +2200,14 @@ function GM:InitPostEntity()
 		table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_SPECIALITIES).."")	
 		while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 		print("[The Hunt]: M9K Specialities Sweps added succesfully.")
+		else
+		print("[The Hunt]:  M9K Specialities Sweps are NOT installed! The game won't add them.")
+		end
 	end
 	
 	if GetConVarString("h_FAS_sweps") == "1" then
+		if IsThatWeaponInstalled("fas2_ak47") == true then
+
 		table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(FAS).."")
@@ -2115,9 +2220,14 @@ function GM:InitPostEntity()
 		while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 		table.insert(MEDIUMWEAPONS, "fas2_att_suppressor")
 		print("[The Hunt]: FA:S weapons added succesfully.")
+		else
+		print("[The Hunt]:  FA:S weapons are NOT installed! The game won't add them.")
+		end
 	end
 	
 	if GetConVarString("h_M9K_ASSAULT_RIFLES_sweps") == "1" then
+			if IsThatWeaponInstalled("m9k_winchester73") == true then
+
 		table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
@@ -2130,17 +2240,92 @@ function GM:InitPostEntity()
 		table.insert(MEDIUMWEAPONS, ""..table.Random(M9K_ASSAULT_RIFLES).."")
 		while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 		print("[The Hunt]:  M9K Assault Rifles added successfully.")
+			else
+		print("[The Hunt]:  M9K Assault Rifles are NOT installed! The game won't add them.")
+		end
 	end	
 	
 	if GetConVarString("h_CUSTOMIZABLE_WEAPONRY_2_0_sweps") == "1" then
+				if IsThatWeaponInstalled("cw_ak74") == true then
+
 		table.foreach(Customizable_Weaponry, function(key,weapon)
 			table.insert(MEDIUMWEAPONS,weapon)
 		end)
 		table.insert(MEDIUMWEAPONS, "cw_ammo_crate_small")
+		table.insert(MEDIUMWEAPONS, "cw_ammo_40mm")
+
 		print("[The Hunt]: CW 2.0 weapons added successfully.")
+		else
+		print("[The Hunt]:  CW 2.0 weapons are NOT installed! The game won't add them.")
+		end
 	end
+
+	
+	if GetConVarString("h_EXTRA_CUSTOMIZABLE_WEAPONRY_2_0_sweps") == "1" then
+					if IsThatWeaponInstalled("cw_scarh") == true then
+
+		table.foreach(Extra_Customizable_Weaponry, function(key,weapon)
+			table.insert(MEDIUMWEAPONS,weapon)
+		end)
+		if not table.HasValue( MEDIUMWEAPONS, "cw_ammo_crate_small" ) then
+			table.insert(MEDIUMWEAPONS, "cw_ammo_crate_small")
+			table.insert(MEDIUMWEAPONS, "cw_ammo_40mm")
+
+		end
+			print("[The Hunt]: Extra CW 2.0 weapons added successfully.")
+					else
+			print("[The Hunt]: Extra CW 2.0 weapons are NOT installed! The game won't add them.")
+		end
+	end
+
+	
+	
+	if GetConVarString("h_UNOFICIAL_EXTRA_CUSTOMIZABLE_WEAPONRY_2_0_sweps") == "1" then
+					if IsThatWeaponInstalled("cw_g4p_usp40") == true then
+
+		table.foreach(Unoficial_Extra_Customizable_Weaponry, function(key,weapon)
+			table.insert(MEDIUMWEAPONS,weapon)
+		end)
+		if not table.HasValue( MEDIUMWEAPONS, "cw_ammo_crate_small" ) then
+			table.insert(MEDIUMWEAPONS, "cw_ammo_crate_small")
+			table.insert(MEDIUMWEAPONS, "cw_ammo_40mm")
+
+		end
+			print("[The Hunt]: Unoficial Extra CW 2.0 weapons added successfully.")
+			else
+			print("[The Hunt]: Unoficial Extra CW 2.0 weapons are NOT installed! The game won't add them.")
+		end
+	end
+
+	
+	
+	if GetConVarString("h_Murder_friendly_Assault_sweps") == "1" then
+						if IsThatWeaponInstalled("ak47") == true then
+
+		table.foreach(Murder_friendly_Assault, function(key,weapon)
+			table.insert(MEDIUMWEAPONS,weapon)
+		end)
+		print("[The Hunt]: Murder friendly Assault weapons added successfully.")
+					else
+			print("[The Hunt]: Murder friendly Assault weapons are NOT installed! The game won't add them.")
+		end
+	end
+
+	if GetConVarString("Murder_friendly_Handguns") == "1" then
+		if IsThatWeaponInstalled("359") == true then
+
+		table.foreach(Murder_friendly_Handguns, function(key,weapon)
+			table.insert(MEDIUMWEAPONS,weapon)
+		end)
+		print("[The Hunt]: Murder friendly Handguns weapons added successfully.")
+		else
+		print("[The Hunt]: Murder friendly Handguns weapons are NOT installed! The game won't add them.")
+		end
+	end	
 	
 	if GetConVarString("h_MHs_Super_Battle_Pack_PART_II_sweps") == "1" then
+			if IsThatWeaponInstalled("acid_sprayer_minds") == true then
+
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MHs_Super_Battle_Pack_PART_II).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MHs_Super_Battle_Pack_PART_II).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MHs_Super_Battle_Pack_PART_II).."")
@@ -2153,9 +2338,15 @@ function GM:InitPostEntity()
 		table.insert(MEDIUMWEAPONS, ""..table.Random(MHs_Super_Battle_Pack_PART_II).."")
 		while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 		print("[The Hunt]:  MH Supper Battle Pack added successfully.")
+				else
+		print("[The Hunt]: MH Supper Battle Pack  weapons are NOT installed! The game won't add them.")
+		end
 	end
+
 	
 	if GetConVarString("h_spastiks_toybox_sweps") == "1" then
+				if IsThatWeaponInstalled("gabriel") == true then
+
 		table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
 		table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
@@ -2168,6 +2359,9 @@ function GM:InitPostEntity()
 		table.insert(MEDIUMWEAPONS, ""..table.Random(spastiks_toybox).."")
 		while table.Count(MEDIUMWEAPONS) > 8 do table.remove(MEDIUMWEAPONS, math.random(1,table.Count(MEDIUMWEAPONS))) end
 		print("[The Hunt]:  Spastik's Toybox SWEPS added successfully.")
+						else
+		print("[The Hunt]: Spastik's Toybox SWEPS are NOT installed! The game won't add them.")
+		end
 	end
 	
 	
@@ -2199,6 +2393,13 @@ function GM:InitPostEntity()
 	end
 	end)
 	print("------------------------- THE HUNT GM:InitPostEntity LOADED -------------------------")
+	timer.Create( "HintSystem", 30, 15, HintSystem )
+
+end
+function HintSystem()
+if GetConVarString("h_hints") == "1" then
+PrintMessage(HUD_PRINTTALK, ""..table.Random(Player_Hints).."")
+end
 end
 
 function GM:PlayerSpawn(ply)
@@ -2337,9 +2538,37 @@ function GM:PlayerSelectSpawn( pl )
 		end
 	end)
 if table.Count(availablespawns) < 1 then
-	PrintMessage(HUD_PRINTTALK, "WARNING: The system did not find any safe spawnpoint.")
+	PrintMessage(HUD_PRINTTALK, "WARNING: The system did not find any safe spawnpoint. There are combine on all of them.")
 end
    return table.Random(availablespawns)
+end
+
+
+function CombineSelectSpawn()
+	local availablespawns = {}
+	local random_entry = math.random( #combinespawnzones )
+	local spawn = false
+	table.foreach(combinespawnzones, function(key,value)
+		local can = 1
+		for k, v in pairs(ents.FindInSphere(value,1000)) do
+			if v:IsPlayer() then
+				if v:VisibleVec(value) then
+				print(v:Nick())
+					can = 0
+				end
+			end
+		end
+		if can == 1 then
+		print("Combine can spawn there")
+		table.insert(availablespawns, value)
+		end
+	end)
+
+if table.Count(availablespawns) < 1 then
+return table.Random(combinespawnzones)
+else
+return table.Random(availablespawns)
+end
 end
 
 function ScalePlayerDamage(ply, hitgroup, dmginfo)
@@ -2459,6 +2688,7 @@ function GM:EntityTakeDamage(damaged,damage)
 	end
 
 	if damage:IsDamageType(64) then 
+		table.insert(zonescovered, damaged:GetPos()+Vector(0,0,30)) print("Patrol zone added")
 		allthecombinecome(damaged,GetConVarNumber("h_maxgunshotinvestigate"))
 	elseif !damaged:IsNPC() and !damaged:IsPlayer() then
 		if CAN_HEAR_BREAK == 1 then
@@ -2518,11 +2748,13 @@ function GM:KeyPress(player,key)
 						loud = 0
 					end
 				end)
-				if loud > 0 then
+				if loud > 0 then 
 					timer.Simple(0.1, function()
+					--if 1==1 /* player:Alive() */ then
 						if player:GetActiveWeapon():Clip1() then
 							if player:GetActiveWeapon():Clip1() < clip then
 								if player:GetActiveWeapon():Clip1() > -1 then
+															
 									local silenced = 0
 										if player:GetActiveWeapon().Silenced == true then
 										--print("Silenced 1")
@@ -2545,9 +2777,11 @@ function GM:KeyPress(player,key)
 											silenced = 1
 										end
 									end
-									if silenced == 0 then
+									if silenced == 0 and player.spotted == 0 then
 										--print("NOT Silenced")
-										allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate")) 
+										allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate"))
+										--table.insert(zonescovered, player:GetPos()+Vector(0,0,30)) print("Patrol zone added")
+
 									end
 									if silenced == 1 then
 										nearbycombinecomecasual(player)
@@ -2555,6 +2789,7 @@ function GM:KeyPress(player,key)
 								end	
 							end
 						end
+						--end
 					end)
 				end
 			end
@@ -2580,9 +2815,45 @@ function GM:KeyPress(player,key)
 			net.Start( "ShowHUDScoreboard" )	
 			net.Send(player)
 		end	
+		if key == IN_WALK then
+				PlayerHighlightItem(player)
+		end	
+		if key == IN_USE then
+			if player:GetEyeTraceNoCursor().Entity:GetClass() == "func_door_rotating" or player:GetEyeTraceNoCursor().Entity:GetClass() == "prop_door_rotating" then
+			print(player:GetPos():Distance(player:GetEyeTraceNoCursor().Entity:GetPos()))
+			if player:GetPos():Distance(player:GetEyeTraceNoCursor().Entity:GetPos()) < 99 then
+					nearbycombinecomecasual(player)
+			end
+			end
+		end	
 	end
 end
 
+hook.Add( "PlayerUse", "PlayerPickUpProp", function( ply, ent )
+if ent.holding !=1 and ent:GetClass() == "prop_physics" or  ent:GetClass() == "prop_physics_multiplayer" then
+
+ent.holding=1
+
+if timer.Exists("PlayerHoldProp") then
+	timer.Destroy( "PlayerHoldProp")
+end
+
+timer.Create( "PlayerHoldProp", 2, 1, function() 
+nearbycombinecomecasual(ent)
+ent.holding=0
+end)
+--else
+
+end
+end)
+
+function GM:PhysgunDrop(ply, ent)
+timer.Simple(2, function()
+
+nearbycombinecomecasual(ent)
+
+end)
+end
 
 function GM:PlayerSetHandsModel( ply, ent )
 	local simplemodel = player_manager.TranslateToPlayerModelName( ply:GetModel() )
@@ -2739,10 +3010,13 @@ function FirstSpawn(ply)
 	ply.Kills=0
 	ply.SilentKills=0
 	ply.teamkiller=0
+	ply.spotted = 0
 	NUMPLAYERS()
 	ply:SetNWInt("ReferentScore", 0)
+	timer.Simple(5, function() ply:SendLua("light()") end)
+	
 	if DARKNESS then
-		ply:SendLua("CLDARKNESS="..DARKNESS.."" )
+		ply:SendLua("CLDARKNESS="..DARKNESS.."" )		
 	end
 end
 hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", FirstSpawn )

@@ -193,13 +193,29 @@
 		}
 		26
 		{
+			"name"		"h_EXTRA_CUSTOMIZABLE_WEAPONRY_2_0_sweps"
+			"text"		"Spawn Extra CW 2.0 Sweps"
+			"help"		"Spawn Extra CW 2.0 Sweps"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		27
+		{
+			"name"		"h_UNOFICIAL_EXTRA_CUSTOMIZABLE_WEAPONRY_2_0_sweps"
+			"text"		"Spawn Un. Extra CW 2.0 Sweps"
+			"help"		"Spawn Un. Extra CW 2.0 Sweps"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		28
+		{
 			"name"		"h_default_loadout"
 			"text"		"Default loadout (separate with , )"
 			"help"		"Default loadout (separate with , )"
 			"type"		"Text"
 			"default"	""
 		}
-		27
+		29
 		{
 			"name"		"h_personalized_sweps"
 			"text"		"Custom weapons to spawn around (separate with , )"
@@ -207,7 +223,7 @@
 			"type"		"Text"
 			"default"	"item_healthvial"
 		}
-		28
+		30
 		{
 			"name"		"h_silent_kill_rewards"
 			"text"		"Silent Kill rewards (separate with , )"
@@ -215,7 +231,7 @@
 			"type"		"Text"
 			"default"	"weapon_slam"
 		}
-		29
+		31
 		{
 			"name"		"h_MHs_Super_Battle_Pack_PART_II_sweps"
 			"text"		"Spawn MHs SBP Part II sweps"
@@ -223,7 +239,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		30
+		32
 		{
 			"name"		"h_spastiks_toybox_sweps"
 			"text"		"Spawn Spastik's Toybox SWEPS"
@@ -231,13 +247,53 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		31
+		33
+		{
+			"name"		"h_Murder_friendly_Assault_sweps"
+			"text"		"Spawn Murder Friendly(Assault) SWEPS"
+			"help"		"Add Murder Friendly(Assault) SWEPS"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		34
+		{
+			"name"		"Murder_friendly_Handguns"
+			"text"		"Spawn Murder Friendly(Hanguns) SWEPS"
+			"help"		"Add Murder Friendly(Hanguns) SWEPS"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		35
 		{
 			"name"		"h_ep2_hunters"
 			"text"		"Enable EP2 Hunters"
 			"help"		"Enable EP2 Hunters"
 			"type"		"CheckBox"
 			"default"	"0"
+		}
+		36
+		{
+			"name"		"h_beta_npcs"
+			"text"		"Enable HL2 Beta NPCs"
+			"help"		"Enable HL2 Beta NPCs"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		37
+		{
+			"name"		"h_hints"
+			"text"		"Enable hints"
+			"help"		"Enable hints"
+			"type"		"CheckBox"
+			"default"	"1"
+		}
+		38
+		{
+			"name"		"h_combine_chat"
+			"text"		"Enable Combine chat"
+			"help"		"Enable Combine chat"
+			"type"		"CheckBox"
+			"default"	"1"
 		}
 	}
 }

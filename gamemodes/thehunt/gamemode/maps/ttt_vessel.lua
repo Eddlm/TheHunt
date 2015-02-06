@@ -4,7 +4,7 @@ CombineThirdWave = 15
 CombineFourthWave = 20
 CombineFifthWave = 1
 CombineInfiniteWave = 20
-DARKNESS = 2
+DARKNESS = 9
 
 HeliCanSpotlight = 1
 

@@ -221,6 +221,59 @@ function revealzonestemp()
 	timer.Simple(4, hidezones)
 end
 
+
+function PlayerHighlightItem(player)
+	if table.Count(noticeable_server) < 3 and table.Count(ents.FindByName("ZoneHighlight")) < 3 then
+			local can = 1
+			if player:GetEyeTraceNoCursor().Entity:IsWorld() then
+			local sprite = ents.Create( "env_sprite" )
+			sprite:SetPos(player:GetEyeTraceNoCursor().HitPos+Vector(0,0,30))
+			sprite:SetColor( Color( 0,0,255 ) )
+			sprite:SetKeyValue( "model", "sprites/light_glow01.vmt" )
+			sprite:SetKeyValue( "scale", 0.50 )
+			sprite:SetKeyValue( "rendermode", 5 )
+			sprite:SetKeyValue( "renderfx", 7 )
+			sprite:Spawn()
+			sprite:Activate()
+			sprite:SetName("ZoneHighlight")
+			sprite:EmitSound("garrysmod/balloon_pop_cute.wav", 100, 100)
+			else
+				table.foreach(noticeable_server, function(key,value)
+					if value == player:GetEyeTraceNoCursor().Entity:EntIndex() then
+						can = 0
+					end
+				end)
+				if can == 1 then
+				for k, player in pairs( ents.GetAll() ) do
+				if player:IsPlayer() then
+				player:SendLua("table.insert(noticeable,LocalPlayer():GetEyeTraceNoCursor().Entity:EntIndex())" )
+				end
+				end			
+				table.insert(noticeable_server,player:GetEyeTraceNoCursor().Entity:EntIndex())
+				player:GetEyeTraceNoCursor().Entity:EmitSound("garrysmod/balloon_pop_cute.wav", 100, 100)
+				end
+			end		
+			
+	if timer.Exists("HighlightTimer") then
+		timer.Destroy( "HighlightTimer")
+	end
+	
+timer.Create( "HighlightTimer", 5, 1,	function()
+			for k, player in pairs( ents.GetAll() ) do
+			if player:IsPlayer() then
+			player:SendLua("table.Empty(noticeable)" )
+			end
+			end	
+			table.Empty(noticeable_server)
+			
+			for k, v in pairs(ents.FindByName("ZoneHighlight") ) do
+			v:Remove()
+			end
+			
+	end)		
+	end
+end
+
 function GM:Initialize()
 	self.BaseClass.Initialize( self )
 end
@@ -239,8 +292,12 @@ function ManualWeaponDrop(ply)
 			ply:GetActiveWeapon():Remove()
 			ply:PrintMessage(HUD_PRINTTALK, "Removed "..ply:GetActiveWeapon():GetClass()..".")
 			else
+			local weapon = ply:GetActiveWeapon()
 			ply:PrintMessage(HUD_PRINTTALK, "Dropped "..ply:GetActiveWeapon():GetClass()..".")
 			ply:DropWeapon(ply:GetActiveWeapon())
+			timer.Create( "PlayerDropWeaponSound", 1, 1, function() 
+			nearbycombinecomecasual(weapon)
+			end)
 		end
 	else
 		ply:PrintMessage(HUD_PRINTTALK, "You can't drop "..ply:GetActiveWeapon():GetClass()..". Sorry.")
@@ -287,7 +344,9 @@ function nearbycombinecomecasual(suspect)
 						if !v:GetEnemy() then
 							if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
 								--print(""..v:GetName().." investigates.")
+								if GetConVarNumber("h_combine_chat") == 1 then
 								PrintMessage(HUD_PRINTTALK, ""..v:GetName()..": "..table.Random(CombineHearBreak).."")
+								end
 								v:SetLastPosition(suspect:GetPos())
 								v:SetSchedule(SCHED_FORCED_GO)
 								come=come+1
@@ -389,7 +448,7 @@ function AdjustWeight(ply)
 	end)
 	ply:SetWalkSpeed(150*weight)
 	ply:SetRunSpeed(250*weight)
-	if ply:GetWalkSpeed() < 100 then
+	if ply:GetWalkSpeed() < 80 then
 	ply:PrintMessage(HUD_PRINTTALK, "You carry too much weight. Drop some weapons by switching to them and saying !drop")
 	end
 end
@@ -412,7 +471,7 @@ function ItemRespawnSystem()
 			end
 			--print("[The Hunt]: There are "..NUMBER.." "..value.."")
 			while NUMBER < PLAYERS do
-				--print("[The Hunt]: Added 1 of "..value.."")
+				print("[ItemRespawnSystem]: Spawning 1 "..value.."")
 				SpawnItem(value, table.Random(ITEMPLACES), Angle(0,0,math.random(-180,180)) )
 				NUMBER = NUMBER+1
 			end
@@ -470,6 +529,12 @@ function ItemRespawnSystem()
 	--print("")
 end
 
+
+
+Player_Hints = {"Ceiling Turrets can be disabled from a Combine Control Panel or explosions.","Silenced gunshots won't alert the combine.","If it's your first time playing, the command !help will help you understand the game.","Noises (explosions, props breaking, combine dying) will atract the combine.","Go after combine that are alone first.","Some crates contain valuable items.","Killing an unaware combine will score you more points.","Unaware combine can drop special items.","Hit and run is the best tactic in The Hunt.","SLAMS are way useful as both tripmines and satchel charges.","You can disable these hints by typing h_hints 0 on the console.","If spotted, kill the guy and RUN","You can hide in dark places. USE IT. They can't see you there, even if they're near you.","Always go near the walls, not in the middle of the street/corridor.","Try to use silenced guns, or, if you don't have them, melee weapons. They don't make noise.","You can drop your weapon by saying !drop. You can bind that command by typin 'bind x h_dropweapon' on the console."}
+
+noticeable_server = {}
+
 SPAWNPOINTS_TO_DELETE = {
 "info_player_terrorist",
 "info_player_counterterrorist",
@@ -496,7 +561,7 @@ TOO_BRIGHT_WEAPONS = {
 "weapon_rpg",
 "weapon_medkit"
 }
--- Weapons that make you more visible. It's harder to hide while carrying this weapon.
+-- Weapons that make you more visible. It's harder to hide while carrying them.
 
 DARK_WEAPONS = { "weapon_frag",
 "weapon_crowbar",
@@ -597,10 +662,10 @@ ONLY_PICKUP_ONCE = { "weapon_physcannon",
 
 VanillaWeapons = { "weapon_shotgun", "weapon_ar2","weapon_pistol", "weapon_crossbow", "weapon_physcannon","weapon_smg1","weapon_357"}
 AirEnemies = { "npc_helicopter", "npc_combinegunship"}
-MainEnemiesGround = { "npc_combine_s", "npc_metropolice","npc_hunter"}
-MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_hunter"}
-MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship", "npc_turret_ceiling","npc_hunter"}
-MainEnemiesDamage = { "npc_combine_s", "npc_metropolice", "npc_manhack",}
+MainEnemiesGround = { "npc_combine_s", "npc_metropolice","npc_hunter","npc_fassassin"}
+MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_hunter","npc_fassassin"}
+MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship", "npc_turret_ceiling","npc_hunter",}
+MainEnemiesDamage = { "npc_combine_s", "npc_metropolice", "npc_manhack"}
 
 
 CombineHearBreak = {
@@ -806,7 +871,19 @@ playermodelsfemale = {
 "models/player/group03/female_06.mdl",
 }
 
+function IsThatWeaponInstalled(weapon)
 
+
+		local can=false
+		table.foreach(weapons.GetList(), function(key,value)
+		if value.ClassName == weapon then 
+		can = true
+		end
+		end)
+if can == true then
+return true
+end
+end
 
 -- Weapons mix
 STALKER_SWEPS ={
@@ -822,6 +899,15 @@ M9K_ASSAULT_RIFLES={"m9k_winchester73","m9k_acr","m9k_ak47","m9k_ak74","m9k_amd6
 
 FAS={"fas2_ak12","fas2_ak47","fas2_ak74","fas2_an94","fas2_dv2","fas2_famas","fas2_g36c","fas2_g3","fas2_glock20","fas2_deagle","fas2_galil","fas2_uzi","fas2_ifak","fas2_ks23","fas2_mac11","fas2_m14","fas2_m1911","fas2_m21","fas2_m24","fas2_m3s90","fas2_m4a1","fas2_m67","fas2_m79","fas2_m82","fas2_machete","fas2_mp5a5","fas2_mp5k","fas2_mp5sd6","fas2_ots33","fas2_p226","fas2_pp19","fas2_ragingbull","fas2_rem870","fas2_rpk","fas2_rk95","fas2_sg550","fas2_sg552","fas2_sks","fas2_sr25","fas2_toz34"}
 Customizable_Weaponry={"cw_ak74","cw_ar15","cw_g3a3","cw_mp5","cw_deagle","cw_mr96"}
+
+Extra_Customizable_Weaponry={"cw_scarh","cw_m14","cw_ump45","cw_m3super90"}
+
+Unoficial_Extra_Customizable_Weaponry={"cw_g4p_usp40","cw_g4p_an94","cw_g4p_awm","cw_g4p_m98b","cw_g4p_fn_fal","cw_g4p_fiveseven","cw_g4p_g2contender","cw_g4p_glock17","cw_g4p_g36c","cw_g4p_ump45","cw_g4p_xm8","cw_g4p_m16a2","cw_g4p_m16a4","cw_g4p_m4a1","cw_g4p_magpul_masada","cw_g4p_masada_acr","cw_g4p_mp412_rex"}
+
+
+Murder_friendly_Assault={"ak47","g21c","vp70","m14","mac10","mp40","mp5k","pr3","ak74u","m16a4","skorpion","xm8"}
+
+Murder_friendly_Handguns={"359","snub","autodeagle","m9","fort12","g17","kim","makarov","mr96","p99","jackal","tokarev"}
 
 VANILLA_WEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
 

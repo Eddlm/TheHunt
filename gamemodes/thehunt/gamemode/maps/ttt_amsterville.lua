@@ -6,8 +6,6 @@ CombineFourthWave = 15
 CombineFifthWave = 20
 CombineInfiniteWave = 25
 
---DARKNESS = 1
-
 CUSTOMWAVESPAWN = 20
 
 zonescovered ={
