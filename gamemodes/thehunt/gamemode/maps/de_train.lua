@@ -21,7 +21,7 @@ function MapSetup()
 for k, v in pairs(ents.FindByClass('func_door_rotating')) do print(v:GetClass()) v:SetKeyValue( 'spawnflags', '32' ) v:Fire('Open','',0) end
 table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value) for k, v in pairs(ents.FindByClass(value)) do print(v:GetClass()) v:Remove() end end)
 SpawnItem('info_player_start', Vector(1943.598633, -1450.663086, -263.619812),Angle(0.071, 103.297, 0.020))
-SpawnItem('info_player_start', Vector(977.952454, 1764.395264, -227.523148),Angle(-0.091, -81.782, 0.021))
+SpawnItem('info_player_start', Vector(823.522827, 1778.389282, -151.968750),Angle(0,0,0))
 SpawnProp(Vector(399.996307, -661.798645, -200.450165),Angle(-0.023, 89.990, -0.031),'models/props_wasteland/laundry_cart002.mdl')
 SpawnProp(Vector(-1033.528320, -1448.767578, -151.617233),Angle(-0.068, 2.833, -0.002),'models/props_wasteland/kitchen_shelf002a.mdl')
 SpawnProp(Vector(144.207932, 1399.630005, -194.431931),Angle(-0.030, 0.043, -0.047),'models/props_wasteland/laundry_cart002.mdl')

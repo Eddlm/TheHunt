@@ -94,22 +94,24 @@ net.Receive( "light_above_limit", function( length, client )
 	net.Start( "Visible" )
 	net.Send(client)
 	client:SetNoTarget(false)
+	client:SendLua(	"light_above_limit = 1" )	
 end )
-
 
 
 net.Receive( "light_below_limit", function( length, client )
 local hidden=1
 
-	for k, v in pairs(ents.FindInSphere(client:GetPos(),1000)) do
-		if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_helicopter" then
+	for k, v in pairs(ents.FindInSphere(client:GetPos(),5000)) do
+			if table.HasValue(CantHideInPlainSight, v:GetClass())then
 			if v:Health() > 0 then
 				if v:Visible(client) then
 					hidden=0
-					client:PrintMessage(HUD_PRINTTALK, ""..v:GetName().." saw you hide.")
+					client:PrintMessage(HUD_PRINTCENTER , ""..v:GetName().." saw you hide.")
+					break
 				end
 			end
 		end
+	
 	end
 	if hidden==1 then client:SetNoTarget(true)
 		client.spotted =  0
@@ -117,6 +119,7 @@ local hidden=1
 		net.Send(client)
 		net.Start( "NotVisible" )
 		net.Send(client)
+		client:SendLua(	"light_above_limit = 0" )		
 	end
 end)
 
@@ -170,8 +173,8 @@ function GM:Initialize()
 	team_deaths =0
 	team_kills =0
 	COMBINE_KILLED = 0
-	CAN_HEAR_BREAK = 1
 	GAME_ENDED = 0
+	LastEnemyWasPlayer=0
 	print("------------------------- THE HUNT GM:Initialize LOADED -------------------------")
 	end
 
@@ -1144,6 +1147,9 @@ function hidezones()
 	end
 end
 
+
+
+-- Combine entity Spawns
 function SpawnHeliA( pos,type,IsBoss,GunOnAtSpawn )
 	RunConsoleCommand( "sk_helicopter_health", "1500")
 	RunConsoleCommand( "g_helicopter_chargetime", "2") 
@@ -1251,6 +1257,8 @@ function SpawnScanner ( pos )
 	NPC:Fire("DeployMine","",0)
 	NPC:Activate()
 end
+
+
 function SpawnCombineSFlashlight ( pos )
 	NPC = ents.Create( "npc_combine_s" )
 	NPC:SetKeyValue("NumGrenades", ""..math.random(0,3).."") 
@@ -1377,12 +1385,15 @@ function SpawnRebel( pos )
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )	
 	NPC:Fire("StartPatrolling","",0)
 end
+
 function SpawnFastZombie( pos )
 	NPC = ents.Create( "npc_fastzombie" )
 	NPC:SetPos( pos )
 	NPC:Spawn()
 	NPC:SetHealth("9000")
 end
+
+
 function spawnSNPC ( pos )
 	NPC = ents.Create( "npc_megacombine" )
 	NPC:SetKeyValue("NumGrenades", "0") 
@@ -1402,6 +1413,15 @@ function SpawnHunter(pos)
 	combinen = combinen + 1
 	NPC:SetName("Hunter")
 end
+
+--
+
+
+function SpawnCombineBouncer(pos)
+	NPC = ents.Create( "combine_bouncer" )
+	NPC:SetPos( pos )
+	NPC:Spawn()
+end
 function SpawnCombineS1 ( pos )
 	NPC = ents.Create( "npc_combine_s" )
 	NPC:SetKeyValue("NumGrenades", "0") 
@@ -1410,12 +1430,18 @@ function SpawnCombineS1 ( pos )
 	NPC:SetKeyValue( "spawnflags", 512 )
 	NPC.HuntID="CombineS1"
 	NPC:Spawn()
-	NPC:Give("ai_weapon_ar2")
+	if GetConVarNumber("h_combine_custom_weapons") == 1 then
+		NPC:Give(""..table.Random(NPC_WEAPON_PACK_2_RAPID_FIRE).."")
+	else
+		NPC:Give("ai_weapon_ar2")
+	end
 	combinen = combinen + 1
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )
 	NPC:Fire("StartPatrolling","",0)
 end
+
+
 function SpawnCombineS2 ( pos )
 	NPC = ents.Create( "npc_combine_s" )
 	NPC:SetKeyValue("NumGrenades", ""..math.random(1,3).."") 
@@ -1424,7 +1450,11 @@ function SpawnCombineS2 ( pos )
 	NPC:SetKeyValue( "spawnflags", 512 )
 	NPC.HuntID="CombineS2"
 	NPC:Spawn()
-	NPC:Give("ai_weapon_ar2")
+	if GetConVarNumber("h_combine_custom_weapons") == 1 then
+		NPC:Give(""..table.Random(NPC_WEAPON_PACK_2_RAPID_FIRE).."")
+	else
+		NPC:Give("ai_weapon_ar2")
+	end
 	combinen = combinen + 1
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_AVERAGE )	
@@ -1460,6 +1490,11 @@ function SpawnCombineShotgunner ( pos )
 	NPC.HuntID="CombineShotgunner"
 	NPC:Spawn()
 	NPC:Give("ai_weapon_shotgun")
+	if GetConVarNumber("h_combine_custom_weapons") == 1 then
+		NPC:Give(""..table.Random(NPC_WEAPON_PACK_2_SHOTGUNS).."")
+	else
+		NPC:Give("ai_weapon_shotgun")
+	end
 	combinen = combinen + 1
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
@@ -1475,7 +1510,11 @@ function SpawnCombineShotgunnerElite ( pos )
 	NPC.HuntID="CombineShotgunnerElite"
 
 	NPC:Spawn()
-	NPC:Give("ai_weapon_shotgun")
+	if GetConVarNumber("h_combine_custom_weapons") == 1 then
+		NPC:Give(""..table.Random(NPC_WEAPON_PACK_2_SHOTGUNS).."")
+	else
+		NPC:Give("ai_weapon_shotgun")
+	end
 	combinen = combinen + 1
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )	
@@ -1499,6 +1538,7 @@ function SpawnMetropoliceStunstick( pos )
 	NPC:Fire("StartPatrolling","",0)
 	NPC:Fire("ActivateBaton","",0)
 end
+
 function SpawnMetropolice( pos )
 	NPC = ents.Create( "npc_metropolice" )
 	NPC:SetKeyValue("Manhacks", math.random(0,1)) 
@@ -1509,7 +1549,11 @@ function SpawnMetropolice( pos )
 	NPC:SetKeyValue("squadname", "")
 	NPC.HuntID="Metropolice"
 	NPC:Spawn()
-	NPC:Give("ai_weapon_pistol")
+	if GetConVarNumber("h_combine_custom_weapons") == 1 then
+		NPC:Give(""..table.Random(NPC_WEAPON_PACK_2_PISTOLS).."")
+	else
+		NPC:Give("ai_weapon_pistol")
+	end
 	combinen = combinen + 1
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
@@ -1527,7 +1571,11 @@ function SpawnMetropoliceHard( pos )
 	NPC:SetKeyValue( "spawnflags", 512 )
 	NPC.HuntID="MetropoliceHard"
 	NPC:Spawn()
-	NPC:Give("ai_weapon_smg1")
+	if GetConVarNumber("h_combine_custom_weapons") == 1 then
+		NPC:Give(""..table.Random(NPC_WEAPON_PACK_2_PISTOLS).."")
+	else
+		NPC:Give("ai_weapon_smg1")
+	end
 	combinen = combinen + 1
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )	
@@ -1541,6 +1589,7 @@ function SpawnRollermine( pos )
 	NPC:SetName("Rollermine")
 	NPC:SetKeyValue( "spawnflags", "1024" )
 end
+
 function SpawnFriendlyRollermine( pos )
 	NPC = ents.Create( "npc_rollermine" )
 	NPC:SetPos( pos )
@@ -1573,6 +1622,11 @@ function SpawnCombineElite1( pos )
 	NPC.HuntID="CombineElite1"
 	NPC:Spawn()
 	NPC:Give( "ai_weapon_ar2" )
+	if GetConVarNumber("h_combine_custom_weapons") == 1 then
+		NPC:Give(""..table.Random(NPC_WEAPON_PACK_2_RAPID_FIRE).."")
+	else
+		NPC:Give("ai_weapon_ar2")
+	end
 	combinen = combinen + 1
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_GOOD )
@@ -1587,7 +1641,11 @@ function SpawnCombineElite2( pos )
 	NPC:SetKeyValue( "spawnflags", 512 )
 	NPC.HuntID="CombineElite2"
 	NPC:Spawn()
-	NPC:Give( "ai_weapon_ar2" )
+	if GetConVarNumber("h_combine_custom_weapons") == 1 then
+		NPC:Give(""..table.Random(NPC_WEAPON_PACK_2_RAPID_FIRE).."")
+	else
+		NPC:Give("ai_weapon_ar2")
+	end
 	combinen = combinen + 1
 	NPC:SetName("Combine nº"..combinen.."")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )
@@ -1756,7 +1814,7 @@ function coverzones()
 			if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then	
 				if v:GetEnemy() then 
 				else
-					v:SetLastPosition(table.Random(zonescovered) + Vector(math.random(-20,20), math.random(-20,20), -30))
+					v:SetLastPosition(table.Random(zonescovered) + Vector(math.random(-20,20), math.random(-20,20), 10))
 					if WAVESPAWN == 1 then
 						v:SetSchedule(SCHED_FORCED_GO_RUN)
 					else
@@ -1775,6 +1833,7 @@ function GM:ShouldCollide(ent1,ent2)
 		if ent2:GetClass() == "npc_combine_s" then
 		if ent1:GetPos():Distance(ent2:GetPos()) < 50 then
 		ent1:SetNoTarget(false)
+		ent1:SendLua(	"light_above_limit=1" )		
 		return true
 		end
 		end
@@ -1784,7 +1843,8 @@ function GM:ShouldCollide(ent1,ent2)
 	if ent1:GetClass() == "npc_combine_s" then
 	if ent2:GetClass():IsPlayer() then
 	if ent1:GetPos():Distance(ent2:GetPos()) < 50 then
-	ent1:SetNoTarget(false)
+	ent2:SetNoTarget(false)
+	ent2:SendLua(	"light_above_limit=1" )		
 	return true
 	end
 	end
@@ -1804,6 +1864,18 @@ function GM:ShouldCollide(ent1,ent2)
 end
 
 function metropolicewander()
+timer.Create( "metropolicewander", 9, 1, metropolicewander ) 
+
+	
+		for k, v in pairs(ents.GetAll()) do
+		if table.HasValue(zombietable, v:GetClass()) and !v:GetEnemy() then
+		print(""..v:GetClass().." wanders")
+		--v:SetLastPosition(table.Random(zonescovered))
+		v:SetSchedule(SCHED_IDLE_WANDER)
+		end	
+		end
+
+		
 	for k, v in pairs(ents.FindByClass("npc_metropolice")) do
 		if !v:GetEnemy() then
 			if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
@@ -1824,10 +1896,8 @@ for k, v in pairs(ents.FindByClass("npc_rollermine")) do
 			end
 		end
 	end
-	timer.Create( "metropolicewander", 9, 1, metropolicewander ) 
 end
 end
-timer.Create( "metropolicewander", 8, 1, metropolicewander ) 
 
 function CombineIdleSpeech()
 	local NPCsFound = 0
@@ -1847,6 +1917,7 @@ end
 
 function npcforget()
 	print("[The Hunt]: npcforget APPLIED")
+	CombineAssisting=0
 	table.foreach(MainEnemiesGround, function(key,enemy)
 		for k, v in pairs(ents.FindByClass(enemy)) do 
 			v:SetKeyValue("squadname", "")
@@ -1859,6 +1930,10 @@ function npcforget()
 		net.Send(value)
 		value.spotted = 0
 	end)
+	if LastEnemyWasPlayer== 1 then
+	PrintMessage(HUD_PRINTTALK, "Combine: "..table.Random(ChatEnemyLost).."")
+	LastEnemyWasPlayer=0
+	end
 end
 
 
@@ -1870,44 +1945,26 @@ function CicloUnSegundo()
 					if npc:IsCurrentSchedule(SCHED_FORCED_GO) or npc:IsCurrentSchedule(SCHED_IDLE_WANDER) or npc:IsCurrentSchedule(SCHED_FORCED_GO_RUN)	then
 						npc:ClearSchedule()
 					end		
-						if npc:GetClass() == "npc_combine_s" or npc:GetClass() == "npc_metropolice" or npc:GetClass() == "npc_hunter" then
+						if table.HasValue(MainEnemiesCoop, npc:GetClass()) then
 							if npc:HasCondition(10) then
+								npc:SetKeyValue("squadname", ""..npc:GetEnemy():GetClass().."")
+								if timer.Exists("npcforgettimer") then
+									timer.Destroy( "npcforgettimer")
+								end
 									if npc:GetEnemy().spotted != 1 then
-										if npc:GetEnemy():IsPlayer() or npc:GetEnemy():GetClass() == "npc_citizen" then
+									if npc:GetEnemy():IsPlayer() or npc:GetEnemy():GetClass() == "npc_citizen" then LastEnemyWasPlayer=1
 											npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
 											if GetConVarNumber("h_combine_chat") == 1 then
 											PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."") end
-											if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
-											table.remove(zonescovered)
-											table.remove(zonescovered)
-											table.remove(zonescovered)
-											table.remove(zonescovered)
-											table.remove(zonescovered)
-											table.remove(zonescovered)
-											table.remove(zonescovered)
-											table.remove(zonescovered)
-											table.remove(zonescovered)
-											table.remove(zonescovered)
-											print("Patrol zones restarted")
-											end					
-											table.insert(zonescovered, npc:GetEnemy():GetPos()+Vector(0,0,30)) print("Patrol zone added")
+											ClearPatrolzones()			
+											table.insert(zonescovered, npc:GetEnemy():GetPos()+Vector(0,0,30)) print("Patrol zone added (Player spotted)")
 											net.Start("Spotted")
 											net.Send(npc:GetEnemy())
 											npc:GetEnemy().spotted = 1
 										end
 									end
-								npc:SetKeyValue("squadname", "CombineSquad")
-								if timer.Exists("npcforgettimer") then
-									timer.Destroy( "npcforgettimer")
-								end
-								
-								for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),2000)) do 
-									if ThisEnt:GetClass() == "npc_hunter" and !ThisEnt:GetEnemy() then
-										print("hunter called")
-										ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
-										ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
-									end								
-									if ThisEnt:GetClass() == "npc_combine_s" or ThisEnt:GetClass() == "npc_metropolice"  then
+								for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),500)) do 						
+									if table.HasValue(MainEnemiesCoop, ThisEnt:GetClass()) and !ThisEnt:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
 										if ThisEnt:GetEnemy() == nil  then 
 											ThisEnt:SetLastPosition(npc:GetEnemy():GetPos())
 											ThisEnt:SetSchedule(SCHED_FORCED_GO_RUN)
@@ -1915,8 +1972,8 @@ function CicloUnSegundo()
 									end
 								end
 								
-								for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),2000)) do 
-									if ThisEnt:GetClass() == "npc_combine_s" or ThisEnt:GetClass() == "npc_metropolice" then
+								for num, ThisEnt in pairs(ents.FindInSphere(npc:GetPos(),9000)) do 
+									if table.HasValue(MainEnemiesCoop, ThisEnt:GetClass()) and !ThisEnt:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
 											if ThisEnt:GetEnemy() == nil  then 
 												if CombineAssisting < GetConVarNumber("h_maxhelp") then
 												--print(ThisEnt:GetName().." is helping "..npc:GetName().."")
@@ -1961,6 +2018,22 @@ function helibehavior()
 			Heli.light:Fire("Target", "", 0)
 		end
 	end
+end
+
+function ClearPatrolzones()
+	if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
+	table.remove(zonescovered)
+	table.remove(zonescovered)
+	table.remove(zonescovered)
+	table.remove(zonescovered)
+	table.remove(zonescovered)
+	table.remove(zonescovered)
+	table.remove(zonescovered)
+	table.remove(zonescovered)
+	table.remove(zonescovered)
+	table.remove(zonescovered)
+	print("Patrol zones restarted")
+	end		
 end
 
 -- Heli path guidance.
@@ -2082,6 +2155,8 @@ function GM:InitPostEntity()
 	timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo ) 
 	timer.Create( "coverzones", 10, 1, coverzones )
 	timer.Create( "wavefinishedchecker", 5, 1, wavefinishedchecker)
+	timer.Create( "metropolicewander", 8, 1, metropolicewander ) 
+
 	CanCheck = 0
 	print("[The Hunt]: Calling map setup function")
 	MapSetup()
@@ -2364,6 +2439,19 @@ function GM:InitPostEntity()
 		end
 	end
 	
+	if GetConVarString("h_HL2Beta_Weapons") == "1" then
+		if IsThatWeaponInstalled("weapon_bp_alyxgun") == true then
+		table.foreach(HL2Beta_Weapons, function(key,weapon)
+			table.insert(MEDIUMWEAPONS,weapon)
+		end)
+		print("[The Hunt]: HL2Beta Weapons added successfully.")
+		else
+		print("[The Hunt]: HL2Beta Weapons are NOT installed! The game won't add them.")
+		end
+	end		
+	
+	
+	
 	
 	if GetConVarString("h_default_loadout") == "" then else
 			print("[The Hunt]: Loaded "..GetConVarString("h_default_loadout").." for the players at start.")
@@ -2393,7 +2481,7 @@ function GM:InitPostEntity()
 	end
 	end)
 	print("------------------------- THE HUNT GM:InitPostEntity LOADED -------------------------")
-	timer.Create( "HintSystem", 30, 15, HintSystem )
+	timer.Create( "HintSystem", 30, 20, HintSystem )
 
 end
 function HintSystem()
@@ -2447,7 +2535,7 @@ function GM:OnNPCKilled(victim, killer, weapon)
 	
 	if victim:GetClass() == "npc_turret_floor" then
 		nearbycombinecome(victim)
-		table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added")
+		table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added (Turret dead)")
 	end
 	if victim:GetClass() == "npc_turret_ceiling" then
 		nearbycombinecome(killer)
@@ -2465,10 +2553,10 @@ function GM:OnNPCKilled(victim, killer, weapon)
 	end
 	
 	if victim:GetClass() == "npc_metropolice" or victim:GetClass() == "npc_combine_s" then
-		table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added")
+		table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added (NPC dead)")
 		CombineAssisting =0
 		COMBINE_KILLED = COMBINE_KILLED+1
-		if killer:IsPlayer() then
+		if killer:IsPlayer() or killer:IsNPC() then
 			net.Start( "PlayerKillNotice" )
 			net.WriteString( ""..killer:GetName().."" )
 			if weapon:IsPlayer() then
@@ -2477,7 +2565,8 @@ function GM:OnNPCKilled(victim, killer, weapon)
 				net.WriteString( ""..weapon:GetClass().."" )
 			end
 			net.WriteString( ""..victim:GetName().."" )
-			net.Broadcast()		
+			net.Broadcast()
+if killer:IsPlayer() then			
 				if !victim:GetEnemy() then
 					killer.SilentKills=killer.SilentKills+1 team_silent_kills=team_silent_kills+1
 					for k, v in pairs(ents.FindInSphere(victim:GetPos(),512)) do
@@ -2507,6 +2596,7 @@ function GM:OnNPCKilled(victim, killer, weapon)
 				team_kills=team_kills+1
 			end
 			killer:AddFrags(1)
+			end
 		end
 	end
 	
@@ -2527,7 +2617,7 @@ function GM:PlayerSelectSpawn( pl )
 		local can = 1
 		for k, v in pairs(ents.FindInSphere(value:GetPos(),1000)) do
 			if v:IsNPC() then
-				if v:Visible(value) then
+				if v:VisibleVec(value:GetPos()+Vector(0,0,60)) then
 					can = 0
 				end
 			end
@@ -2553,7 +2643,7 @@ function CombineSelectSpawn()
 		for k, v in pairs(ents.FindInSphere(value,1000)) do
 			if v:IsPlayer() then
 				if v:VisibleVec(value) then
-				print(v:Nick())
+				--print(v:Nick())
 					can = 0
 				end
 			end
@@ -2565,6 +2655,7 @@ function CombineSelectSpawn()
 	end)
 
 if table.Count(availablespawns) < 1 then
+PrintMessage(HUD_PRINTTALK, "WARNING: There are players on ALL the combine spawnpoints.")
 return table.Random(combinespawnzones)
 else
 return table.Random(availablespawns)
@@ -2586,21 +2677,29 @@ end
 hook.Add("ScalePlayerDamage","ScalePlayerDamage", ScalePlayerDamage)
 
 function ScaleNPCDamage( damaged, hitgroup, damage )
+end
+hook.Add("ScaleNPCDamage","ScaleNPCDamage",ScaleNPCDamage)
+
+
+
+function GM:EntityTakeDamage(damaged,damage)
+--print(""..damaged:GetClass().." taken damage")
+
+
 	damage:ScaleDamage(1)
-	table.foreach(MainEnemiesDamage, function(key,value)
-	if damaged:GetClass() == value  then
-		if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) end -- flee from fire and friendly fire
+	if table.HasValue(MainEnemiesDamage, damaged:GetClass()) then
+		if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) damage:ScaleDamage(0) end -- flee from fire and friendly fire
 			if damaged:GetEnemy() == nil then
 				damage:ScaleDamage(GetConVarNumber("h_npcscaledamage")+30)
 				damaged:ClearSchedule() 
-			else		
+			else
 				damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
+				if damage:IsDamageType(DMG_CLUB) then damage:ScaleDamage(0.2) end
 			end
 			if damaged:Health() > damage:GetDamage() then
 				damaged:SetEnemy(damage:GetAttacker())
 			end
 		end
-	end)
 
 	-- friendly fire between same class NPCs
 	/*
@@ -2672,13 +2771,8 @@ if damaged:GetClass() == "npc_turret_ceiling" then
 		damage:ScaleDamage(0)
 	end
 end
-end
-hook.Add("ScaleNPCDamage","ScaleNPCDamage",ScaleNPCDamage)
 
 
-
-function GM:EntityTakeDamage(damaged,damage)
---print(""..damaged:GetClass().." taken damage")
 
 	if damage:GetAttacker():GetClass() == "monster_apc" then
 		damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
@@ -2688,17 +2782,18 @@ function GM:EntityTakeDamage(damaged,damage)
 	end
 
 	if damage:IsDamageType(64) then 
-		table.insert(zonescovered, damaged:GetPos()+Vector(0,0,30)) print("Patrol zone added")
+		table.insert(zonescovered, damaged:GetPos()+Vector(0,0,30)) print("Patrol zone added (Entity take damage)")
 		allthecombinecome(damaged,GetConVarNumber("h_maxgunshotinvestigate"))
+		ClearPatrolzones()
 	elseif !damaged:IsNPC() and !damaged:IsPlayer() then
-		if CAN_HEAR_BREAK == 1 then
-			CAN_HEAR_BREAK = 0
-			nearbycombinecomecasual(damaged)
-			timer.Simple(5, function() CAN_HEAR_BREAK = 1 end)
-		end
+	if game.GetMap() == "zs_subway_v8" then
+	if !damaged:GetClass() == "prop_dynamic" or !damaged:GetClass() == "keyframe_rope" then nearbycombinecomecasual(damaged) end
+	else
+	nearbycombinecomecasual(damaged)
 	end
 end
-
+--print("Entity damaged: "..damaged:GetClass().."")
+end
 function PropBreak(breaker,prop)
 if math.random(1,3) == 1 then
 	if prop:IsValid() then
@@ -2717,54 +2812,52 @@ if math.random(1,3) == 1 then
 	end
 end
 
-if CAN_HEAR_BREAK == 1 then
-	CAN_HEAR_BREAK = 0
+
 	nearbycombinecomecasual(prop)
-	timer.Simple(5, function() CAN_HEAR_BREAK = 1 end)
-end
+
 end
 hook.Add("PropBreak","OnPropBreak",PropBreak)
 
 
 
 function GM:KeyPress(player,key)
-	if player:Alive() then
+	if player:Alive() and player:GetActiveWeapon() != NULL then
 		local clip = player:GetActiveWeapon():Clip1()
 		local loud = 1
 		if key == IN_ATTACK then
 			if player:Alive() then
 					if player:GetActiveWeapon():GetClass() == "weapon_crowbar" then
-						if CAN_HEAR_BREAK == 1 then 
-							local traceRes = util.QuickTrace(player:GetPos(), player:GetForward()*75, player)
-							if traceRes.HitWorld then
-								CAN_HEAR_BREAK = 0
-								timer.Simple(5, function() CAN_HEAR_BREAK = 1 end)
-								nearbycombinecomecasual(player)
+							--local traceRes = 2
+							if util.QuickTrace(player:GetPos(), player:GetForward()*75, player).HitWorld then
+							print("player hit crowbar")
+							nearbycombinecomecasual(player)
 							end
-						end
 					end
-				table.foreach(SILENT_WEAPONS, function(key,value)
-					if player:GetActiveWeapon():GetClass() == value then
-						loud = 0
+				if table.HasValue(SILENT_WEAPONS, player:GetActiveWeapon():GetClass()) then
+					loud = 0
 					end
-				end)
+			--	table.foreach(SILENT_WEAPONS, function(key,value)
+					--if player:GetActiveWeapon():GetClass() == value then
+						--loud = 0
+					--end
+			--	end)
 				if loud > 0 then 
 					timer.Simple(0.1, function()
 					--if 1==1 /* player:Alive() */ then
 						if player:GetActiveWeapon():Clip1() then
 							if player:GetActiveWeapon():Clip1() < clip then
 								if player:GetActiveWeapon():Clip1() > -1 then
-															
 									local silenced = 0
 										if player:GetActiveWeapon().Silenced == true then
 										--print("Silenced 1")
 										silenced = 1 end
-									table.foreach(SILENCED_WEAPONS, function(key,value)
-										if player:GetActiveWeapon():GetClass() == value then
-											--print("Silenced 2")
-											silenced = 1
-										end
-									end)
+									if table.HasValue(SILENCED_WEAPONS, player:GetActiveWeapon():GetClass()) then silenced = 1 end
+--									table.foreach(SILENCED_WEAPONS, function(key,value)
+--										if player:GetActiveWeapon():GetClass() == value then
+--											--print("Silenced 2")
+--											silenced = 1
+--										end
+--									end)
 									if player:GetActiveWeapon().Primary then 
 										if player:GetActiveWeapon().Primary.Sound == "Weapon_USP.SilencedShot" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" or player:GetActiveWeapon().Primary.Sound == "Weapon_M4A1.Silenced" then
 											--print("Silenced 3")
@@ -2781,7 +2874,6 @@ function GM:KeyPress(player,key)
 										--print("NOT Silenced")
 										allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate"))
 										--table.insert(zonescovered, player:GetPos()+Vector(0,0,30)) print("Patrol zone added")
-
 									end
 									if silenced == 1 then
 										nearbycombinecomecasual(player)
@@ -2796,12 +2888,13 @@ function GM:KeyPress(player,key)
 		end
 		if key == IN_ATTACK2 then
 			if player:GetAmmoCount(player:GetActiveWeapon():GetSecondaryAmmoType()) > 0 or (player:GetActiveWeapon():GetClass() == "weapon_shotgun") then
-				table.foreach(SECONDARY_FIRE_WEAPONS, function(key,value)
-					if player:GetActiveWeapon():GetClass() == value then
-						allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate"))
-						--print("[The Hunt]: combine come (not silent secondary fire)")
-					end
-				end)
+		--		table.foreach(SECONDARY_FIRE_WEAPONS, function(key,value)
+		--			if player:GetActiveWeapon():GetClass() == value then
+		--				allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate"))
+		--				--print("[The Hunt]: combine come (not silent secondary fire)")
+		--			end
+		--		end)
+				if table.HasValue(SECONDARY_FIRE_WEAPONS, player:GetActiveWeapon():GetClass()) then allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate")) end
 			end
 		end	
 		if key == IN_ATTACK2 or key == IN_ATTACK then
@@ -2830,17 +2923,19 @@ function GM:KeyPress(player,key)
 end
 
 hook.Add( "PlayerUse", "PlayerPickUpProp", function( ply, ent )
-if ent.holding !=1 and ent:GetClass() == "prop_physics" or  ent:GetClass() == "prop_physics_multiplayer" then
-
+if ent.holding !=1 then
+-- /* and ent:GetClass() == "prop_physics" or  ent:GetClass() == "prop_physics_multiplayer" */
 ent.holding=1
 
 if timer.Exists("PlayerHoldProp") then
 	timer.Destroy( "PlayerHoldProp")
 end
 
-timer.Create( "PlayerHoldProp", 2, 1, function() 
+timer.Create( "PlayerHoldProp", 2, 1, function()
+if IsValid(ent) then
 nearbycombinecomecasual(ent)
 ent.holding=0
+end
 end)
 --else
 
@@ -2849,9 +2944,10 @@ end)
 
 function GM:PhysgunDrop(ply, ent)
 timer.Simple(2, function()
+if IsValid(ent) then
 
 nearbycombinecomecasual(ent)
-
+end
 end)
 end
 
@@ -2890,7 +2986,7 @@ end
 
 -- What happens when a player is beind killed.
 function GM:DoPlayerDeath( ply, attacker, dmginfo )
-	timer.Simple(1, npcforget)
+	--timer.Simple(1, npcforget)
 	ply:CreateRagdoll()
 	ply:AddDeaths(1)
 	NUMPLAYERS()
@@ -2915,7 +3011,7 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	table.foreach( ply:GetWeapons(), function(key,value)
 		if key > 1 then
 			if value:Clip1() then
-				if value:Clip1() == 0 then
+				if value:Clip1() == 0 and !table.HasValue(ONLY_PICKUP_ONCE, value)  then
 					value:Remove()
 					else
 					ply:DropWeapon(value)
@@ -2964,6 +3060,7 @@ if PLAYERSINMAP > 1 then
 end
 */
 
+
 	-- If the zonescovered are ten more than the original number, clean it.
 	if table.Count(zonescovered) > ORIGINAL_ZONES_NUMBER+10 then
 		table.remove(zonescovered)
@@ -2980,28 +3077,29 @@ end
 	end
 	
 	-- Add a patrol zone where the player died.
-	table.insert(zonescovered, ply:GetPos()+Vector(0,0,30)) print("[The Hunt]: Patrol zone added")
+	table.insert(zonescovered, ply:GetPos()+Vector(0,0,30)) print("[The Hunt]: Patrol zone added (Player dead)")
 	
 	
 	-- Anti teamkill shit. If a player kills another player with a prop or a satchel charge, they will recieve a warning. The third time they will be killed and not able to spawn.
-	if attacker:IsPlayer() and dmginfo:GetInflictor():GetClass() == "prop_physics_multiplayer" or dmginfo:GetInflictor():GetClass() == "prop_physics" or dmginfo:GetInflictor():GetClass() == "cw_ammo_crate_small" or dmginfo:GetInflictor():GetClass() == "npc_satchel" then
-		if attacker:EntIndex() != ply:EntIndex() then
+	if attacker:IsPlayer() and dmginfo:GetInflictor():GetClass() == "prop_physics_multiplayer" or dmginfo:GetInflictor():GetClass() == "prop_physics" or dmginfo:GetInflictor():GetClass() == "cw_ammo_crate_small" or dmginfo:GetInflictor():GetClass() == "npc_satchel"  or dmginfo:GetInflictor():GetClass() == "npc_grenade_frag" 
+then
+		if attacker:Nick() != ply:Nick() then
 			attacker.teamkiller=attacker.teamkiller+1
 			dmginfo:GetAttacker():PrintMessage(HUD_PRINTCENTER, "Try to avoid killing teammates.")
-			
 			if dmginfo:GetAttacker().teamkiller > 2 then
-				dmginfo:GetAttacker():PrintMessage(HUD_PRINTCENTER, "Killed.")
+				dmginfo:GetAttacker():PrintMessage(HUD_PRINTCENTER, "Stop killing teammates.")
 				dmginfo:GetAttacker():Kill()
 				dmginfo:GetAttacker().lifes=0
 				dmginfo:GetAttacker().canspawn = 0
 			end
 		end
-	
+
 	else
 		print(""..ply:GetName().." died by "..dmginfo:GetInflictor():GetClass().."")
 	end
 	CalculatePlayerScore(ply)
 end
+
 
 
 function FirstSpawn(ply)
@@ -3022,4 +3120,3 @@ end
 hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", FirstSpawn )
 -- GM HOOKS ^
 print("------------------------- THE HUNT init.lua LOADED SUCCESSFULLY -------------------------")
-

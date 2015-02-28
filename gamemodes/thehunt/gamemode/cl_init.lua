@@ -8,9 +8,10 @@ light_above_limit = 3
 LIGHTEXT = 'Visible'
 LIGHTCOLOR = Color(255,0,0)
 lightcol = 0
-CLDARKNESS = 9
+vlight=0
+CLDARKNESS = 0
 score_color=Color(150,150,150)
-
+vdarkencolor = Color(0,255,0)
 
 if !ConVarExists("h_outline_radius") then
 	CreateClientConVar( "h_outline_radius", "1000", true, false )
@@ -72,6 +73,10 @@ hook.Add( "HUDPaint", "HuntHud", function()
 			draw.DrawText( "Silent Kills: "..LocalPlayer():GetNWInt("SilentKills").."", "TargetID", ScrW() * 0.03, ScrH() * 0.76, Color(0,255,0), TEXT_ALIGN_LEFT )
 			draw.DrawText( "Deaths: "..LocalPlayer():GetNWInt("Deaths").."", "TargetID", ScrW() * 0.03, ScrH() * 0.78, Color(0,255,0), TEXT_ALIGN_LEFT )
 		end
+			if (input.IsKeyDown(32)) then
+				draw.DrawText( "Lighting: "..math.Round(vlight,1).."", "TargetID", ScrW() * 0.5, ScrH() * 0.52, vdarkencolor, TEXT_ALIGN_CENTER )
+		end
+		
 	end
 end)
 
@@ -79,7 +84,7 @@ end)
 hook.Add( "PreDrawHalos", "AddHalos", function()
 	if LocalPlayer():Alive() and LocalPlayer():GetPos() then
 		for k, v in pairs(ents.FindInSphere(LocalPlayer():GetEyeTraceNoCursor().HitPos, GetConVarNumber("h_outline_radius"))) do
-			if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_hunter" then
+			if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_hunter" or v:GetClass() == "combine_bouncer"  then
 				if v:IsValid() then
 						halo.Add( {v}, Color( 84,2,2 ), 1, 1, 1, true, true )
 				end
@@ -92,11 +97,14 @@ hook.Add( "PreDrawHalos", "AddHalos", function()
 					halo.Add( {v}, Color( 18,176,0 ), 1, 1, 3, true, true )
 				end
 			end
-			table.foreach(noticeable, function(key,value)
-			if v:EntIndex() == value then
-				halo.Add( {v}, Color( 0,0,255 ), 1, 1, 1, true, true )
-			end
-			end)
+			if table.HasValue(noticeable, v:EntIndex()) then
+			halo.Add( {v}, Color( 0,0,255 ), 1, 1, 1, true, true ) end
+
+--		table.foreach(noticeable, function(key,value)
+--		if v:EntIndex() == value then
+--			halo.Add( {v}, Color( 0,0,255 ), 1, 1, 1, true, true )
+--		end
+--		end)
 		end
 		for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(), 300)) do
 			if v:GetClass() == "npc_tripmine" and LocalPlayer():Health() then
@@ -151,28 +159,55 @@ CombineBootSound = {
 }
 
 
+
+hook.Add("Tick", "KeyDown_Test", function()
+	if (input.IsKeyDown(32)) then
+		--print("Player is pressing V!")
+			if LocalPlayer():Alive() then
+			vlight = (render.GetLightColor(LocalPlayer():GetEyeTraceNoCursor().HitPos)*Vector(100,100,100)):Length()
+			if LocalPlayer():Health() > 0 and LocalPlayer():GetActiveWeapon() != NULL then
+
+				if table.HasValue(TOO_BRIGHT_WEAPONS, LocalPlayer():GetActiveWeapon():GetClass()) then
+				vlight=vlight+1 end
+				if LocalPlayer():Crouching() then vlight=vlight-1 end
+				if LocalPlayer():FlashlightIsOn() then if vlight < 20 then vlight = vlight+30 end end
+			end
+			end
+
+				if  vlight < 2 then vdarkencolor = Color(0,255,0) end
+				if  vlight >= 2 and vlight < 10 then
+					vdarkencolor = Color(190,100,0,255)
+				end
+				if vlight > 10 then
+					vdarkencolor = Color(220,0,0,255)
+				end
+			
+	end	
+end)
+
+
 function light()
 	timer.Simple( 0.2, light )
 	if LocalPlayer() then
 		if LocalPlayer():Alive() then
 			lightcol = (render.GetLightColor(LocalPlayer():GetPos())*Vector(100,100,100)):Length()
-			if LocalPlayer():Health() > 0 and LocalPlayer():GetActiveWeapon() != nil then
-				table.foreach(DARK_WEAPONS, function(key,value)
-					if LocalPlayer():GetActiveWeapon():GetClass() != value then lightcol=lightcol+1 end
-				end)
-				table.foreach(TOO_BRIGHT_WEAPONS, function(key,value)
-					if LocalPlayer():GetActiveWeapon():GetClass() == value then lightcol=lightcol+1 end
-				end)
+			if LocalPlayer():Health() > 0 and LocalPlayer():GetActiveWeapon() != NULL then
+			--	table.foreach(DARK_WEAPONS, function(key,value)
+			--		if LocalPlayer():GetActiveWeapon():GetClass() != value then lightcol=lightcol+1 end
+			--	end)
+				if table.HasValue(TOO_BRIGHT_WEAPONS, LocalPlayer():GetActiveWeapon():GetClass()) then
+				lightcol=lightcol+1 end
 				if LocalPlayer():Crouching() then lightcol=lightcol-1 end
 				if LocalPlayer():FlashlightIsOn() then if lightcol < 20 then lightcol = lightcol+30 end end
 			end
+			if LocalPlayer():GetVelocity():Length() > 200 then lightcol=lightcol+2 end
 			lightcol=lightcol-CLDARKNESS
 			if lightcol <= 2 then
 				if light_above_limit != 0 then
 				darkencolor = Color(0,255,0)
 					if LocalPlayer():GetVelocity():Length() < 240 then
 						if LocalPlayer():Alive() then
-							light_above_limit=0
+							--light_above_limit=0
 							net.Start("light_below_limit")
 							net.SendToServer()
 						end
@@ -188,7 +223,7 @@ function light()
 				end
 				if light_above_limit != 1 then
 					if LocalPlayer():Alive() then
-						light_above_limit=1
+						--light_above_limit=1
 						net.Start("light_above_limit")
 						net.SendToServer()
 					end

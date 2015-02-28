@@ -263,7 +263,16 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
+		
 		35
+		{
+			"name"		"h_HL2Beta_Weapons"
+			"text"		"Spawn HL2Beta Weapons"
+			"help"		"Spawn HL2Beta Weapons"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		36
 		{
 			"name"		"h_ep2_hunters"
 			"text"		"Enable EP2 Hunters"
@@ -271,7 +280,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		36
+		37
 		{
 			"name"		"h_beta_npcs"
 			"text"		"Enable HL2 Beta NPCs"
@@ -279,7 +288,7 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		37
+		38
 		{
 			"name"		"h_hints"
 			"text"		"Enable hints"
@@ -294,6 +303,22 @@
 			"help"		"Enable Combine chat"
 			"type"		"CheckBox"
 			"default"	"1"
+		}
+		40
+		{
+			"name"		"h_combine_custom_weapons"
+			"text"		"Enable NPC Weapon Pack 2"
+			"help"		"Enable NPC Weapon Pack 2"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		41
+		{
+			"name"		"h_combine_bouncers"
+			"text"		"Max Combine Bouncers"
+			"help"		"Max Combine Bouncers"
+			"type"		"Numeric"
+			"default"	"2"
 		}
 	}
 }

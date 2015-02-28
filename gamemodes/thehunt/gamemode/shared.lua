@@ -106,7 +106,6 @@ function ComparePlayerScore(ply)
 	return score
 end
 
-
 function ISaid( ply, text, public )
 local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLED
 	
@@ -223,6 +222,12 @@ end
 
 
 function PlayerHighlightItem(player)
+
+
+
+
+
+
 	if table.Count(noticeable_server) < 3 and table.Count(ents.FindByName("ZoneHighlight")) < 3 then
 			local can = 1
 			if player:GetEyeTraceNoCursor().Entity:IsWorld() then
@@ -237,7 +242,8 @@ function PlayerHighlightItem(player)
 			sprite:Activate()
 			sprite:SetName("ZoneHighlight")
 			sprite:EmitSound("garrysmod/balloon_pop_cute.wav", 100, 100)
-			else
+/*					
+	else
 				table.foreach(noticeable_server, function(key,value)
 					if value == player:GetEyeTraceNoCursor().Entity:EntIndex() then
 						can = 0
@@ -252,6 +258,7 @@ function PlayerHighlightItem(player)
 				table.insert(noticeable_server,player:GetEyeTraceNoCursor().Entity:EntIndex())
 				player:GetEyeTraceNoCursor().Entity:EmitSound("garrysmod/balloon_pop_cute.wav", 100, 100)
 				end
+*/				
 			end		
 			
 	if timer.Exists("HighlightTimer") then
@@ -279,6 +286,21 @@ function GM:Initialize()
 end
 
 function ManualWeaponDrop(ply)
+
+if ply:GetActiveWeapon():GetClass() == "weapon_frag" then
+
+	if ply:GetAmmoCount(ply:GetActiveWeapon():GetPrimaryAmmoType()) > 0 then
+	ammo = ply:GetAmmoCount(ply:GetActiveWeapon():GetPrimaryAmmoType())
+	ply:GetActiveWeapon():SetClip1(1)
+	ply:StripWeapon("weapon_frag")
+	end
+
+end
+
+if ply:GetActiveWeapon() != NULL then
+ply:DropWeapon(ply:GetActiveWeapon())
+end
+/*
 	local wep = ply:GetActiveWeapon():GetClass()
 	local candrop = 1
 	if ply:GetActiveWeapon():GetClass() == "weapon_physcannon" then
@@ -302,6 +324,7 @@ function ManualWeaponDrop(ply)
 	else
 		ply:PrintMessage(HUD_PRINTTALK, "You can't drop "..ply:GetActiveWeapon():GetClass()..". Sorry.")
 	end
+	*/
 end
 
 function nearbycombinecome(suspect)
@@ -344,8 +367,10 @@ function nearbycombinecomecasual(suspect)
 						if !v:GetEnemy() then
 							if !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then
 								--print(""..v:GetName().." investigates.")
-								if GetConVarNumber("h_combine_chat") == 1 then
+								if GetConVarNumber("h_combine_chat") == 1 and CAN_HEAR_BREAK == 1 then
 								PrintMessage(HUD_PRINTTALK, ""..v:GetName()..": "..table.Random(CombineHearBreak).."")
+								CAN_HEAR_BREAK = 0
+								timer.Simple(5, function() CAN_HEAR_BREAK = 1 end)
 								end
 								v:SetLastPosition(suspect:GetPos())
 								v:SetSchedule(SCHED_FORCED_GO)
@@ -410,16 +435,20 @@ end
 function GM:PlayerCanPickupWeapon(ply, wep)
 	--print(""..ply:GetName().." trying to get " ..wep:GetClass().."")
 	local CANPICKUP = 1
-	table.foreach(ONLY_PICKUP_ONCE, function(key,value)
-		if wep:GetClass() == value then
+	--table.foreach(ONLY_PICKUP_ONCE, function(key,value)
+		if table.HasValue(ONLY_PICKUP_ONCE, wep:GetClass()) then
+		--PrintTable(ONLY_PICKUP_ONCE)
+		--PrintTable(ply:GetWeapons())
+		--if table.HasValue(ply:GetWeapons(), wep:GetClass()) then
 			for k,v in pairs (ply:GetWeapons()) do
-				if v:GetClass() == value then
+			if v:GetClass() == wep:GetClass() then
 				--print(""..ply:GetName().." already has " ..v:GetClass().."")
-				CANPICKUP = 0 
+				CANPICKUP = 0
 				end
-			end
+			--end
 		end
-	end)
+		end
+	--end)
 	
 	if GetConVarString("h_weight_system") == "1" then timer.Simple(1, function() AdjustWeight(ply) end) end
 	
@@ -436,6 +465,7 @@ function GM:PlayerCanPickupWeapon(ply, wep)
 	end
 	
 	CANPICKUP = nil
+	nearbycombinecomecasual(ply)
 	return true 
 end
 
@@ -455,9 +485,10 @@ end
 
 
 function ItemRespawnSystem()
+		local PLAYERS = 0
+	timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 	if GetConVarNumber("h_item_respawn_system") == 1 then
 		local CAN = 1
-		local PLAYERS = 0
 		local NUMBER = 0
 		for k,weapon in pairs(ents.FindByClass("player")) do 
 			PLAYERS = PLAYERS + 1
@@ -472,7 +503,7 @@ function ItemRespawnSystem()
 			--print("[The Hunt]: There are "..NUMBER.." "..value.."")
 			while NUMBER < PLAYERS do
 				print("[ItemRespawnSystem]: Spawning 1 "..value.."")
-				SpawnItem(value, table.Random(ITEMPLACES), Angle(0,0,math.random(-180,180)) )
+				SpawnItem(value, ItemSelectSpawn(ITEMPLACES), Angle(0,0,math.random(-180,180)) )
 				NUMBER = NUMBER+1
 			end
 			NUMBER=0
@@ -493,7 +524,7 @@ function ItemRespawnSystem()
 				SpawnItem("item_healthcharger", chargerpos, chargerangles )
 			end
 		end
-		
+
 		for k,v in pairs(ents.FindByClass("item_suitcharger")) do 
 			local canrespawn = 1
 			local chargerpos = v:GetPos()
@@ -525,15 +556,87 @@ function ItemRespawnSystem()
 			RPGSPAWN=RPGSPAWN - 1
 		end
 	end
-	timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
-	--print("")
+
+	if GetConVarNumber("h_combine_bouncers") > 0 then	
+		local bouncers=0
+			
+		for k,bouncer in pairs(ents.FindByClass("combine_bouncer")) do 
+		bouncers=bouncers+1
+		end
+		
+		if  bouncers < GetConVarNumber("h_combine_bouncers") then	
+			if team_kills > team_silent_kills+(bouncers*2) or bouncers < 1 then
+				local pos = ItemSelectSpawn(zonescovered)
+				SpawnCombineBouncer(pos)
+			end
+		end
+		--print("Kills: "..team_kills+team_silent_kills.." -  Silent Kills+Bouncers*1.5: "..((team_silent_kills + bouncers) * 1.5).." - Bouncers: "..bouncers.."")
+	end
+	if haszombies then zombiesmap() end
+end
+
+function zombiesmap()
+	if math.random(1,10) == 2 then	
+		local zombies=0		
+		for k,zombi in pairs(ents.GetAll()) do 
+		if table.HasValue(zombietable, zombi:GetClass())then
+		zombies=zombies+1
+		print("Zombie found")
+		end
+		end
+		
+		if zombies < ORIGINAL_ZONES_NUMBER then	
+					table.foreach(zombietable, function(key,value)
+					SpawnItem(value,ItemSelectSpawn(zonescovered),Angle(0,0,0))
+					print(""..value.."")
+					end)
+
+		end
+	end
+
+end
+
+function ItemSelectSpawn(spawntable)
+	local availablespawns = {}
+	local random_entry = math.random( #spawntable )
+	local spawn = false
+	table.foreach(spawntable, function(key,value)
+		local can = 1
+		for k, v in pairs(ents.FindInSphere(value+Vector(0,0,70),9000)) do
+			if v:IsPlayer() or v:IsNPC() or v:IsWeapon() then
+				if v:VisibleVec(value) then
+				--print(v:Nick())
+					can = 0
+				end
+			end
+		end
+		if can == 1 then
+		--print("Bouncer can spawn there")
+		table.insert(availablespawns, value)
+		end
+	end)
+
+if table.Count(availablespawns) < 1 then
+--PrintMessage(HUD_PRINTTALK, "WARNING: There are players on ALL the combine spawnpoints.")
+return table.Random(spawntable)
+else
+return table.Random(availablespawns)
+end
 end
 
 
+CantHideInPlainSight={"npc_zombie","npc_fastzombie","npc_poisonzombie","npc_combine_s","npc_metropolice","npc_helicopter","npc_gunship"}
 
-Player_Hints = {"Ceiling Turrets can be disabled from a Combine Control Panel or explosions.","Silenced gunshots won't alert the combine.","If it's your first time playing, the command !help will help you understand the game.","Noises (explosions, props breaking, combine dying) will atract the combine.","Go after combine that are alone first.","Some crates contain valuable items.","Killing an unaware combine will score you more points.","Unaware combine can drop special items.","Hit and run is the best tactic in The Hunt.","SLAMS are way useful as both tripmines and satchel charges.","You can disable these hints by typing h_hints 0 on the console.","If spotted, kill the guy and RUN","You can hide in dark places. USE IT. They can't see you there, even if they're near you.","Always go near the walls, not in the middle of the street/corridor.","Try to use silenced guns, or, if you don't have them, melee weapons. They don't make noise.","You can drop your weapon by saying !drop. You can bind that command by typin 'bind x h_dropweapon' on the console."}
+zombietable={"npc_headcrab_fast","npc_zombie","npc_zombie","npc_zombie","npc_fastzombie","npc_fastzombie","npc_headcrab_black","npc_headcrab_black","npc_poisonzombie"}
+
+
+Player_Hints = {"Ceiling Turrets can be disabled from a Combine Control Panel or explosions.","Silenced gunshots won't alert the combine.","If it's your first time playing, the command !help will help you understand the game.","Noises (explosions, props breaking, combine dying) will atract the combine.","Go after combine that are alone first.","Some crates contain valuable items.","Killing an unaware combine will score you more points.","Unaware combine can drop special items.","Hit and run is the best tactic in The Hunt.","SLAMS are way useful as both tripmines and satchel charges.","You can disable these hints by typing h_hints 0 on the console or disabling them in the options menu.","If spotted, kill the guy and RUN","You can hide in dark places. USE IT. They can't see you there, even if they're near you.","Always go near the walls, not in the middle of the street/corridor.","Try to use silenced guns, or, if you don't have them, melee weapons. They make less noise.","You can drop your weapon by saying !drop. You can bind that command by typin 'bind x h_dropweapon' on the console.","You can disable the Combine Bouncers by reducing their number to zero or typing h_combine_bouncers 0 on the console."}
 
 noticeable_server = {}
+
+
+HL2Beta_Weapons = {"weapon_bp_alyxgun", "weapon_bp_annabelle", "weapon_bp_ar1", "weapon_bp_shotgun", "weapon_bp_binoculars", "weapon_bp_bbcrem", "weapon_bp_flaregun", "weapon_bp_guardgun", "weapon_bp_hmg1", "weapon_bp_hopwire", "weapon_bp_iceaxe", "weapon_bp_immolator", "weapon_bp_flamethrower", "weapon_bp_manhack", "weapon_bp_launcher", "weapon_bp_cocktail", "weapon_bp_oicw", "weapon_bp_rlauncher", "weapon_bp_rtboicw", "weapon_bp_smg2", "weapon_bp_smg3", "weapon_bp_sniper", "weapon_bp_stickylauncher", "weapon_bp_taucannon"}
+
 
 SPAWNPOINTS_TO_DELETE = {
 "info_player_terrorist",
@@ -667,6 +770,15 @@ MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combi
 MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship", "npc_turret_ceiling","npc_hunter",}
 MainEnemiesDamage = { "npc_combine_s", "npc_metropolice", "npc_manhack"}
 
+ChatEnemyLost = {
+"Shit, we have lost them.",
+"Overwatch, sight on objetive lost.",
+"Lost sight.",
+"Snake should be proud of this guy.",
+"Lost the guy.",
+"You can run...",
+"You can't escape.",
+}
 
 CombineHearBreak = {
 "I think I heard something.",
@@ -915,4 +1027,16 @@ MHs_Super_Battle_Pack_PART_II ={"acid_sprayer_minds","acidball_minds","alienblas
 
 
 spastiks_toybox={"bakker's blaster","gabriel","gretchen","henderson","lil' jim","murphy's law","the aerosol ar","the anti-rifle","the backscratcher","the bfhmg","the camper's choice","the coiled snake","the commander's compact","the doorman","the eleventh hour","the fire hazard","the fodder buster","the gambler","the grand prize","the greaser","the guerilla","the hammerhead","the hide n' seek advanced","the hometown slugger","the junkmaster","the kilroy warhammer","the lawnmower","the lobotomizer","the morning hail","the night light","the panther fist","the pea shooter","the penguinade","the pepper grinder","the quadruple agent","the rainmaker","the reanimated rocket rifle","the rusted bangstick","the salvaged sidearm","the secret carbine","the segundo pocket pistol","the sleeping pill","the spastik special","the special delivery","the straight razor","the swiss hellbringer","the trash compactor","the turbo lover","the waiting game"}
+
+----- NPC WEAPON PACK 2 (http://steamcommunity.com/sharedfiles/filedetails/?id=231718148)  
+
+NPC_WEAPON_PACK_2_RAPID_FIRE={"npc_acr","npc_m4a1iron","npc_m4a1holo","npc_hk416","npc_g36","npc_ak47","npc_fal","npc_m249","npc_hk21e","npc_ump45","npc_p90","npc_mp5","npc_uzi","npc_m24","npc_M76"}
+
+NPC_WEAPON_PACK_2_PISTOLS={"npc_m9","npc_m1911","npc_g18","npc_deagle",}
+
+NPC_WEAPON_PACK_2_RPGS={"npc_rpg7","npc_matador","npc_m202"}
+
+NPC_WEAPON_PACK_2_SHOTGUNS={"npc_mossberg590"}
+
+NPC_WEAPON_PACK_2_SNIPERS={"npc_m82","npc_as50","npc_awp"}
 
