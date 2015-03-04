@@ -1,6 +1,6 @@
 SWEP.PrintName			= "Map Configurator"			
 SWEP.Author			= "Eddlm"
-SWEP.Instructions		= "Left click: copy to console"
+SWEP.Instructions		= "Read what the tool says"
 SWEP.Spawnable = true
 SWEP.AdminOnly = false
 SWEP.Primary.ClipSize		= -1
@@ -192,8 +192,6 @@ local advancedangles = string.Implode( ", ", angles)
 table.insert(player_spawnpoints, "SpawnItem('info_player_start', Vector("..advancedpos.."),Angle("..advancedangles.."))")
 end
 
-
-
 if entity:GetModel() == "models/combine_helicopter.mdl" and entity.type == "heli_spawner" then
 local plypos = tostring(entity:GetPos())
 local pos = string.Explode( " ", plypos )
@@ -204,7 +202,6 @@ local angles = string.Explode( " ", plyangles )
 local advancedangles = string.Implode( ", ", angles)
 table.insert(helipath_spawnpoints, "Vector("..advancedpos.."),")
 end
-
 
 if entity:GetClass() == "npc_turret_floor" then
 local plypos = tostring(entity:GetPos())
@@ -417,6 +414,7 @@ end
 file.Write("thehunt_maps/"..game.GetMap().."", "")
 file.Append("thehunt_maps/"..game.GetMap()..".txt","---------------------- THE HUNT CONFIGURATION FILE ----------------------\n")
 
+file.Append("thehunt_maps/"..game.GetMap()..".txt","include( '/../../gamemodes/thehunt/gamemode/maps/basewaves.lua' )\n")
 file.Append("thehunt_maps/"..game.GetMap()..".txt","include( 'basewaves.lua' )\n")
 file.Append("thehunt_maps/"..game.GetMap()..".txt","CombineFirstWave = 7\n")
 file.Append("thehunt_maps/"..game.GetMap()..".txt","CombineSecondWave = 10\n")

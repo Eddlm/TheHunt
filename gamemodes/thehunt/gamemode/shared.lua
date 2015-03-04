@@ -286,19 +286,29 @@ function GM:Initialize()
 end
 
 function ManualWeaponDrop(ply)
+			local weapon = ply:GetActiveWeapon()
+
+
+if ply:GetActiveWeapon() != NULL then
 
 if ply:GetActiveWeapon():GetClass() == "weapon_frag" then
 
 	if ply:GetAmmoCount(ply:GetActiveWeapon():GetPrimaryAmmoType()) > 0 then
 	ammo = ply:GetAmmoCount(ply:GetActiveWeapon():GetPrimaryAmmoType())
 	ply:GetActiveWeapon():SetClip1(1)
+	ply:DropWeapon(ply:GetActiveWeapon())
 	ply:StripWeapon("weapon_frag")
 	end
 
-end
+else
 
-if ply:GetActiveWeapon() != NULL then
 ply:DropWeapon(ply:GetActiveWeapon())
+end
+			timer.Create( "PlayerDropWeaponSound", 2, 1, function() 
+			nearbycombinecomecasual(weapon)
+			end)
+
+
 end
 /*
 	local wep = ply:GetActiveWeapon():GetClass()
@@ -410,7 +420,7 @@ local coming=0
 		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
 			if !v:GetEnemy() then
 				if coming < MAXCOMBINERUSH then
-					--print(""..v:GetName().." heard that.")
+					print(""..v:GetName().." heard that.")
 					v:SetLastPosition(suspect:GetPos())
 					v:SetSchedule(SCHED_FORCED_GO_RUN)
 					coming=coming+1
@@ -422,7 +432,7 @@ local coming=0
 		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
 			if !v:GetEnemy() then
 				if coming < MAXCOMBINERUSH then
-					--print(""..v:GetName().." heard that.")
+					print(""..v:GetName().." heard that.")
 					v:SetLastPosition(suspect:GetPos())
 					v:SetSchedule(SCHED_FORCED_GO_RUN)
 					coming=coming+1

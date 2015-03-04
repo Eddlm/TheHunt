@@ -95,12 +95,12 @@ end
 end
 
 end)
-
-end
 util.SpriteTrail(self, 1, Color(5,53,166), false, 50, 15, 3, 1/(15+3)*0.5, "trails/laser.vmt")
 
 timer.Simple(4, function() self:GetPhysicsObject():AddVelocity(Vector(math.random(0,50), math.random(0,50), 0))
  end)
+end
+
 end
 function ENT:Use(activator)
 end
@@ -171,7 +171,7 @@ end
 function ENT:PhysicsCollide( data, physobj )
 
 if  ALERT == 0 then
-print(""..self:GetClass().." has collided with "..data.HitEntity:GetClass()..", ID "..data.HitEntity:EntIndex().."")
+--print(""..self:GetClass().." has collided with "..data.HitEntity:GetClass()..", ID "..data.HitEntity:EntIndex().."")
 
 	if ( data.DeltaTime > 0.1 && data.Speed < 80) then
 		sound.Play( "buttons/combine_button1.wav", self:GetPos(), 100, 100, math.Clamp( data.Speed / 150, 0, 1 ) )

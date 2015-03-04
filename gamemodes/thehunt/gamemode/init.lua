@@ -139,7 +139,7 @@ end
 
 function GM:Initialize()
 	print("------------------------- THE HUNT GM:Initialize LOADING -------------------------")
-	print("The Hunt version: v1.9. Date: 03/01/2015")
+	print("The Hunt version: v2.0. Date: 04/03/2015")
 	if !ConVarExists("h_npctrails") then
 		CreateClientConVar( "h_npctrails", "0", true, false )
 	end
@@ -305,7 +305,7 @@ print("[The Hunt]: Rebooting: CicloUnSegundo")
 timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo ) 
 
 print("[The Hunt]: Rebooting: coverzones")
-timer.Create( "coverzones", 10, 1, coverzones )
+timer.Create( "coverzones", 10, 0, coverzones )
 
 print("[The Hunt]: Rebooting: wavefinishedchecker")
 timer.Create( "wavefinishedchecker", 5, 1, wavefinishedchecker)
@@ -347,8 +347,8 @@ end )
 
 
 concommand.Add( "h_version", function(ply)
-	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.9. Date: 03/01/2015")
-	ply:PrintMessage(HUD_PRINTTALK, "Last changes: various fixes, changed combine spawn system.")
+	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v2.0. Date: 04/03/2015")
+	ply:PrintMessage(HUD_PRINTTALK, "Last changes: tweaked combine Spawn System, added NPC weapons and a new enemy.")
 end )
 
 
@@ -631,11 +631,11 @@ end )
 
 concommand.Add( "firstwave", function(ply)
 	if ply:IsAdmin() then
-		Wave = 1
+		--Wave = 1
 		timer.Create( "firstwave", 1, CombineFirstWave, firstwave )
-		WAVESPAWN = 1
-		timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
-		timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
+		--WAVESPAWN = 1
+		--timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
+		--timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
 	end
 end)
 
@@ -643,38 +643,38 @@ end)
 
 concommand.Add( "secondwave", function(ply)
 	if ply:IsAdmin() then
-		Wave = 2
+		--Wave = 2
 		timer.Create( "secondwave", 1, CombineSecondWave, secondwave ) 
-		WAVESPAWN = 1
-		timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
-		timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
+		--WAVESPAWN = 1
+		--timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
+		--timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
 	end
 end )
 concommand.Add( "thirdwave", function(ply)
 	if ply:IsAdmin() then
-		Wave = 3
+		--Wave = 3
 		timer.Create( "thirdwave", 1, CombineThirdWave, thirdwave ) 
-		WAVESPAWN = 1
-		timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
-		timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
+		--WAVESPAWN = 1
+		--timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
+		--timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
 	end
 end )
 concommand.Add( "fourthwave", function(ply)
 	if ply:IsAdmin() then
-		Wave = 4
+		--Wave = 4
 		timer.Create( "fourthwave", 1, CombineFourthWave, fourthwave ) 
-		WAVESPAWN = 1
-		timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
-		timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
+		--WAVESPAWN = 1
+		--timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
+		--timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
 	end
 end )
 concommand.Add( "fifthwave", function(ply)
 	if ply:IsAdmin() then
-		Wave = 5
+		--Wave = 5
 		timer.Create( "fifthwave", 1, CombineFifthWave, fifthwave ) 
-		WAVESPAWN = 1
-		timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
-		timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
+		--WAVESPAWN = 1
+		--timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
+		--timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )	
 	end
 end )
 
@@ -727,13 +727,15 @@ end
 
 -- Counts whatever entity you want to count.
 function CountEntity(ent)
+--print(""..tostring(ent).."")
 local entities=0
 		for k, v in pairs(ents.GetAll()) do
 		if v.HuntID == tostring(ent) then
 			entities=entities+1
 		end
 		end
-		print(""..entities.."")
+
+	--	print(""..entities.."")
 		return(entities)
 end
 
@@ -770,11 +772,13 @@ end
 
 -- Prints every entity that is near you, on the console.
 function NearbyEntities()
+print(player.GetByID(1):GetEyeTraceNoCursor().Entity:EntIndex())
 	print("[The Hunt]: Entities found:")
 	for k, v in pairs(ents.FindInSphere(player.GetByID(1):GetPos(),256)) do
 		print(""..v:GetClass()..", "..v:GetName()..", "..v:EntIndex().."")
 	end
 	print("[The Hunt]: End of entities")
+	
 end
 
 -- Utility function to kill every combine.
@@ -792,9 +796,11 @@ end
 
 -- Function wich starts the first wave on every game automatically.
 function autofirstwave()
-	timer.Create( "firstwave", 1, CombineFirstWave, firstwave )
-	WAVESPAWN = 1
-	Wave = 0
+	timer.Simple(1, firstwave)
+	--timer.Create( "firstwave", 1, CombineFirstWave, firstwave )
+	--timer.Create( "coverzonesall", 1, CUSTOMWAVESPAWN, coverzones)
+	CombineSelectSpawn()
+	Wave = 1
 	combinen = 0
 	CAN_HEAR_BREAK = 1
 	team_silent_kills=0
@@ -802,8 +808,8 @@ function autofirstwave()
 	team_kills =0
 	COMBINE_KILLED = 0
 	cansilentkillreward = 1
-	timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
-	timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
+	--timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
+	----timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
 end
 
 
@@ -852,6 +858,9 @@ function wavefinishedchecker()
 				end
 			
 			table.foreach(player.GetAll(), function(key,value)
+				net.Start( "Hidden" )
+				net.Send(value)
+				value.spotted = 0
 				if value.lifes < 1 and value.teamkiller < 3 then 
 				value.canspawn = 1
 				value.lifes = GetConVarNumber("h_player_lifes")/2
@@ -864,9 +873,6 @@ function wavefinishedchecker()
 			-- This means combine defeat.
 			if COMBINE_KILLED > GetConVarNumber("h_combine_killed_to_win") then
 			GAME_ENDED = 1
-				if table.Random(player.GetAll()).sex == "male" then table.Random(player.GetAll()):EmitSound(		table.Random(malewin), 100, 100) else
-					table.Random(player.GetAll()):EmitSound(table.Random(femalewin), 100, 100)
-				end
 				PrintMessage(HUD_PRINTTALK, "[Overwatch]: Attention: Mission failure. More than "..GetConVarNumber("h_combine_killed_to_win").." ground units have been lost.")
 				PrintMessage(HUD_PRINTTALK, "[Overwatch]: Remaining units, cease aggression and return.")
 				timer.Simple(13, function() PrintMessage(HUD_PRINTTALK, "[The Hunt]: Congratulations, you won! You prevented the combine raid. Here's the statistics:") end)
@@ -874,8 +880,8 @@ function wavefinishedchecker()
 				CanCheck = 0
 			else
 				waveend()
-				CanCheck = 0
 				end
+
 			end
 		end
 	end
@@ -1088,26 +1094,29 @@ function PlayerStats(ply)
 end
 
 function waveend()
-	WAVESPAWN = 1
+CanCheck = 0
+	--WAVESPAWN = 1
 	timer.Simple (1, OverwatchAmbientOne)
 	if Wave < 5 then
 		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..Wave.." proven unable to contain hostiles.")
 	end
 	timer.Simple(GetConVarNumber("h_time_between_waves"), function()
-		timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
-		timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
-		if Wave == 1 then timer.Create( "secondwave", 1, CombineSecondWave, secondwave ) 
-		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
-		if Wave == 2 then timer.Create( "thirdwave", 1, CombineThirdWave, thirdwave ) 
-		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
-		if Wave == 3 then timer.Create( "fourthwave", 1, CombineFourthWave, fourthwave ) 
-		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
-		if Wave == 4 then timer.Create( "fifthwave", 1, CombineFifthWave, fifthwave )  
-		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.") end
+		--timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
+		----timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
+		if Wave == 1 then  secondwave() print("wave 2")
+		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.")
+		elseif Wave == 2 then thirdwave() print("wave 3")
+		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.")
+		elseif Wave == 3 then fourthwave() print("wave 4")
+		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.")
+		elseif Wave == 4 then fifthwave()  print("wave 5")
+		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..(Wave+1).." dispatched.")
+		elseif Wave == 5  or Wave > 5 then print("wave 6")
+		infinitewavehandler()
+		end
+			Wave = Wave+1
 	end)
-	if Wave == 5 or Wave == 6 then 
-			infinitewavehandler()
-	end
+
 	table.foreach(player.GetAll(), function(key,ply)
 		ply:SetNWInt("ReferentScore",ply:GetNWInt("Score"))
 		CalculatePlayerScore(ply)
@@ -1117,20 +1126,18 @@ end
 
 -- Controls the 6th wave.
 function infinitewavehandler()
-	WAVESPAWN = 1
 	CanCheck = 0
-	Wave=6
+	Wave = 6
 	if INFINITE_ACHIEVED == 1 then
 		PrintMessage(HUD_PRINTTALK, "[Overwatch]: "..table.Random(OVERWATCH_TAUNTS).."")
-	end	
-	if INFINITE_ACHIEVED == 0 then
+else
 		INFINITE_ACHIEVED = 1
 		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Dude you fucked up.")
 	end	
 	timer.Simple(GetConVarNumber("h_time_between_waves"), function()
-		timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
-		timer.Create( "infinitewave", 2, CombineInfiniteWave, infinitewave )
-		timer.Simple(20, function() CanCheck = 1 end)
+		--timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
+		infinitewave()
+		--timer.Simple(20, function() CanCheck = 1 end)
 	end)
 end
 
@@ -1540,6 +1547,7 @@ function SpawnMetropoliceStunstick( pos )
 end
 
 function SpawnMetropolice( pos )
+print("d1")
 	NPC = ents.Create( "npc_metropolice" )
 	NPC:SetKeyValue("Manhacks", math.random(0,1)) 
 	NPC:SetKeyValue( "model", "models/Police.mdl" )
@@ -1563,6 +1571,7 @@ end
 
 
 function SpawnMetropoliceHard( pos )
+print("d2")
 	NPC = ents.Create( "npc_metropolice" )
 	NPC:SetKeyValue("Manhacks", math.random(1,2)) 
 	NPC:SetKeyValue( "model", "models/Police.mdl" )
@@ -1808,12 +1817,11 @@ end
 
 -- CYCLES v
 function coverzones()
-	timer.Create( "coverzones", 20, 0, coverzones ) 	
+	timer.Create( "coverzones", 20, 1, coverzones ) 	
 	table.foreach(MainEnemiesGround, function(key,value)
 		for k, v in pairs(ents.FindByClass(value)) do
 			if !v:IsCurrentSchedule(SCHED_FORCED_GO) && !v:IsCurrentSchedule(SCHED_FORCED_GO_RUN) then	
-				if v:GetEnemy() then 
-				else
+				if !v:GetEnemy() then 
 					v:SetLastPosition(table.Random(zonescovered) + Vector(math.random(-20,20), math.random(-20,20), 10))
 					if WAVESPAWN == 1 then
 						v:SetSchedule(SCHED_FORCED_GO_RUN)
@@ -1922,7 +1930,7 @@ function npcforget()
 		for k, v in pairs(ents.FindByClass(enemy)) do 
 			v:SetKeyValue("squadname", "")
 			v:ClearEnemyMemory()
-			v:SetSchedule(SCHED_MOVE_AWAY)
+			--v:SetSchedule(SCHED_MOVE_AWAY)
 		end
 	end)
 	table.foreach(player.GetAll(), function(key,value)
@@ -1930,10 +1938,26 @@ function npcforget()
 		net.Send(value)
 		value.spotted = 0
 	end)
-	if LastEnemyWasPlayer== 1 then
+	if LastEnemyWasPlayer== 1 and GetConVarNumber("h_combine_chat") == 1 then
 	PrintMessage(HUD_PRINTTALK, "Combine: "..table.Random(ChatEnemyLost).."")
 	LastEnemyWasPlayer=0
+	--npc:EmitSound("npc/combine_soldier/vo/lostcontact.wav", 80,100)
 	end
+end
+
+
+function ClearCombineSpawnPoints()
+
+
+
+table.foreach(combinespawnzones, function(key,zone)
+
+		for k, v in pairs(ents.FindInSphere(zone,50)) do 
+		if v:IsNPC() then print(""..v:GetName().." is stuck on the spawn, respawning") v:Remove()
+		SpawnCombineS1(zone)
+		end
+		end
+end)
 end
 
 
@@ -2153,7 +2177,7 @@ function GM:InitPostEntity()
 	timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 	timer.Create( "CombineIdleSpeech", math.random(5,15), 0, CombineIdleSpeech ) 
 	timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo ) 
-	timer.Create( "coverzones", 10, 1, coverzones )
+	timer.Create( "coverzones", 20, 0, coverzones )
 	timer.Create( "wavefinishedchecker", 5, 1, wavefinishedchecker)
 	timer.Create( "metropolicewander", 8, 1, metropolicewander ) 
 
@@ -2553,7 +2577,7 @@ function GM:OnNPCKilled(victim, killer, weapon)
 	end
 	
 	if victim:GetClass() == "npc_metropolice" or victim:GetClass() == "npc_combine_s" then
-		table.insert(zonescovered, victim:GetPos()+Vector(0,0,30)) print("Patrol zone added (NPC dead)")
+		table.insert(zonescovered, victim:GetPos()+Vector(0,0,10)) print("Patrol zone added (NPC dead)")
 		CombineAssisting =0
 		COMBINE_KILLED = COMBINE_KILLED+1
 		if killer:IsPlayer() or killer:IsNPC() then
@@ -2598,6 +2622,9 @@ if killer:IsPlayer() then
 			killer:AddFrags(1)
 			end
 		end
+		if !timer.Exists("npcforgettimer") then
+			timer.Create( "npcforgettimer", GetConVarNumber("h_lostplayertimeout"), 1, npcforget ) 
+		end
 	end
 	
 	-- Calculate scores only if the "killed" npc isn't a turret. They have no "killers" when they die
@@ -2616,7 +2643,7 @@ function GM:PlayerSelectSpawn( pl )
 	table.foreach(spawns, function(key,value)
 		local can = 1
 		for k, v in pairs(ents.FindInSphere(value:GetPos(),1000)) do
-			if v:IsNPC() then
+			if v:IsNPC() or v:GetClass() == "combine_bouncer" then
 				if v:VisibleVec(value:GetPos()+Vector(0,0,60)) then
 					can = 0
 				end
@@ -2635,31 +2662,43 @@ end
 
 
 function CombineSelectSpawn()
-	local availablespawns = {}
-	local random_entry = math.random( #combinespawnzones )
-	local spawn = false
+CombineAvailableSpawns = {}
+	--local random_entry = math.random( #combinespawnzones )
+	--local spawn = false
 	table.foreach(combinespawnzones, function(key,value)
 		local can = 1
 		for k, v in pairs(ents.FindInSphere(value,1000)) do
 			if v:IsPlayer() then
 				if v:VisibleVec(value) then
-				--print(v:Nick())
+				print(v:Nick())
 					can = 0
 				end
 			end
 		end
 		if can == 1 then
 		print("Combine can spawn there")
-		table.insert(availablespawns, value)
+		table.insert(CombineAvailableSpawns, value)
+		else
+		print("Player blocking a combine spawnzone")
 		end
 	end)
 
-if table.Count(availablespawns) < 1 then
+	
+if table.Count(CombineAvailableSpawns) < 1 then
+table.foreach(combinespawnzones, function(key,value)
+table.insert(CombineAvailableSpawns, value)
+end)
+end
+	
+	/*
+if table.Count(CombineAvailableSpawns) < 1 then
 PrintMessage(HUD_PRINTTALK, "WARNING: There are players on ALL the combine spawnpoints.")
 return table.Random(combinespawnzones)
 else
-return table.Random(availablespawns)
+return table.Random(CombineAvailableSpawns)
 end
+
+*/
 end
 
 function ScalePlayerDamage(ply, hitgroup, dmginfo)
@@ -2684,17 +2723,17 @@ hook.Add("ScaleNPCDamage","ScaleNPCDamage",ScaleNPCDamage)
 
 function GM:EntityTakeDamage(damaged,damage)
 --print(""..damaged:GetClass().." taken damage")
-
-
 	damage:ScaleDamage(1)
+
+
 	if table.HasValue(MainEnemiesDamage, damaged:GetClass()) then
 		if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) damage:ScaleDamage(0) end -- flee from fire and friendly fire
 			if damaged:GetEnemy() == nil then
-				damage:ScaleDamage(GetConVarNumber("h_npcscaledamage")+30)
+				damage:ScaleDamage(GetConVarNumber("h_npcscaledamage")*1.5)
 				damaged:ClearSchedule() 
 			else
 				damage:ScaleDamage(GetConVarNumber("h_npcscaledamage"))
-				if damage:IsDamageType(DMG_CLUB) then damage:ScaleDamage(0.2) end
+				if damage:IsDamageType(DMG_CLUB) then damage:ScaleDamage(0.5) end
 			end
 			if damaged:Health() > damage:GetDamage() then
 				damaged:SetEnemy(damage:GetAttacker())
@@ -2782,7 +2821,7 @@ end
 	end
 
 	if damage:IsDamageType(64) then 
-		table.insert(zonescovered, damaged:GetPos()+Vector(0,0,30)) print("Patrol zone added (Entity take damage)")
+		table.insert(zonescovered, damaged:GetPos()+Vector(math.random(-200,200),math.random(-200,200),0)) print("Patrol zone added (Entity take damage)")
 		allthecombinecome(damaged,GetConVarNumber("h_maxgunshotinvestigate"))
 		ClearPatrolzones()
 	elseif !damaged:IsNPC() and !damaged:IsPlayer() then
@@ -2793,6 +2832,7 @@ end
 	end
 end
 --print("Entity damaged: "..damaged:GetClass().."")
+print(damage:GetDamage())
 end
 function PropBreak(breaker,prop)
 if math.random(1,3) == 1 then
@@ -2870,8 +2910,8 @@ function GM:KeyPress(player,key)
 											silenced = 1
 										end
 									end
-									if silenced == 0 and player.spotted == 0 then
-										--print("NOT Silenced")
+									if silenced == 0 /* and player.spotted == 0 */ then
+										print("NOT Silenced")
 										allthecombinecome(player,GetConVarNumber("h_maxgunshotinvestigate"))
 										--table.insert(zonescovered, player:GetPos()+Vector(0,0,30)) print("Patrol zone added")
 									end

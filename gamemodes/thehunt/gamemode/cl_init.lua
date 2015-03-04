@@ -84,7 +84,7 @@ end)
 hook.Add( "PreDrawHalos", "AddHalos", function()
 	if LocalPlayer():Alive() and LocalPlayer():GetPos() then
 		for k, v in pairs(ents.FindInSphere(LocalPlayer():GetEyeTraceNoCursor().HitPos, GetConVarNumber("h_outline_radius"))) do
-			if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_hunter" or v:GetClass() == "combine_bouncer"  then
+			if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_hunter" then
 				if v:IsValid() then
 						halo.Add( {v}, Color( 84,2,2 ), 1, 1, 1, true, true )
 				end
@@ -99,12 +99,6 @@ hook.Add( "PreDrawHalos", "AddHalos", function()
 			end
 			if table.HasValue(noticeable, v:EntIndex()) then
 			halo.Add( {v}, Color( 0,0,255 ), 1, 1, 1, true, true ) end
-
---		table.foreach(noticeable, function(key,value)
---		if v:EntIndex() == value then
---			halo.Add( {v}, Color( 0,0,255 ), 1, 1, 1, true, true )
---		end
---		end)
 		end
 		for k, v in pairs(ents.FindInSphere(LocalPlayer():GetPos(), 300)) do
 			if v:GetClass() == "npc_tripmine" and LocalPlayer():Health() then
