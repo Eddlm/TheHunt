@@ -22,7 +22,7 @@ table.foreach(SPAWNPOINTS_TO_DELETE, function(key,value) for k, v in pairs(ents.
 
 timer.Simple(2, function()
 table.foreach(ents.GetAll(), function(key,value)
-if value.EntIndex() == 518 then 
+if value:EntIndex() == 518 then 
 value:Remove() 
 end
 end)

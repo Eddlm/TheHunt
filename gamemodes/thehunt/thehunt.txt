@@ -320,6 +320,14 @@
 			"type"		"Numeric"
 			"default"	"2"
 		}
+		42
+		{
+			"name"		"h_zombie_mode"
+			"text"		"Force Zombie spawns"
+			"help"		"Force the zombie spawner to kick in."
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 	}
 }
 

@@ -582,7 +582,7 @@ function ItemRespawnSystem()
 		end
 		--print("Kills: "..team_kills+team_silent_kills.." -  Silent Kills+Bouncers*1.5: "..((team_silent_kills + bouncers) * 1.5).." - Bouncers: "..bouncers.."")
 	end
-	if haszombies then zombiesmap() end
+	if haszombies or GetConVarNumber("h_zombie_mode") == 1 then zombiesmap() end
 end
 
 function zombiesmap()
@@ -591,14 +591,14 @@ function zombiesmap()
 		for k,zombi in pairs(ents.GetAll()) do 
 		if table.HasValue(zombietable, zombi:GetClass())then
 		zombies=zombies+1
-		print("Zombie found")
+		--print("Zombie found")
 		end
 		end
 		
 		if zombies < ORIGINAL_ZONES_NUMBER then	
 					table.foreach(zombietable, function(key,value)
 					SpawnItem(value,ItemSelectSpawn(zonescovered),Angle(0,0,0))
-					print(""..value.."")
+					--print(""..value.."")
 					end)
 
 		end

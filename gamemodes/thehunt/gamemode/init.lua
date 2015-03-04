@@ -139,7 +139,7 @@ end
 
 function GM:Initialize()
 	print("------------------------- THE HUNT GM:Initialize LOADING -------------------------")
-	print("The Hunt version: v2.0. Date: 04/03/2015")
+	print("The Hunt version: v1.9. Date: 03/01/2015")
 	if !ConVarExists("h_npctrails") then
 		CreateClientConVar( "h_npctrails", "0", true, false )
 	end
@@ -347,8 +347,8 @@ end )
 
 
 concommand.Add( "h_version", function(ply)
-	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v2.0. Date: 04/03/2015")
-	ply:PrintMessage(HUD_PRINTTALK, "Last changes: tweaked combine Spawn System, added NPC weapons and a new enemy.")
+	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.9. Date: 03/01/2015")
+	ply:PrintMessage(HUD_PRINTTALK, "Last changes: various fixes, changed combine spawn system.")
 end )
 
 
