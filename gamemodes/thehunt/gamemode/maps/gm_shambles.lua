@@ -251,114 +251,212 @@ CreateHeliPath(Vector(1581.253784, 786.827454, -1252.681641))
 CreateHeliPath(Vector(-3628.562012, -4783.553223, 117.478256))
 CreateHeliPath(Vector(-4810.824219, -6042.408691, 266.021301))
 CreateHeliPath(Vector(-2754.968018, -5913.759277, 118.561386))
-SpawnHeliA(Vector(7012.879883, -6419.743652, -730.003357), ""..table.Random(AirEnemies).."" ,0,1)
-SpawnHeliA(Vector(-7104.905273, -8087.144043, 164.011353), ""..table.Random(AirEnemies).."" ,0,1)
 end
 
 function firstwave()
-Wave = 1
-	if math.random (1,6) == 2 then 
-		SpawnMetropoliceHard(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	else
-		SpawnMetropolice(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	end
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
+WAVESPAWN = 1
+local ShouldRepeat = 0
+
+if CountEntity("MetropoliceHard") <  5 and ShouldRepeat==0 then
+SpawnMetropoliceHard(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
 end
 
+if CountEntity("CombineS1") <  10 and ShouldRepeat==0 then SpawnCombineS1(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+
+end
+
+
+if CountEntity("CombineShotgunner") <  1 and ShouldRepeat==0 then SpawnCombineShotgunner(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
+
+
+
+if ShouldRepeat==1 then
+	timer.Simple(0.5, coverzones)
+	timer.Simple(1, firstwave)
+else
+print("Finished Spawning Wave "..Wave.."")
+WAVESPAWN = 0
+CanCheck = 1
+timer.Simple(5, ClearCombineSpawnPoints)
+end
+end
+
+
 function secondwave()
-Wave = 2
 
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunner(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
-		SpawnMetropoliceHard(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineS1(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
+WAVESPAWN = 1
+local ShouldRepeat = 0
+if CountEntity("MetropoliceHard") <  5 and ShouldRepeat==0 then
+SpawnMetropoliceHard(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
 
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
+if CountEntity("Metropolice") < 5 and ShouldRepeat==0 then
+SpawnMetropolice(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
+
+
+if CountEntity("CombineS1") <  5 and ShouldRepeat==0 then SpawnCombineS1(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
+
+
+if CountEntity("CombineShotgunner") <  5 and ShouldRepeat==0 then SpawnCombineShotgunner(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
+if ShouldRepeat==1 then
+	timer.Simple(0.5, coverzones)
+	timer.Simple(1, secondwave)
+else
+WAVESPAWN = 0
+CanCheck = 1
+timer.Simple(5, ClearCombineSpawnPoints)
+print("Finished Spawning Wave "..Wave.."")
+end
 end
 
 function thirdwave()
-Wave = 3
-RPGCANSPAWN = 1
+WAVESPAWN = 1
+local ShouldRepeat = 0
+if CountEntity("CombineS2") < 10 and ShouldRepeat==0 then
+		SpawnCombineS2(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
 
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunner(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
-		SpawnCombineElite1(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
-	
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
+if CountEntity("CombineElite1") < 10 and ShouldRepeat==0 then SpawnCombineElite1(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+
+end
+
+if CountEntity("CombineShotgunner") <  5 and ShouldRepeat==0 then SpawnCombineShotgunner(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
+if ShouldRepeat==1 then
+	timer.Simple(0.5, coverzones)
+	timer.Simple(1, thirdwave)
+else
+WAVESPAWN = 0
+CanCheck = 1
+timer.Simple(5, ClearCombineSpawnPoints)
+print("Finished Spawning Wave "..Wave.."")
+end
 end
 
 function fourthwave()
-Wave = 4
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
+WAVESPAWN = 1
+local ShouldRepeat = 0
+if CountEntity("CombineS2") < 15 and ShouldRepeat==0 then
 		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineElite1(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
-	
+ShouldRepeat=1
+end
 
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
+if CountEntity("CombineElite1") <  15 and ShouldRepeat==0 then SpawnCombineElite1(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+
+end
+
+if CountEntity("CombineShotgunnerElite") <  10 and ShouldRepeat==0 then SpawnCombineShotgunnerElite(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
+
+if ShouldRepeat==1 then
+	timer.Simple(0.5, coverzones)
+	timer.Simple(1, fourthwave)
+else
+WAVESPAWN = 0
+CanCheck = 1
+timer.Simple(5, ClearCombineSpawnPoints)
+print("Finished Spawning Wave "..Wave.."")
+end
 end
 
 function fifthwave()
-Wave = 5
-
-for k, v in pairs(ents.FindByClass("npc_helicopter")) do v:Fire("gunon","",0) v.boss = 1 end
-for k, v in pairs(ents.FindByClass("npc_combinegunship")) do v:Fire("gunon","",0) v.boss = 1 end
-
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
+WAVESPAWN = 1
+local ShouldRepeat = 0
+HelicopterWave(1)
+if CountEntity("CombineS2") < 15 and ShouldRepeat==0  then
 		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
-
-local NumHelis = 0
-for k, v in pairs(ents.FindByClass("npc_helicopter")) do
-NumHelis=NumHelis+1
+ShouldRepeat=1
 end
 
-for k, v in pairs(ents.FindByClass("npc_combinegunship")) do
-NumHelis=NumHelis+1
+if CountEntity("CombineElite2") <  15 and ShouldRepeat==0 then 	SpawnCombineElite2(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
 end
 
-if NumHelis > 0 then print("too much helis")
-else 
-SpawnHeliA(Vector(7012.879883, -6419.743652, -730.003357), "npc_helicopter" ,0,1)
+if CountEntity("CombineShotgunnerElite") <  15 and ShouldRepeat==0 then SpawnCombineShotgunnerElite(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
 end
 
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
+if ShouldRepeat==1 then
+	timer.Simple(0.5, coverzones)
+	timer.Simple(1, fifthwave)
+else
+WAVESPAWN = 0
+CanCheck = 1
+timer.Simple(5, ClearCombineSpawnPoints)
+print("Finished Spawning Wave "..Wave.."")
 end
+end
+
+
 
 function infinitewave()
-Wave = 6 
+HelicopterWave(2)
+WAVESPAWN = 1
+local ShouldRepeat = 0
+if CountEntity("CombineS2") < 15 and ShouldRepeat==0 then
+		SpawnCombineS2(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
 
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
-	
+if CountEntity("CombineElite2") <  15 and ShouldRepeat==0 then SpawnCombineElite2(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+
+end
+
+if CountEntity("CombineShotgunnerElite") <  10 and ShouldRepeat==0 then SpawnCombineShotgunnerElite(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+ShouldRepeat=1
+end
+
 if GetConVarString("h_supersoldier") == "1" then
-if math.random (1,20) == 1 then 
-SpawnCombineSynth(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
+		if CountEntity("CombineSynth") < 3  then
+		SpawnCombineSynth(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+		end
 end
+
+
+if GetConVarString("h_beta_npcs") == "1" then
+	if CountEntity("Cremator") < 2  then
+		SpawnCremator(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+	end
+	if CountEntity("Assassin") < 4  then
+		SpawnAssassin(table.Random(CombineAvailableSpawns) + Vector(math.random(-5,5)))
+	end
 end
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
+
+
+if IsMounted("ep2") and GetConVarString("h_ep2_hunters") == "1"  then
+		if CountEntity("Hunter") < 5 then
+			SpawnHunter(table.Random(CombineAvailableSpawns))
+			print("EP2 Hunter spawned")
+		end
+
+	else
+print("EP2 Hunter can't spawn. Have you mounted EP2 and enabled them?")
+end
+
+if ShouldRepeat==1 then
+	timer.Simple(0.5, coverzones)
+	timer.Simple(1, infinitewave)
+else
+WAVESPAWN = 0
+CanCheck = 1
+timer.Simple(5, ClearCombineSpawnPoints)
+print("Finished Spawning Wave "..Wave.."")
+end
 end

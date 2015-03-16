@@ -1,3 +1,5 @@
+include( "basewaves.lua" )
+
 CombineFirstWave = 7
 CombineSecondWave = 10
 CombineThirdWave = 13
@@ -186,92 +188,5 @@ SpawnItem("info_player_start", Vector(192.574646, 954.887451, 192.031250), Angle
 SpawnItem("info_player_start", Vector(-1432.688965, -153.709427, 0.031250), Angle(3.357615, 178.452682, 0.000000) )
 SpawnItem("info_player_start", Vector(-1414.184570, 399.616669, 220.031250), Angle(60.551239, -179.867859, 0.000000) )
 SpawnItem("info_player_start", Vector(-2443.595215, -441.268951, -335.968750), Angle(2.074437, -83.815331, 0.000000) )
-
-function firstwave()
-Wave = 1
-	if math.random (1,6) == 2 then 
-		SpawnMetropoliceHard(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	else
-		SpawnMetropolice(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	end
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end
 end
 
-function secondwave()
-Wave = 2
-
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunner(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
-		SpawnMetropoliceHard(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineS1(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
-
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end
-
-function thirdwave()
-Wave = 3
-
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunner(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
-		SpawnCombineElite1(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end
-
-function fourthwave()
-Wave = 4
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineElite1(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
-	
-
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end
-
-function fifthwave()
-Wave = 5
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
-
-
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end
-
-function infinitewave()
-Wave = 6
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	elseif math.random (1,6) == 2 then 
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	else
-		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-	end
-
-if GetConVarString("h_supersoldier") == "1" then
-if math.random (1,20) == 1 then 
-SpawnCombineSynth(table.Random(combinespawnzones) + Vector(math.random(-5,5)))
-end
-end
--- CanCheck = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end

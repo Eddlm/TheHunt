@@ -1,12 +1,5 @@
-CombineFirstWave = 5
-CombineSecondWave = 10
-CombineThirdWave = 15
-CombineFourthWave = 20
-CombineFifthWave = 1
-CombineInfiniteWave = 20
+include( 'basewaves.lua' )
 
-
-CUSTOMWAVESPAWN = 17
 SPECIALITEMPLACES = {Vector(-252.060135, 1484.715942, 432.480896),}
 
 
@@ -207,76 +200,4 @@ CreateHeliPath(Vector(-817.209900, 1888.825439, 1316.231323))
 CreateHeliPath(Vector(-1240.823364, 1128.402588, 1343.844482))
 CreateHeliPath(Vector(1427.200806, 1124.467041, 1298.343872))
 CreateHeliPath(Vector(-94.497116, 1271.690796, 2117.913818))
-end
-
-function firstwave()
-Wave = 1
-	if math.random (1,6) == 2 then 
-		SpawnMetropoliceHard(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	else
-		SpawnMetropolice(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	end
-WAVESPAWN = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end
-
-function secondwave()
-Wave = 2
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunner(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	elseif math.random (1,6) == 2 then 
-		SpawnMetropoliceHard(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	else
-		SpawnCombineS1(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	end
-WAVESPAWN = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end
-
-function thirdwave()
-Wave = 3
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunner(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	elseif math.random (1,6) == 2 then 
-		SpawnCombineElite1(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -10), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	else
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	end
-
-WAVESPAWN = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end
-
-function fourthwave()
-Wave = 4
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	elseif math.random (1,6) == 2 then 
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	else
-		SpawnCombineElite1(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	end
-WAVESPAWN = 1
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
-end
-
-function fifthwave()
-Wave = 5
-RPGCANSPAWN = 1
-SpawnItem("weapon_rpg", Vector(-200.811264, 1131.869995, 475.769531), Angle(0.982, 23.366, 82.893) )
-SpawnHeliA( Vector(-267.674652, -260.307861, 440.381775), "npc_helicopter", 1,1 )
-end
-
-
-
-function infinitewave()
-Wave = 6
-	if math.random (1,6) == 2 then 
-		SpawnCombineShotgunnerElite(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	elseif math.random (1,6) == 2 then 
-		SpawnCombineS2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	else
-		SpawnCombineElite2(table.Random(combinespawnzones) + Vector(math.random(-5,5), math.random(-5,5), -50), table.Random(zonescovered) + Vector(math.random(-200,250), math.random(-200,250), 0))
-	end
-timer.Create( "coverzonesall", 0.4, 1, coverzones)
 end

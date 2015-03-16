@@ -139,7 +139,7 @@ end
 
 function GM:Initialize()
 	print("------------------------- THE HUNT GM:Initialize LOADING -------------------------")
-	print("The Hunt version: v1.9. Date: 03/01/2015")
+	print("The Hunt version: v2.0. Date: 16/02/2015")
 	if !ConVarExists("h_npctrails") then
 		CreateClientConVar( "h_npctrails", "0", true, false )
 	end
@@ -347,8 +347,8 @@ end )
 
 
 concommand.Add( "h_version", function(ply)
-	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v1.9. Date: 03/01/2015")
-	ply:PrintMessage(HUD_PRINTTALK, "Last changes: various fixes, changed combine spawn system.")
+	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v2.0. Date: 16/03/2015")
+	ply:PrintMessage(HUD_PRINTTALK, "Last changes: Various fixes on maps.")
 end )
 
 
@@ -459,9 +459,8 @@ concommand.Add( "revealtargets", function(ply)
 end)
 
 
-concommand.Add( "helpme", function(ply)
+concommand.Add( "h_help", function(ply)
 	print("[The Hunt]: Useful Commands")
-	print("[The Hunt]: firstwave: starts the firstwave")
 	print("[The Hunt]: h_fixtimers: use it if any feature stops working")
 	print("[The Hunt]: h_version: Info about the current The Hunt version.")
 	print("")
@@ -710,7 +709,6 @@ function HelicopterWave(maxhelis)
 		else
 			SpawnHeliA(table.Random(HELIPATHS), ""..table.Random(AirEnemies).."" ,1,1)
 		end
-	else print("Tried to spawn helis but team score is too low.")
 	end
 end
 
@@ -773,12 +771,13 @@ end
 -- Prints every entity that is near you, on the console.
 function NearbyEntities()
 print(player.GetByID(1):GetEyeTraceNoCursor().Entity:EntIndex())
+/*
 	print("[The Hunt]: Entities found:")
 	for k, v in pairs(ents.FindInSphere(player.GetByID(1):GetPos(),256)) do
 		print(""..v:GetClass()..", "..v:GetName()..", "..v:EntIndex().."")
 	end
 	print("[The Hunt]: End of entities")
-	
+	*/
 end
 
 -- Utility function to kill every combine.
@@ -851,11 +850,7 @@ function wavefinishedchecker()
 	if BossHeliAlive == 0 or BossHeliAlive == nil then
 		if CanCheck == 1 then 
 			if EnemiesRemainining < GetConVarNumber("h_minenemies") then			
-				for k,v in pairs( player.GetAll() ) do  
-					if v.sex == "male" then v:EmitSound(table.Random(malewin), 100, 100) else
-						v:EmitSound(table.Random(femalewin), 100, 100)
-					end
-				end
+
 			
 			table.foreach(player.GetAll(), function(key,value)
 				net.Start( "Hidden" )
@@ -1094,13 +1089,24 @@ function PlayerStats(ply)
 end
 
 function waveend()
+
+
+
 CanCheck = 0
 	--WAVESPAWN = 1
 	timer.Simple (1, OverwatchAmbientOne)
 	if Wave < 5 then
 		PrintMessage(HUD_PRINTTALK, "[Overwatch]: Squad Nº"..Wave.." proven unable to contain hostiles.")
+		
+		for k,v in pairs( player.GetAll() ) do  
+			if v.sex == "male" then v:EmitSound(table.Random(malewin), 100, 100) else
+				v:EmitSound(table.Random(femalewin), 100, 100)
+			end
+		end
+
 	end
-	timer.Simple(GetConVarNumber("h_time_between_waves"), function()
+
+		timer.Simple(GetConVarNumber("h_time_between_waves"), function()
 		--timer.Simple( 30, function() CanCheck = 1 print("[The Hunt]: Can check is 1, wave can be defeated now.") end )
 		----timer.Simple( CUSTOMWAVESPAWN, function() WAVESPAWN = 0 print("[The Hunt]: wavespawn is now 0") end )		
 		if Wave == 1 then  secondwave() print("wave 2")
@@ -1126,6 +1132,13 @@ end
 
 -- Controls the 6th wave.
 function infinitewavehandler()
+
+		for k,v in pairs( player.GetAll() ) do  
+			if v.sex == "male" then v:EmitSound(table.Random(malewin), 100, 100) else
+				v:EmitSound(table.Random(femalewin), 100, 100)
+			end
+		end
+
 	CanCheck = 0
 	Wave = 6
 	if INFINITE_ACHIEVED == 1 then
@@ -1183,11 +1196,7 @@ function SpawnHeliA( pos,type,IsBoss,GunOnAtSpawn )
 	HeliA:Fire("activate","",0)
 	-- HeliA:Fire("missileon","",0)
 	if type == "npc_helicopter" then
-		if GunOnAtSpawn == 1 then
-			HeliA:Fire("gunon","",1)
-		else
-			HeliA:Fire("gunoff","",0)
-		end
+	HeliA:Fire("gunon","",1)
 	HeliA.spotlight = ents.Create( "point_spotlight" )
 	HeliA.spotlight:SetPos(HeliA:GetPos()+(HeliA:GetForward()*150+Vector(0,0,-50)))
 	HeliA.spotlight:SetAngles(HeliA.spotlight:GetAngles()+Angle(30,0,0))
@@ -1198,24 +1207,14 @@ function SpawnHeliA( pos,type,IsBoss,GunOnAtSpawn )
 	HeliA.spotlight:SetKeyValue("rendercolor", "100 200 200")
 	HeliA.spotlight:Spawn()
 	HeliA.spotlight:Activate()
-	local HeliCanSpotlight = 1
-	local CanSpotlight = 0
-	for k, v in pairs(ents.FindByClass("npc_helicopter")) do
-		CanSpotlight = CanSpotlight+1
-	end
-	
-	if CanSpotlight > 1 then
-		HeliCanSpotlight = 0
-	end
-	if HeliCanSpotlight == 1  and type == "npc_helicopter" then
+
+	if type == "npc_helicopter" then
 		HeliA.light = ents.Create("env_projectedtexture");
 		HeliA.light:SetPos(HeliA:GetPos());
 		HeliA.light:SetAngles(HeliA:GetAngles()+Angle(30,0,0) );
 		HeliA.light:SetParent(HeliA);
 		HeliA.light:SetKeyValue("spawnflags", 2);
-		if prevent_spotlight_lag == true then 
-			HeliA.light:SetKeyValue("enableshadows", 0)
-		end
+		HeliA.light:SetKeyValue("enableshadows", 1)
 		HeliA.light:SetKeyValue("farz", 2000);
 		HeliA.light:SetKeyValue("target", "");
 		HeliA.light:SetKeyValue("nearz", 400);
@@ -1939,17 +1938,16 @@ function npcforget()
 		value.spotted = 0
 	end)
 	if LastEnemyWasPlayer== 1 and GetConVarNumber("h_combine_chat") == 1 then
-	PrintMessage(HUD_PRINTTALK, "Combine: "..table.Random(ChatEnemyLost).."")
-	LastEnemyWasPlayer=0
-	--npc:EmitSound("npc/combine_soldier/vo/lostcontact.wav", 80,100)
+		LastEnemyWasPlayer=0
+		for k, v in pairs(ents.FindByClass("npc_combine_s")) do 
+			PrintMessage(HUD_PRINTTALK, ""..v:GetName()..": "..table.Random(ChatEnemyLost).."")
+			break
+		end
 	end
 end
 
 
 function ClearCombineSpawnPoints()
-
-
-
 table.foreach(combinespawnzones, function(key,zone)
 
 		for k, v in pairs(ents.FindInSphere(zone,50)) do 
@@ -2515,7 +2513,6 @@ end
 end
 
 function GM:PlayerSpawn(ply)
-	--timer.Simple (1.3, npcforget)
 	ply:SetTeam(1)
     ply:SetCustomCollisionCheck(true)
 	ply:StripAmmo()
@@ -3037,6 +3034,7 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	
 	if attacker:IsNPC() then
 		attacker:EmitSound(table.Random(CombineKillSounds), 100, 100)
+		attacker:ClearEnemyMemory()
 	end
 
 	-- One npc_sniper can only kill one player, then, it won't shoot players anymore. So I remove it and respawn another when he kills a player.
@@ -3123,7 +3121,7 @@ end
 	-- Anti teamkill shit. If a player kills another player with a prop or a satchel charge, they will recieve a warning. The third time they will be killed and not able to spawn.
 	if attacker:IsPlayer() and dmginfo:GetInflictor():GetClass() == "prop_physics_multiplayer" or dmginfo:GetInflictor():GetClass() == "prop_physics" or dmginfo:GetInflictor():GetClass() == "cw_ammo_crate_small" or dmginfo:GetInflictor():GetClass() == "npc_satchel"  or dmginfo:GetInflictor():GetClass() == "npc_grenade_frag" 
 then
-		if attacker:Nick() != ply:Nick() then
+		if attacker:GetName() != ply:GetName() then
 			attacker.teamkiller=attacker.teamkiller+1
 			dmginfo:GetAttacker():PrintMessage(HUD_PRINTCENTER, "Try to avoid killing teammates.")
 			if dmginfo:GetAttacker().teamkiller > 2 then
