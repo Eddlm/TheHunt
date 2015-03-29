@@ -2635,7 +2635,7 @@ function GM:OnNPCKilled(victim, killer, weapon)
 			end
 			killer:AddFrags(1)
 			-- combine disguise
-			if math.random(1,10) == 1 then
+			if math.random(1,1) == 1 then
 			if	killer.disguised == 0 and killer:GetPos():Distance(victim:GetPos()) < 120 then 
 			if victim:GetModel() == "models/combine_soldier.mdl" then timer.Create( "PlayerDisguises", 2.2, 1, function() CombineDisguise(killer,"models/player/combine_soldier.mdl") end) end
 			if victim:GetModel() == "models/combine_super_soldier.mdl" then timer.Create( "PlayerDisguises", 2.2, 1, function() CombineDisguise(killer,"models/player/combine_super_soldier.mdl") end) end
