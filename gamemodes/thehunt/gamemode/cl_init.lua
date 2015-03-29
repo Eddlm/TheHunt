@@ -12,7 +12,8 @@ vlight=0
 CLDARKNESS = 0
 score_color=Color(150,150,150)
 vdarkencolor = Color(0,255,0)
-
+disguised=0
+disguisehinted=0
 if !ConVarExists("h_outline_radius") then
 	CreateClientConVar( "h_outline_radius", "1000", true, false )
 end
@@ -73,16 +74,21 @@ hook.Add( "HUDPaint", "HuntHud", function()
 			draw.DrawText( "Silent Kills: "..LocalPlayer():GetNWInt("SilentKills").."", "TargetID", ScrW() * 0.03, ScrH() * 0.76, Color(0,255,0), TEXT_ALIGN_LEFT )
 			draw.DrawText( "Deaths: "..LocalPlayer():GetNWInt("Deaths").."", "TargetID", ScrW() * 0.03, ScrH() * 0.78, Color(0,255,0), TEXT_ALIGN_LEFT )
 		end
+
 			if (input.IsKeyDown(32)) then
 				draw.DrawText( "Lighting: "..math.Round(vlight,1).."", "TargetID", ScrW() * 0.5, ScrH() * 0.52, vdarkencolor, TEXT_ALIGN_CENTER )
 		end
-		
+		if disguised==1 then
+		draw.DrawText( "Disguised", "TargetID", ScrW() * 0.5, ScrH() * 0.90, Color(0,255,0), TEXT_ALIGN_CENTER )
+		draw.DrawText( "say !gohere to guide other combine where you aim", "TargetID", ScrW() * 0.5, ScrH() * 0.92, Color(0,255,0), TEXT_ALIGN_CENTER )
+		draw.DrawText( "say !patrolhere to make other combine maintain an area vigilated.", "TargetID", ScrW() * 0.5, ScrH() * 0.94, Color(0,255,0), TEXT_ALIGN_CENTER )
+		end
 	end
 end)
 
 
 hook.Add( "PreDrawHalos", "AddHalos", function()
-	if LocalPlayer():Alive() and LocalPlayer():GetPos() then
+	if LocalPlayer():Alive() and LocalPlayer():GetPos() and disguised ==0 then
 		for k, v in pairs(ents.FindInSphere(LocalPlayer():GetEyeTraceNoCursor().HitPos, GetConVarNumber("h_outline_radius"))) do
 			if v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_hunter" then
 				if v:IsValid() then
@@ -92,7 +98,7 @@ hook.Add( "PreDrawHalos", "AddHalos", function()
 			if v:GetClass() == "item_healthcharger" and LocalPlayer():Health() < 40 and LocalPlayer():Health() > 0 then
 				halo.Add( {v}, Color( 0,204,255 ), 1, 1, 1, true, true )
 			end
-			if v:IsPlayer() then
+			if v:IsPlayer() or v:GetClass() == "npc_citizen" then
 				if v:Health() > 0 then
 					halo.Add( {v}, Color( 18,176,0 ), 1, 1, 3, true, true )
 				end
@@ -238,8 +244,10 @@ local text = "ERROR"
 local font = "TargetID"
 
 if (trace.Entity:IsPlayer()) then
-	text = trace.Entity:Nick()
-else
+	text = trace.Entity:GetName()
+elseif trace.Entity:GetNWString("name") then
+	text = trace.Entity:GetNWString("name")
+else 
 	text=""
 end
 
@@ -288,3 +296,26 @@ function ChatToWebsite(pl, text)
 	end
 end
 hook.Add("OnPlayerChat", "ChatToWebsite", ChatToWebsite)
+--testmusic = CreateSound( LocalPlayer(), "music/hl2_song20_submix0.mp3")
+
+
+function Hints()
+
+local seconds=0
+table.foreach(Player_Hints, function(key,value) 
+timer.Simple(seconds, function() notification.AddLegacy(value,   NOTIFY_HINT  , 6 ) end)
+seconds=seconds+20
+end)
+end
+
+
+function DisguiseHints()
+if disguisehinted == 0 then
+disguisehinted=1
+local seconds=0
+table.foreach(Disguise_Hints, function(key,value) 
+timer.Simple(seconds, function() notification.AddLegacy(value,   NOTIFY_HINT  , 6 ) end)
+seconds=seconds+10
+end)
+end
+end

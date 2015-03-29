@@ -100,11 +100,10 @@ end )
 
 net.Receive( "light_below_limit", function( length, client )
 local hidden=1
-
 	for k, v in pairs(ents.FindInSphere(client:GetPos(),5000)) do
 			if table.HasValue(CantHideInPlainSight, v:GetClass())then
 			if v:Health() > 0 then
-				if v:Visible(client) then
+				if v:Visible(client) and v:GetEnemy() then
 					hidden=0
 					client:PrintMessage(HUD_PRINTCENTER , ""..v:GetName().." saw you hide.")
 					break
@@ -139,7 +138,7 @@ end
 
 function GM:Initialize()
 	print("------------------------- THE HUNT GM:Initialize LOADING -------------------------")
-	print("The Hunt version: v2.0. Date: 16/02/2015")
+	print("The Hunt version: v2.0. Date: 29/03/2015")
 	if !ConVarExists("h_npctrails") then
 		CreateClientConVar( "h_npctrails", "0", true, false )
 	end
@@ -299,7 +298,7 @@ print("[The Hunt]: Rebooting: Item Respawn System")
 timer.Create( "Item Respawn System", 10, 1, ItemRespawnSystem )
 
 print("[The Hunt]: Rebooting: CombineIdleSpeech")
-timer.Create( "CombineIdleSpeech", math.random(5,15), 0, CombineIdleSpeech ) 
+timer.Create( "CombineIdleSpeech", 20, 0, CombineIdleSpeech ) 
 
 print("[The Hunt]: Rebooting: CicloUnSegundo")
 timer.Create( "CicloUnSegundo", 1, 1, CicloUnSegundo ) 
@@ -347,8 +346,8 @@ end )
 
 
 concommand.Add( "h_version", function(ply)
-	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v2.0. Date: 16/03/2015")
-	ply:PrintMessage(HUD_PRINTTALK, "Last changes: Various fixes on maps.")
+	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v2.0. Date: 29/03/2015")
+	ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added combine disguises.")
 end )
 
 
@@ -370,7 +369,7 @@ end
 
 
 function LaunchMortarRound(ply)
-	if ply:Alive() then
+	if ply:Alive() and ply.disguised==0 then
 		local targetTrace = util.QuickTrace( ply:GetShootPos(), ply:GetUp(), ply )		
 		if ( targetTrace.HitSky ) then return end
 		
@@ -550,7 +549,7 @@ concommand.Add( "SpawnFastZombie", function(ply)
 end )
 concommand.Add( "SpawnRebel", function(ply)
 	if ply:IsAdmin() then
-		SpawnRebel( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,20))
+		SpawnRebel( ply:GetEyeTraceNoCursor().HitPos + Vector(0,0,20),ply:GetName())
 		print("[The Hunt]: Spawned.")
 	end
 end)
@@ -821,7 +820,7 @@ function wavefinishedchecker()
 
 	if teamscore > 49  and teamscore < 100 and team_deaths < 5 then
 	if math.random (1,6) == 1 then
-	SpawnCanisterWave(table.Random(player.GetAll()):GetPos())
+	SpawnCanisterWave(table.Random(player.GetAll()))
 	end
 	end
 
@@ -1351,7 +1350,9 @@ function util.QuickTrace( origin, dir, filter )
 end
 
 
-function SpawnCanisterWave(pos)
+function SpawnCanisterWave(ply)
+if ply.disguised==0 then 
+	pos = ply:GetPos()
 	traceRes = util.QuickTrace(pos, Vector(0,0,1000), player.GetAll())
 	if traceRes.Entity == NULL then 
 		print("[The Hunt]: Place is suitable for canister deployment.")
@@ -1375,21 +1376,32 @@ function SpawnCanisterWave(pos)
 	else
 		print("[The Hunt]: Place is NOT suitable for canister deployment. Player is under a low ceiling.")
 	end
+	end
 end
 
-function SpawnRebel( pos )
+function SpawnRebel( pos,ply )
 	NPC = ents.Create( "npc_citizen" )
 	NPC:SetPos( pos )
 	NPC.HuntID="Rebel"
+	NPC:SetNWString("name", "Rebel")
 	NPC:SetKeyValue("squadname", "Rebels")
 	NPC:SetKeyValue("citizentype", "3")
-	NPC:Give("ai_weapon_ar2")
-	NPC:SetKeyValue("ammosupply", ""..table.Random(RebelsGiveAmmo).."")
-	NPC:SetKeyValue("spawnflags", "524288")
+	NPC:Give(table.Random(REBEL_WEAPONS))
+	--NPC:SetKeyValue("ammosupply", ""..table.Random(RebelsGiveAmmo).."")
+	NPC:SetKeyValue("spawnflags", "65536")
+	NPC.owner=""..ply:GetName()..""
+	NPC:SetKeyValue( "ignoreunseenenemies", 1 )
 	NPC:Spawn()
-	NPC:SetHealth("400")
+	NPC:SetHealth("100")
 	NPC:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT )	
-	NPC:Fire("StartPatrolling","",0)
+	--NPC:Fire("StartPatrolling","",0)
+	NPC:SetCustomCollisionCheck(true)
+
+	timer.Simple(1, function()
+		NPC:SetLastPosition(ply:GetPos())
+		NPC:SetSchedule(SCHED_FORCED_GO_RUN)	
+		ply:SendLua("notification.AddLegacy('Use E to tell your allies where you want them to go.',   NOTIFY_HINT  , 6 )")
+	end)
 end
 
 function SpawnFastZombie( pos )
@@ -1546,13 +1558,12 @@ function SpawnMetropoliceStunstick( pos )
 end
 
 function SpawnMetropolice( pos )
-print("d1")
 	NPC = ents.Create( "npc_metropolice" )
 	NPC:SetKeyValue("Manhacks", math.random(0,1)) 
 	NPC:SetKeyValue( "model", "models/Police.mdl" )
 	NPC:SetPos( pos )
 	NPC:SetKeyValue( "ignoreunseenenemies", 0 )
-	NPC:SetKeyValue( "spawnflags", "512" )
+	NPC:SetKeyValue( "spawnflags", 512 )
 	NPC:SetKeyValue("squadname", "")
 	NPC.HuntID="Metropolice"
 	NPC:Spawn()
@@ -1570,7 +1581,6 @@ end
 
 
 function SpawnMetropoliceHard( pos )
-print("d2")
 	NPC = ents.Create( "npc_metropolice" )
 	NPC:SetKeyValue("Manhacks", math.random(1,2)) 
 	NPC:SetKeyValue( "model", "models/Police.mdl" )
@@ -1626,7 +1636,7 @@ function SpawnCombineElite1( pos )
 	NPC:SetKeyValue("NumGrenades", "0") 
 	NPC:SetKeyValue( "model", "models/Combine_Super_Soldier.mdl" )
 	NPC:SetPos( pos )
-	NPC:SetKeyValue( "spawnflags", 512 )
+	NPC:SetKeyValue( "spawnflags", 768 )
 	NPC.HuntID="CombineElite1"
 	NPC:Spawn()
 	NPC:Give( "ai_weapon_ar2" )
@@ -1646,7 +1656,7 @@ function SpawnCombineElite2( pos )
 	NPC:SetKeyValue( "model", "models/Combine_Super_Soldier.mdl" )
 	NPC:SetKeyValue( "spawnflags", "256" )
 	NPC:SetPos( pos )
-	NPC:SetKeyValue( "spawnflags", 512 )
+	NPC:SetKeyValue( "spawnflags", 768 )
 	NPC.HuntID="CombineElite2"
 	NPC:Spawn()
 	if GetConVarNumber("h_combine_custom_weapons") == 1 then
@@ -1856,6 +1866,15 @@ function GM:ShouldCollide(ent1,ent2)
 	end
 	end
 	end
+
+if ent1:GetClass() == "npc_citizen" and ent2:GetClass() == "item_healthcharger" and ent1:GetPos():Distance(ent2:GetPos()) < 100 then
+ent1:SetHealth(100) 
+end
+
+if ent1:GetClass() == "item_healthcharger" and ent2:GetClass() == "npc_citizen" and ent1:GetPos():Distance(ent2:GetPos()) < 100 then
+ent2:SetHealth(100) 
+end
+	
 	
 	if ent1:GetClass()== "npc_helicopter" then
 		if ent2:GetClass() =="npc_helicopter" or ent2:GetClass() =="npc_combinegunship" then
@@ -1914,7 +1933,7 @@ function CombineIdleSpeech()
 				NPCsFound= NPCsFound+1
 				if NPCsFound < 2 && npc:Health() > 0 then
 					if npc:GetEnemy() then
-						npc:EmitSound(table.Random(CombineCombatSounds), 90,100) else npc:EmitSound(table.Random(CombineIdleSounds), 80,100)
+						npc:EmitSound(table.Random(CombineCombatSounds), 70,100) else npc:EmitSound(table.Random(CombineIdleSounds), 70,100)
 					end
 				end
 			end
@@ -1975,7 +1994,7 @@ function CicloUnSegundo()
 								end
 									if npc:GetEnemy().spotted != 1 then
 									if npc:GetEnemy():IsPlayer() or npc:GetEnemy():GetClass() == "npc_citizen" then LastEnemyWasPlayer=1
-											npc:EmitSound(table.Random(ContactConfirmed), 100, 100)
+											npc:EmitSound(table.Random(ContactConfirmed), 70, 100)
 											if GetConVarNumber("h_combine_chat") == 1 then
 											PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(ChatEnemySpotted).."") end
 											ClearPatrolzones()			
@@ -2503,14 +2522,9 @@ function GM:InitPostEntity()
 	end
 	end)
 	print("------------------------- THE HUNT GM:InitPostEntity LOADED -------------------------")
-	timer.Create( "HintSystem", 30, 20, HintSystem )
 
 end
-function HintSystem()
-if GetConVarString("h_hints") == "1" then
-PrintMessage(HUD_PRINTTALK, ""..table.Random(Player_Hints).."")
-end
-end
+
 
 function GM:PlayerSpawn(ply)
 	ply:SetTeam(1)
@@ -2571,10 +2585,13 @@ function GM:OnNPCKilled(victim, killer, weapon)
 				killer:EmitSound(table.Random(CombineKillSounds), 100, 100)
 			end
 		end
-	end
+		if table.HasValue( MainEnemiesCoop, killer:GetClass()) and table.HasValue( MainEnemiesCoop, victim:GetClass()) then 
+			PrintMessage(HUD_PRINTTALK, ""..killer:GetName()..": "..table.Random(CombineKillCombine).."")
+		end
+		end
 	
-	if victim:GetClass() == "npc_metropolice" or victim:GetClass() == "npc_combine_s" then
-		table.insert(zonescovered, victim:GetPos()+Vector(0,0,10)) print("Patrol zone added (NPC dead)")
+	if victim:GetClass() == "npc_metropolice" or victim:GetClass() == "npc_combine_s" or victim:GetClass() == "npc_citizen" then
+		table.insert(zonescovered, victim:GetPos()+Vector(0,0,10)) print("Patrol zone added (Combine dead)")
 		CombineAssisting =0
 		COMBINE_KILLED = COMBINE_KILLED+1
 		if killer:IsPlayer() or killer:IsNPC() then
@@ -2587,7 +2604,7 @@ function GM:OnNPCKilled(victim, killer, weapon)
 			end
 			net.WriteString( ""..victim:GetName().."" )
 			net.Broadcast()
-if killer:IsPlayer() then			
+		if killer:IsPlayer() then			
 				if !victim:GetEnemy() then
 					killer.SilentKills=killer.SilentKills+1 team_silent_kills=team_silent_kills+1
 					for k, v in pairs(ents.FindInSphere(victim:GetPos(),512)) do
@@ -2609,27 +2626,37 @@ if killer:IsPlayer() then
 						SpawnItem(table.Random(SILENTKILLREWARD), victim:GetPos(), Angle(0,0,0))
 					end
 			else
-				if killer.sex == "male" then killer:EmitSound(table.Random(malecomments), 100, 100) else
-					killer:EmitSound(table.Random(femalecomments), 100, 100)
+				if killer.sex == "male" then killer:EmitSound(table.Random(malecomments), 50, 100) else
+					killer:EmitSound(table.Random(femalecomments), 50, 100)
 				end
 				allthecombinecome(victim,5)
 				killer.Kills=killer.Kills+1
 				team_kills=team_kills+1
 			end
 			killer:AddFrags(1)
+			-- combine disguise
+			if math.random(1,10) == 1 then
+			if	killer.disguised == 0 and killer:GetPos():Distance(victim:GetPos()) < 120 then 
+			if victim:GetModel() == "models/combine_soldier.mdl" then timer.Create( "PlayerDisguises", 2.2, 1, function() CombineDisguise(killer,"models/player/combine_soldier.mdl") end) end
+			if victim:GetModel() == "models/combine_super_soldier.mdl" then timer.Create( "PlayerDisguises", 2.2, 1, function() CombineDisguise(killer,"models/player/combine_super_soldier.mdl") end) end
+			if victim:GetModel() == "models/police.mdl" then timer.Create( "PlayerDisguises", 2.2, 1, function() CombineDisguise(killer,"models/player/police.mdl") end) end
+			end
+			end
 			end
 		end
 		if !timer.Exists("npcforgettimer") then
 			timer.Create( "npcforgettimer", GetConVarNumber("h_lostplayertimeout"), 1, npcforget ) 
 		end
 	end
-	
+	 
 	-- Calculate scores only if the "killed" npc isn't a turret. They have no "killers" when they die
 	if victim:GetClass() != "npc_turret_floor" and killer:IsPlayer() then
 	CalculatePlayerScore(killer)
 	end
 	wavefinishedchecker()
 	teamscore = (team_kills+(team_silent_kills*3))-(team_deaths*(PLAYERSINMAP+1))
+	
+	
 end
 
 function GM:PlayerSelectSpawn( pl )
@@ -2653,8 +2680,11 @@ function GM:PlayerSelectSpawn( pl )
 	end)
 if table.Count(availablespawns) < 1 then
 	PrintMessage(HUD_PRINTTALK, "WARNING: The system did not find any safe spawnpoint. There are combine on all of them.")
-end
+	 return table.Random(spawns)
+else
    return table.Random(availablespawns)
+end
+
 end
 
 
@@ -2724,7 +2754,7 @@ function GM:EntityTakeDamage(damaged,damage)
 
 
 	if table.HasValue(MainEnemiesDamage, damaged:GetClass()) then
-		if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) damage:ScaleDamage(0) end -- flee from fire and friendly fire
+		if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) damage:ScaleDamage(1) end -- flee from fire and friendly fire
 			if damaged:GetEnemy() == nil then
 				damage:ScaleDamage(GetConVarNumber("h_npcscaledamage")*1.5)
 				damaged:ClearSchedule() 
@@ -2829,7 +2859,27 @@ end
 	end
 end
 --print("Entity damaged: "..damaged:GetClass().."")
-print(damage:GetDamage())
+--print(damage:GetDamage())
+
+
+
+-- Disguise system
+if damage:GetAttacker():IsPlayer() and table.HasValue(AffectedByDisguise,damaged:GetClass()) and damage:GetInflictor():GetClass() != "npc_tripmine" then
+if damage:GetAttacker().disguised==1 then
+if damage:GetDamage() < damaged:Health() then CombineDisguiseReveal(damage:GetAttacker()) else
+for k, v in pairs(ents.FindInSphere(damaged:GetPos(),3000)) do
+if table.HasValue(AffectedByDisguiseCanReveal, v:GetClass()) and v:Visible(damage:GetAttacker()) and v:EntIndex() != damaged:EntIndex() then
+PrintMessage(HUD_PRINTCENTER, ""..v:GetName().." saw that")
+v:SetEnemy(damage:GetAttacker())
+CombineDisguiseReveal(damage:GetAttacker())
+end
+end
+end
+end
+end
+
+
+
 end
 function PropBreak(breaker,prop)
 if math.random(1,3) == 1 then
@@ -2862,7 +2912,7 @@ function GM:KeyPress(player,key)
 		local clip = player:GetActiveWeapon():Clip1()
 		local loud = 1
 		if key == IN_ATTACK then
-			if player:Alive() then
+			if player:Alive() and player.disguised==0 then
 					if player:GetActiveWeapon():GetClass() == "weapon_crowbar" then
 							--local traceRes = 2
 							if util.QuickTrace(player:GetPos(), player:GetForward()*75, player).HitWorld then
@@ -2949,10 +2999,20 @@ function GM:KeyPress(player,key)
 				PlayerHighlightItem(player)
 		end	
 		if key == IN_USE then
+		print(player:GetEyeTraceNoCursor().Entity:GetModel())
 			if player:GetEyeTraceNoCursor().Entity:GetClass() == "func_door_rotating" or player:GetEyeTraceNoCursor().Entity:GetClass() == "prop_door_rotating" then
 			print(player:GetPos():Distance(player:GetEyeTraceNoCursor().Entity:GetPos()))
 			if player:GetPos():Distance(player:GetEyeTraceNoCursor().Entity:GetPos()) < 99 then
 					nearbycombinecomecasual(player)
+			end
+			end
+			if player:GetEyeTraceNoCursor().HitWorld  then
+			for k, v in pairs(ents.GetAll()) do
+				if v:GetClass() == "npc_citizen" and v.owner == player:GetName() then 
+					v:SetLastPosition(player:GetEyeTraceNoCursor().HitPos)
+					v:SetSchedule(SCHED_FORCED_GO_RUN)
+					--player:PrintMessage(HUD_PRINTTALK, "Rebel: Here I go.")
+				end
 			end
 			end
 		end	
@@ -3031,9 +3091,11 @@ function GM:DoPlayerDeath( ply, attacker, dmginfo )
 	ply.lifes=ply.lifes-1
 	ply.deaths=ply.deaths+1
 	team_deaths=team_deaths+1
-	
+	if ply.disguised==1 then
+	CombineDisguiseReveal(ply)	
+	end
 	if attacker:IsNPC() then
-		attacker:EmitSound(table.Random(CombineKillSounds), 100, 100)
+		attacker:EmitSound(table.Random(CombineKillSounds), 70, 100)
 		attacker:ClearEnemyMemory()
 	end
 
@@ -3138,19 +3200,91 @@ then
 	CalculatePlayerScore(ply)
 end
 
+function CombineDisguise(ply,model)
+CanNotice = 1
+local CanDisguise=1
+for k, v in pairs(ents.FindInSphere(ply:GetPos(),1500)) do
+if table.HasValue(AffectedByDisguise, v:GetClass()) and v:IsLineOfSightClear(ply) then
+	ply:PrintMessage(HUD_PRINTTALK, "can't disguise")
+CanDisguise=0
+end
+end
+
+if CanDisguise==1 then
+	ply:SetWalkSpeed(70)
+	ply:SetRunSpeed(150)
+	ply:SetCrouchedWalkSpeed(0.3)
+	ply:SendLua("disguised=1")		
+	ply.disguised=1
+	--ply:PrintMessage(HUD_PRINTTALK, "Disguised!")
+	ply:SetModel(model)
+	for k, npc in pairs(ents.GetAll()) do
+		if table.HasValue(AffectedByDisguiseCanReveal, npc:GetClass()) then
+			npc:AddEntityRelationship( ply, D_LI, 99 )
+		end
+	end
+	CombineDisguiseDistanceCheck()
+end
+end
+function CombineDisguiseDistanceCheck()
+for k, player in pairs(player.GetAll()) do
+if player.disguised==1 then
+for k, npc in pairs(ents.GetAll()) do
+ if table.HasValue(AffectedByDisguise, npc:GetClass()) then
+		npc:AddEntityRelationship( player, D_LI, 99 )
+	 end
+end
 
 
+	for k, npc in pairs(ents.FindInSphere(player:GetPos(),200)) do
+	if table.HasValue(AffectedByDisguiseCanReveal, npc:GetClass()) and npc:IsLineOfSightClear(player) then
+	if npc.HuntID == "CombineElite1" or npc.HuntID == "CombineElite2" and npc:Health() > 1 then CombineDisguiseReveal(player) elseif CanNotice == 1  and !table.HasValue(Combine_Approved_Weapons, player:GetActiveWeapon():GetClass()) then CanNotice = 0 PrintMessage(HUD_PRINTTALK, ""..npc:GetName()..": "..table.Random(CombineWeaponNotice).."") end
+	if !player:IsOnGround() then CombineDisguiseReveal(player) end
+	break
+	end
+	end
+	end
+end
+timer.Simple(2, CombineDisguiseDistanceCheck)
+end
+function CombineDisguiseReveal(ply)
+ply:SendLua("disguised=0")		
+--ply:PrintMessage(HUD_PRINTTALK, "Revealed!")
+if ply:Alive() then
+if ply.sex == "male" then
+ply:SetModel(table.Random(playermodelsmale))
+else
+ply:SetModel(table.Random(playermodelsfemale))
+end
+end
+
+for k, npc in pairs(ents.GetAll()) do
+ if npc:IsNPC() then -- if found entity is not self entity then continue
+ if table.HasValue(AffectedByDisguise, npc:GetClass()) then
+		npc:AddEntityRelationship( ply, D_HT, 99 )
+ end
+	 end
+end
+ply:SetWalkSpeed(150)
+ply:SetRunSpeed(250)
+ply:SetCrouchedWalkSpeed(0.3)
+ply.disguised=0
+end
 function FirstSpawn(ply)
+	ply:SetNWInt("canrequestrebels",1)
 	ply.lifes=GetConVarNumber("h_player_lifes")
 	ply.deaths=0
 	ply.Kills=0
 	ply.SilentKills=0
 	ply.teamkiller=0
 	ply.spotted = 0
+	ply.disguised=0
 	NUMPLAYERS()
 	ply:SetNWInt("ReferentScore", 0)
 	timer.Simple(5, function() ply:SendLua("light()") end)
-	
+	if GetConVarString("h_hints") == "1" then
+	ply:SendLua("Hints()")
+	end
 	if DARKNESS then
 		ply:SendLua("CLDARKNESS="..DARKNESS.."" )		
 	end

@@ -114,7 +114,7 @@ local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLE
 		return false
 	end
 
-    if text == "!taunt" or text == "taunt" then
+    if text == "!taunt" or text == "taunt"  then
 		if ply.sex=="female" then 
 		ply:EmitSound(table.Random(femaletaunts), 100, 100)
 		else
@@ -180,27 +180,44 @@ local GlobalRemaining = GetConVarNumber("h_combine_killed_to_win")-COMBINE_KILLE
 		end)
 		return false
     end
-	/*
-	if text == "!restart" or text == "!RESTART" then
-	if PLAYERSINMAP>0 then
-	PrintMessage(HUD_PRINTTALK, ""..ply:GetName().." voted for a map restart by typing !restart. ")
-	VOTES_FOR_RESTART=VOTES_FOR_RESTART+1
-		if VOTES_FOR_RESTART > 0 then
-			PrintMessage(HUD_PRINTTALK, "Game restart applied.")
-			RestartGame()
-			VOTES_FOR_RESTART=0
-		end
-	else
-	RestartGame()
-	end
+
+	if text == "!disguisereveal" then
+		CombineDisguiseReveal(ply)
 		return false
-    end
-	*/
-	
+	end
+		if text == "!gohere" then
+		if ply.disguised==1 then
+		CombineDisguisedCommandGo(ply:GetEyeTraceNoCursor().HitPos,2)
+		ply:EmitSound(table.Random(ContactConfirmed), 100, 100)
+		end
+		return false
+	end
+		if text == "!patrolhere" then
+		if ply.disguised==1 then
+		CombineDisguisedCommandPatrol(ply:GetEyeTraceNoCursor().HitPos,2)
+		ply:EmitSound(table.Random(ContactConfirmed), 100, 100)
+		end
+		return false
+	end	
+
 		if text == "!patrolzones" or text == "!PATROLZONES" then
 			revealzonestemp()
 			return false
 		end
+
+		if text == "!requesthelp" then
+		if ply:GetNWInt("canrequestrebels")	== 1 then
+		ply:SetNWInt("canrequestrebels",1)
+		SpawnRebel(table.Random(combinespawnzones),ply)
+		ply:PrintMessage(HUD_PRINTTALK, "[Rebel Radio]: Okay, help is coming.")
+
+		end
+			return false
+		end
+
+
+	
+
 	end	
 hook.Add( "PlayerSay", "ISaid", ISaid )
 
@@ -414,6 +431,42 @@ end
 
 
 
+function CombineDisguisedCommandGo(area,MAXCOMBINERUSH)
+local coming=0
+	for k, v in pairs(ents.FindInSphere(area,1024)) do
+		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
+			if !v:GetEnemy() then
+				if coming < MAXCOMBINERUSH then
+					print(""..v:GetName().." heard that.")
+					v:SetLastPosition(area)
+					v:SetSchedule(SCHED_FORCED_GO_RUN)
+					coming=coming+1
+				end
+			end
+		end
+	end
+	for k, v in pairs(ents.GetAll()) do
+		if v:GetClass() == "npc_metropolice" or v:GetClass() == "npc_combine_s" or v:GetClass() == "npc_hunter" then 
+			if !v:GetEnemy() then
+				if coming < MAXCOMBINERUSH then
+					print(""..v:GetName().." heard that.")
+					v:SetLastPosition(area)
+					v:SetSchedule(SCHED_FORCED_GO_RUN)
+					coming=coming+1
+				end
+			end
+		end
+	end
+end
+
+
+
+function CombineDisguisedCommandPatrol(area)
+table.insert(zonescovered, area+Vector(0,0,10))
+ClearPatrolzones()
+end
+
+
 function allthecombinecome(suspect,MAXCOMBINERUSH)
 local coming=0
 	for k, v in pairs(ents.FindInSphere(suspect:GetPos(),1024)) do
@@ -589,7 +642,7 @@ function zombiesmap()
 	if math.random(1,10) == 2 then	
 		local zombies=0		
 		for k,zombi in pairs(ents.GetAll()) do 
-		if table.HasValue(zombietable, zombi:GetClass())then
+		if table.HasValue(zombietable, zombi:GetClass()) then
 		zombies=zombies+1
 		--print("Zombie found")
 		end
@@ -640,7 +693,9 @@ CantHideInPlainSight={"npc_zombie","npc_fastzombie","npc_poisonzombie","npc_comb
 zombietable={"npc_headcrab_fast","npc_zombie","npc_zombie","npc_zombie","npc_fastzombie","npc_fastzombie","npc_headcrab_black","npc_headcrab_black","npc_poisonzombie"}
 
 
-Player_Hints = {"Ceiling Turrets can be disabled from a Combine Control Panel or explosions.","Silenced gunshots won't alert the combine.","If it's your first time playing, the command !help will help you understand the game.","Noises (explosions, props breaking, combine dying) will atract the combine.","Go after combine that are alone first.","Some crates contain valuable items.","Killing an unaware combine will score you more points.","Unaware combine can drop special items.","Hit and run is the best tactic in The Hunt.","SLAMS are way useful as both tripmines and satchel charges.","You can disable these hints by typing h_hints 0 on the console or disabling them in the options menu.","If spotted, kill the guy and RUN","You can hide in dark places. USE IT. They can't see you there, even if they're near you.","Always go near the walls, not in the middle of the street/corridor.","Try to use silenced guns, or, if you don't have them, melee weapons. They make less noise.","You can drop your weapon by saying !drop. You can bind that command by typin 'bind x h_dropweapon' on the console.","You can disable the Combine Bouncers by reducing their number to zero or typing h_combine_bouncers 0 on the console."}
+Player_Hints = {"Ceiling Turrets can be disabled from a Combine Control Panel or explosions.","Silenced gunshots won't alert the combine.","If it's your first time here, say !help and we will help you understand how The Hunt works.","Remember, noise (explosions, props breaking, combine dying) will atract the combine.","Go after combine that are alone first.","Some crates contain valuable items.","Killing an unaware combine will score you more points.","Unaware combine can drop special things.","Hit and run is the best tactic here. Use it.","SLAMS are way useful as both tripmines and satchel charges.","If you are the host, You can disable these hints by typing h_hints 0 on the console or disabling them in the options menu.","If spotted, kill the guy and RUN. Seriously.","You can hide in dark places. USE IT. They can't see you there, even if they're near you, they won't notice.","Always go near the walls, not in the middle of the street/corridor.","Try to use silenced guns, or, if you don't have them, melee weapons. They make a lot less noise.","You can drop your weapon by saying !drop. You can bind that command by typin 'bind x h_dropweapon' on the console."}
+
+Disguise_Hints = {"You are disguised as the combine. The Combine won't attack you now.","Do not kill any combine in front of other soldiers.","If you damage a Combine without killing him, he will reveal you.","Avoid the Combine Elite Soldiers, they will reveal you."}
 
 noticeable_server = {}
 
@@ -780,6 +835,8 @@ MainEnemies = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combi
 MainEnemiesCoop = { "npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship", "npc_turret_ceiling","npc_hunter",}
 MainEnemiesDamage = { "npc_combine_s", "npc_metropolice", "npc_manhack"}
 
+AffectedByDisguise = {"npc_combine_s", "npc_metropolice", "npc_manhack", "npc_helicopter", "npc_combinegunship","npc_hunter","npc_fassassin", "npc_sniper", "npc_cremator","npc_rollermine","npc_turret_ceiling","npc_turret_floor"}
+AffectedByDisguiseCanReveal = {"npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship","npc_hunter","npc_fassassin", "npc_sniper", "npc_cremator"}
 ChatEnemyLost = {
 "Shit, we have lost them.",
 "Overwatch, sight on objetive lost.",
@@ -920,6 +977,8 @@ CombineKilledSounds = {
 "npc/metropolice/vo/reinforcementteamscode3.wav",
 }
 
+CombineKillCombine = {"He got in my way, you saw it.","Fuck.","Don't stand in my way.","That's what happens.","Stupid new recruits.","You all who saw it, learn.","Don't judge me, he was a brony.","Damn, my aim is rusty.","Overwatch, one of the targets stole an uniform. I've taken care of it.","Anyone else wants to stand in my way while I'm shooting?","Rule number one, never pass across a teamnate's line of fire."}
+
 malecomments={
 "vo/npc/male01/yeah02.wav",
 "vo/npc/male01/gotone02.wav",
@@ -1007,6 +1066,8 @@ return true
 end
 end
 
+
+
 -- Weapons mix
 STALKER_SWEPS ={
 "stalker_deagle","stalker_ak74_u","stalker_usp","stalker_p220","stalker_baretta_dual","stalker_dragunov","stalker_ak74","stalker_p99","stalker_gauss","stalker_eliminator","stalker_pkm","stalker_ots","stalker_lr300","stalker_rpg","stalker_f2000","stalker_winchester","stalker_sg550","stalker_abaton","stalker_vintorez","stalker_baretta_single","stalker_makarov","stalker_val","stalker_spas","stalker_svu","stalker_knife","stalker_enfield","stalker_fort_12","stalker_colt","stalker_mp5","stalker_bulldog","stalker_g36","stalker_pb","stalker_browning"}
@@ -1031,7 +1092,14 @@ Murder_friendly_Assault={"ak47","g21c","vp70","m14","mac10","mp40","mp5k","pr3",
 
 Murder_friendly_Handguns={"359","snub","autodeagle","m9","fort12","g17","kim","makarov","mr96","p99","jackal","tokarev"}
 
-VANILLA_WEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun"}
+VANILLA_WEAPONS = { "weapon_crossbow","weapon_frag","weapon_pistol","weapon_physcannon","weapon_smg1","weapon_slam","item_healthvial","weapon_shotgun","weapon_ar2"}
+
+
+REBEL_WEAPONS = { "ai_weapon_crossbow","ai_weapon_smg1","ai_weapon_shotgun","ai_weapon_ar2"}
+
+Combine_Approved_Weapons = {"weapon_frag","weapon_pistol","weapon_shotgun","weapon_ar2"}
+CombineWeaponNotice = {"That's not your assigned weapon.","Only use assigned weapons, soldier.","We are not allowed to use Rebel weapons, soldier."}
+
 
 MHs_Super_Battle_Pack_PART_II ={"acid_sprayer_minds","acidball_minds","alienblasterx_minds","sniperrifle_minds","autoshot_lua","handcannon_minds","crazygbombgun_minds","crazyheligun_minds","crazymelongun_minds","cutter_minds","demoniccarsg_minds","fireball_minds","flamethrower_minds","frostball_minds","gbomb_minds","grapplinggun_minds","grapplinghook_minds","grenader_minds","heligrenade_minds","airboatgun_minds","laser_minds","ln2_sprayer_minds","melongrenade_minds","mrproper_minds","physautomat_minds","rifle_minds","nrocket_launcher_minds"}
 
