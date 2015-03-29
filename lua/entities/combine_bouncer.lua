@@ -14,7 +14,7 @@ ENT.Spawnable		= true
 ENT.AdminOnly		= false
 ENT.RenderGroup		= RENDERGROUP_TRANSLUCENT
 
-local enemies={"player","npc_headcrab_fast","npc_zombie","npc_fastzombie","npc_headcrab_black","npc_poisonzombie"}
+local enemies={"player","npc_headcrab_fast","npc_zombie","npc_fastzombie","npc_headcrab_black","npc_poisonzombie","npc_citizen"}
 local allies={"npc_combine_s","npc_metropolice","npc_rollermine","npc_helicopter","npc_combine_gunship","npc_manhack","combine_bouncer"}
 local sounds ={"npc/scanner/scanner_scan1.wav","npc/scanner/scanner_scan2.wav","npc/scanner/scanner_scan4.wav"}
 local ignore ={"func_rotating","prop_dynamic","combine_bouncer","func_tracktrain"}
@@ -137,23 +137,18 @@ end
 function ENT:Think()
 if ALERT == 0 then
 for k, v in pairs(ents.FindInSphere(self:GetPos(),256)) do
-if !table.HasValue(ignore, v:GetClass()) and  !table.HasValue(allies, v:GetClass()) and !table.HasValue(ignoreID, v:EntIndex())  then
+if !table.HasValue(ignore, v:GetClass()) and  !table.HasValue(allies, v:GetClass()) and !table.HasValue(ignoreID, v:EntIndex()) and (!v.disguised or v.disguised==0) then
 if v:GetPhysicsObject():IsValid() then
 if self:Visible(v) and  v:GetPhysicsObject():GetVelocity():Length() > 50 or v:GetPhysicsObject():GetAngleVelocity():Length() > 0 then
-if self:GetPhysicsObject():IsValid() and self:Visible(v) and self:GetPhysicsObject():GetVelocity():Length() < 500 then
---self:GetPhysicsObject():SetVelocity((v:GetPos()+Vector(0,0,40) - self:GetPos()) * 0.5)
---self:GetPhysicsObject():SetVelocity(self:GetPhysicsObject():GetVelocity()*0.6)
-self:GetPhysicsObject():AddVelocity((v:GetPhysicsObject():GetVelocity():Length()/300) * ((v:GetPos() + (v:GetPhysicsObject():GetVelocity()/3)) - self:GetPos()))
-if self:GetPhysicsObject():GetVelocity():Length() > 500 then self:GetPhysicsObject():SetVelocity(self:GetPhysicsObject():GetVelocity()*0.6) end
---target:SetPos(v:GetPos())
---target:SetPos(self:GetPos())
---self:GetPhysicsObject():SetVelocity((v:GetPos()+Vector(0,0,40) - self:GetPhysicsObject():GetVelocity() * Vector(1,1,-0.1)))
---print(v:GetPhysicsObject():GetVelocity():Length() * (v:GetPos() + Vector(0,0,10) - self:GetPos()))
+	if self:GetPhysicsObject():IsValid() and self:Visible(v) and self:GetPhysicsObject():GetVelocity():Length() < 500 then
+		self:GetPhysicsObject():AddVelocity((v:GetPhysicsObject():GetVelocity():Length()/300) * ((v:GetPos() + (v:GetPhysicsObject():GetVelocity()/3)) - self:GetPos()))
+		if self:GetPhysicsObject():GetVelocity():Length() > 500 then
+			self:GetPhysicsObject():SetVelocity(self:GetPhysicsObject():GetVelocity()*0.6)
+		end
 
-
-if CurrentEnemy!=v:EntIndex() then
-self:EmitSound("npc/roller/mine/rmine_blip1.wav", 75, 100)
-end
+	if CurrentEnemy!=v:EntIndex() then
+		self:EmitSound("npc/roller/mine/rmine_blip1.wav", 75, 100)
+	end
 CurrentEnemy=v:EntIndex()
 
 break
@@ -196,6 +191,7 @@ if  ALERT == 0 then
 	
 	
 if  table.HasValue(enemies, data.HitEntity:GetClass()) or (ALERT==1 and !data.HitEntity:IsWorld())  then
+if (! data.HitEntity.disguised or  data.HitEntity.disguised==0) then
 --if  table.HasValue(enemies, data.HitEntity:GetClass()) then data.HitEntity:Kill() end
 self.ent = ents.Create( "env_explosion" )
 self.ent:SetName("combine_explosion")
@@ -215,7 +211,7 @@ timer.Destroy("recover"..self:EntIndex().."")
 
 --timer.Simple(1, function() self:GetPhysicsObject():AddVelocity(Vector(math.random(-50,50),math.random(-50,50),0)) end)
 self:Remove()
-
+end
 
 else
 table.insert(ignoreID, tonumber(data.HitEntity:EntIndex()))
