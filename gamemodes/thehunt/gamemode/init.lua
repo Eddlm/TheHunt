@@ -138,7 +138,7 @@ end
 
 function GM:Initialize()
 	print("------------------------- THE HUNT GM:Initialize LOADING -------------------------")
-	print("The Hunt version: v2.0. Date: 29/03/2015")
+	print("The Hunt version: v2.0. Date: 16/02/2015")
 	if !ConVarExists("h_npctrails") then
 		CreateClientConVar( "h_npctrails", "0", true, false )
 	end
@@ -346,8 +346,8 @@ end )
 
 
 concommand.Add( "h_version", function(ply)
-	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v2.0. Date: 29/03/2015")
-	ply:PrintMessage(HUD_PRINTTALK, "Last changes: Added combine disguises.")
+	ply:PrintMessage(HUD_PRINTTALK, "The Hunt version: v2.0. Date: 16/03/2015")
+	ply:PrintMessage(HUD_PRINTTALK, "Last changes: Various fixes on maps.")
 end )
 
 
@@ -1169,6 +1169,7 @@ end
 
 
 -- Combine entity Spawns
+
 function SpawnHeliA( pos,type,IsBoss,GunOnAtSpawn )
 	RunConsoleCommand( "sk_helicopter_health", "1500")
 	RunConsoleCommand( "g_helicopter_chargetime", "2") 
@@ -1894,11 +1895,11 @@ timer.Create( "metropolicewander", 9, 1, metropolicewander )
 
 	
 		for k, v in pairs(ents.GetAll()) do
-		if table.HasValue(zombietable, v:GetClass()) and !v:GetEnemy() then
-		print(""..v:GetClass().." wanders")
-		--v:SetLastPosition(table.Random(zonescovered))
-		v:SetSchedule(SCHED_IDLE_WANDER)
-		end	
+			if table.HasValue(zombietable, v:GetClass()) and !v:GetEnemy() then
+			print(""..v:GetClass().." wanders")
+			--v:SetLastPosition(table.Random(zonescovered))
+			v:SetSchedule(SCHED_IDLE_WANDER)
+			end	
 		end
 
 		
@@ -1923,6 +1924,7 @@ for k, v in pairs(ents.FindByClass("npc_rollermine")) do
 		end
 	end
 end
+
 end
 
 function CombineIdleSpeech()
@@ -2103,7 +2105,7 @@ function helipath()
 									if Heli:Visible(HeliTrack) and HeliTrack:Visible(Heli:GetEnemy()) then
 										--print("Going to "..HeliTrack:EntIndex().."")
 										HeliTrack:SetName("going")
-										Heli:Fire("SetTrack",tostring(HeliTrack:GetName()))
+										Heli:Fire("SetTrack", tostring(HeliTrack:GetName()))
 										timer.Simple (0.5, function() HeliTrack:SetName("used") end)
 										found = 2
 									end
@@ -2525,7 +2527,6 @@ function GM:InitPostEntity()
 
 end
 
-
 function GM:PlayerSpawn(ply)
 	ply:SetTeam(1)
     ply:SetCustomCollisionCheck(true)
@@ -2635,7 +2636,7 @@ function GM:OnNPCKilled(victim, killer, weapon)
 			end
 			killer:AddFrags(1)
 			-- combine disguise
-			if math.random(1,1) == 1 then
+			if math.random(1,10) == 1 then
 			if	killer.disguised == 0 and killer:GetPos():Distance(victim:GetPos()) < 120 then 
 			if victim:GetModel() == "models/combine_soldier.mdl" then timer.Create( "PlayerDisguises", 2.2, 1, function() CombineDisguise(killer,"models/player/combine_soldier.mdl") end) end
 			if victim:GetModel() == "models/combine_super_soldier.mdl" then timer.Create( "PlayerDisguises", 2.2, 1, function() CombineDisguise(killer,"models/player/combine_super_soldier.mdl") end) end
@@ -2754,7 +2755,7 @@ function GM:EntityTakeDamage(damaged,damage)
 
 
 	if table.HasValue(MainEnemiesDamage, damaged:GetClass()) then
-		if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) damage:ScaleDamage(1) end -- flee from fire and friendly fire
+		if damage:IsDamageType(8) or damage:GetAttacker():GetClass() == damaged:GetClass() then damaged:SetSchedule(SCHED_MOVE_AWAY) damage:ScaleDamage(2) end -- flee from fire and friendly fire
 			if damaged:GetEnemy() == nil then
 				damage:ScaleDamage(GetConVarNumber("h_npcscaledamage")*1.5)
 				damaged:ClearSchedule() 
@@ -3224,6 +3225,7 @@ if CanDisguise==1 then
 		end
 	end
 	CombineDisguiseDistanceCheck()
+	ply:SetupHands()
 end
 end
 function CombineDisguiseDistanceCheck()

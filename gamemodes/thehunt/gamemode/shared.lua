@@ -721,6 +721,12 @@ RebelsGiveAmmo = {
 "XBowBolt"
 }
 
+ function start()
+player.GetByID(1):StripWeapons()
+player.GetByID(1):Give("weapon_shotgun")
+player.GetByID(1):SetNWString("canusemenu", "no")
+otherfunction()
+end
 
 
 TOO_BRIGHT_WEAPONS = {
@@ -1110,7 +1116,7 @@ spastiks_toybox={"bakker's blaster","gabriel","gretchen","henderson","lil' jim",
 
 NPC_WEAPON_PACK_2_RAPID_FIRE={"npc_acr","npc_m4a1iron","npc_m4a1holo","npc_hk416","npc_g36","npc_ak47","npc_fal","npc_m249","npc_hk21e","npc_ump45","npc_p90","npc_mp5","npc_uzi","npc_m24","npc_M76"}
 
-NPC_WEAPON_PACK_2_PISTOLS={"npc_m9","npc_m1911","npc_g18","npc_deagle",}
+NPC_WEAPON_PACK_2_PISTOLS={"npc_m9","npc_m1911","npc_deagle"}
 
 NPC_WEAPON_PACK_2_RPGS={"npc_rpg7","npc_matador","npc_m202"}
 
